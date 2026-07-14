@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>JitneyLogic | Secure Terminal</title>
     <style>
-        /* * JITNEYLOGIC: MATTE MAXIMALIST (NEOBRUTALIST) SYSTEM */
+        /* MATTE MAXIMALIST TOKENS */
         :root {
             --jitney-purple: hsl(259, 30%, 42%);
             --stark-white: #f8fafc;
@@ -16,15 +16,11 @@
             --shadow-depth: 8px;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             background-color: var(--jitney-purple);
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: system-ui, -apple-system, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -33,7 +29,6 @@
             color: var(--charcoal);
         }
 
-        /* The Main Terminal Card */
         .terminal-card {
             background-color: var(--stark-white);
             border: var(--border-width) solid var(--charcoal);
@@ -44,16 +39,17 @@
             display: flex;
             flex-direction: column;
             gap: 24px;
+            position: relative;
+            z-index: 1;
         }
 
-        /* Branding Header */
         .brand-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid var(--charcoal);
             padding-bottom: 12px;
-            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-family: ui-monospace, monospace;
             font-weight: 700;
             text-transform: uppercase;
             font-size: 0.85rem;
@@ -62,8 +58,7 @@
 
         .status-dot {
             display: inline-block;
-            width: 10px;
-            height: 10px;
+            width: 10px; height: 10px;
             background-color: var(--sage-green);
             border: 2px solid var(--charcoal);
             border-radius: 50%;
@@ -71,111 +66,170 @@
             animation: pulse 2s infinite;
         }
 
-        /* Typography */
         h1 {
             font-size: clamp(2rem, 5vw, 2.75rem);
             font-weight: 900;
             line-height: 1.1;
             text-transform: uppercase;
             letter-spacing: -0.5px;
-            min-height: 2.2em; /* Prevents the box from jumping when text changes */
+            min-height: 2.2em; 
         }
 
-        p.subtext {
-            font-size: 1.1rem;
-            font-weight: 500;
-            line-height: 1.5;
-        }
+        p.subtext { font-size: 1.1rem; font-weight: 500; line-height: 1.5; }
 
-        /* Video Container - Forces 16:9 Aspect Ratio */
+        /* THE CUSTOM VIDEO WRAPPER */
         .video-wrapper {
             position: relative;
             width: 100%;
-            padding-bottom: 56.25%; /* 16:9 Ratio */
+            padding-bottom: 56.25%; 
             border: var(--border-width) solid var(--charcoal);
             background-color: var(--charcoal);
+            cursor: pointer;
             overflow: hidden;
+        }
+
+        /* The Overlay that tricks them into tapping */
+        .video-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(24, 24, 27, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            transition: background 0.2s;
+        }
+
+        .video-wrapper:hover .video-overlay {
+            background: rgba(24, 24, 27, 0.1);
+        }
+
+        .play-button {
+            background-color: var(--gold-accent);
+            color: var(--charcoal);
+            padding: 12px 24px;
+            font-weight: 900;
+            text-transform: uppercase;
+            border: 2px solid var(--charcoal);
+            box-shadow: 4px 4px 0px var(--charcoal);
+            font-size: 1.2rem;
+            letter-spacing: 1px;
         }
 
         .video-wrapper iframe {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             border: none;
+            pointer-events: none; /* Forces the click to hit our overlay, not Vimeo */
         }
 
-        /* Neobrutalist Action Button */
-        .action-btn {
-            display: block;
-            width: 100%;
-            background-color: var(--sage-green);
+        /* FULLSCREEN MODAL (The Fix) */
+        .fullscreen-modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(24, 24, 27, 0.95);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .fullscreen-modal iframe {
+            width: 90vw;
+            height: 50vw; /* Keeps aspect ratio */
+            max-height: 80vh;
+            border: 4px solid var(--stark-white);
+            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+        }
+
+        .close-modal {
             color: var(--stark-white);
-            text-align: center;
-            padding: 18px 24px;
-            font-size: 1.25rem;
-            font-weight: 800;
+            font-family: ui-monospace, monospace;
+            font-size: 1.2rem;
+            margin-top: 20px;
+            cursor: pointer;
             text-transform: uppercase;
-            text-decoration: none;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+        }
+
+        /* Action Button */
+        .action-btn {
+            display: block; width: 100%;
+            background-color: var(--sage-green); color: var(--stark-white);
+            text-align: center; padding: 18px 24px;
+            font-size: 1.25rem; font-weight: 800;
+            text-transform: uppercase; text-decoration: none; letter-spacing: 1px;
             border: var(--border-width) solid var(--charcoal);
             box-shadow: 6px 6px 0px var(--charcoal);
             transition: all 0.15s ease-in-out;
-            cursor: pointer;
-            margin-top: 10px;
+            cursor: pointer; margin-top: 10px;
         }
+        .action-btn:hover { background-color: var(--gold-accent); color: var(--charcoal); }
+        .action-btn:active { transform: translate(6px, 6px); box-shadow: 0px 0px 0px var(--charcoal); }
 
-        /* The Hover & Press Effects */
-        .action-btn:hover {
-            background-color: var(--gold-accent);
-            color: var(--charcoal);
-        }
-
-        .action-btn:active {
-            transform: translate(6px, 6px);
-            box-shadow: 0px 0px 0px var(--charcoal);
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.4; }
-            100% { opacity: 1; }
-        }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
         @media (max-width: 480px) {
-            .terminal-card {
-                padding: 30px 20px;
-                box-shadow: 6px 6px 0px var(--charcoal);
-            }
+            .terminal-card { padding: 30px 20px; box-shadow: 6px 6px 0px var(--charcoal); }
+            /* On mobile, the fullscreen modal frame adjusts to fit width */
+            .fullscreen-modal iframe { width: 100vw; height: 56.25vw; border-left: none; border-right: none;}
         }
     </style>
 </head>
 <body>
 
     <div class="terminal-card">
-        
         <div class="brand-header">
             <span>JITNEYLOGIC // ARCHITECTURE</span>
             <span><span class="status-dot"></span>SYSTEM LIVE</span>
         </div>
 
         <h1 id="hero-headline">Stop Babysitting The Floor. Start Engineering It.</h1>
-        
         <p class="subtext">You've reached the end of the manual. Hit play to see the actual engine running our frontline sales architecture.</p>
 
-       <div style="padding:56.25% 0 0 0;position:relative; border: var(--border-width) solid var(--charcoal); background-color: var(--charcoal); overflow: hidden;">
-            <iframe src="https://player.vimeo.com/video/1209732458?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="JitneyLogic Closer Cockpit"></iframe>
+        <div class="video-wrapper" onclick="openFullscreen()">
+            <div class="video-overlay">
+                <div class="play-button">Tap To Expand</div>
+            </div>
+            <iframe src="https://player.vimeo.com/video/1209732458?badge=0&autopause=0&player_id=0&app_id=58479&background=1" frameborder="0"></iframe>
         </div>
-        <script src="https://player.vimeo.com/api/player.js"></script>
 
         <a href="#" class="action-btn"
            onmouseover="document.getElementById('hero-headline').innerText='Friction Costs You Deals. Watch How We Kill It.';"
            onmouseout="document.getElementById('hero-headline').innerText='Stop Babysitting The Floor. Start Engineering It.';">
            Secure Executive Briefing
         </a>
-
     </div>
+
+    <div class="fullscreen-modal" id="videoModal">
+        <iframe id="modalIframe" src="" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+        <div class="close-modal" onclick="closeFullscreen()">[ X ] Close Terminal</div>
+    </div>
+
+    <script>
+        function openFullscreen() {
+            const modal = document.getElementById('videoModal');
+            const iframe = document.getElementById('modalIframe');
+            // We inject the URL when clicked, forcing it to autoplay and allow fullscreen native controls
+            iframe.src = "https://player.vimeo.com/video/1209732458?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1";
+            modal.style.display = "flex";
+            
+            // Attempt to trigger native mobile fullscreen if the browser allows it
+            if (iframe.requestFullscreen) { iframe.requestFullscreen(); }
+            else if (iframe.webkitRequestFullscreen) { iframe.webkitRequestFullscreen(); } // Safari
+        }
+
+        function closeFullscreen() {
+            const modal = document.getElementById('videoModal');
+            const iframe = document.getElementById('modalIframe');
+            modal.style.display = "none";
+            iframe.src = ""; // Kills the video so audio stops playing
+            
+            if (document.exitFullscreen) { document.exitFullscreen(); }
+            else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+        }
+    </script>
 
 </body>
 </html>
