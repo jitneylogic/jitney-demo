@@ -195,7 +195,8 @@
             <iframe src="https://player.vimeo.com/video/1209732458?badge=0&autopause=0&player_id=0&app_id=58479&background=1" frameborder="0"></iframe>
         </div>
 
-        <a href="#" class="action-btn"
+      <a href="#" class="action-btn"
+           onclick="Calendly.initPopupWidget({url: 'calendly.com/tyler-jitneylogic'});return false;"
            onmouseover="document.getElementById('hero-headline').innerText='Friction Costs You Deals. Watch How We Kill It.';"
            onmouseout="document.getElementById('hero-headline').innerText='Stop Babysitting The Floor. Start Engineering It.';">
            Secure Executive Briefing
@@ -230,6 +231,7 @@
             else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
         }
     </script>
-
+<link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+    <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
 </body>
 </html>
