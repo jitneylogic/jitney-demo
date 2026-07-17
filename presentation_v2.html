@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JitneyLogic | Architecture Funnel</title>
+    <style>
+        /* MATTE MAXIMALIST TOKENS */
+        :root {
+            --jitney-purple: hsl(259, 30%, 42%);
+            --friction-maroon: #C13C37; 
+            --sage-green: #4C9170;
+            --stark-white: #f8fafc;
+            --charcoal: #18181b;
+            --gold-accent: #d97706;
+            --border-width: 4px;
+            --shadow-depth: 8px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--jitney-purple);
+            font-family: system-ui, -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--charcoal);
+        }
+
+        /* Core Terminal Card */
+        .terminal-card {
+            background-color: var(--stark-white);
+            border: var(--border-width) solid var(--charcoal);
+            box-shadow: var(--shadow-depth) var(--shadow-depth) 0px var(--charcoal);
+            width: 100%;
+            max-width: 900px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Branding & Status Header */
+        .brand-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--charcoal);
+            padding-bottom: 12px;
+            font-family: ui-monospace, monospace;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .status-indicator { display: flex; align-items: center; }
+
+        .status-dot {
+            display: inline-block;
+            width: 12px; height: 12px;
+            border: 2px solid var(--charcoal);
+            border-radius: 50%;
+            margin-right: 8px;
+            background-color: var(--friction-maroon);
+            animation: pulse 1.5s infinite;
+        }
+
+        h1 {
+            font-size: clamp(2.2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        p.subtext {
+            font-size: 1.25rem; font-weight: 600; line-height: 1.5;
+            color: #3f3f46; margin-top: 8px;
+        }
+
+        .canvas-area {
+            min-height: 300px; display: flex; align-items: center;
+            justify-content: center; padding: 20px 0;
+        }
+
+        /* CHAOS STATE */
+        .chaos-container {
+            display: flex; flex-wrap: wrap; gap: 12px;
+            justify-content: center; align-items: center; width: 100%;
+        }
+
+        .chaos-node {
+            background-color: var(--friction-maroon); color: var(--stark-white);
+            border: 3px solid var(--charcoal); box-shadow: 4px 4px 0px var(--charcoal);
+            padding: 12px 18px; font-weight: 800; font-size: 0.9rem;
+            text-transform: uppercase; cursor: default;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .chaos-node:nth-child(odd) { transform: rotate(-3deg); }
+        .chaos-node:nth-child(even) { transform: rotate(2deg) translateY(4px); }
+        .chaos-node:nth-child(3n) { transform: rotate(-1deg) scale(1.05); }
+        .chaos-node:nth-child(4n) { transform: rotate(4deg) translateY(-4px); }
+        
+        .chaos-node:hover { transform: scale(1.1) rotate(0deg); box-shadow: 6px 6px 0px var(--charcoal); z-index: 10; }
+
+        /* SOLUTION STATE */
+        .solution-container {
+            display: none; grid-template-columns: 1fr 1fr; gap: 24px; width: 100%;
+        }
+
+        .solution-node {
+            background-color: var(--sage-green); color: var(--stark-white);
+            border: var(--border-width) solid var(--charcoal);
+            box-shadow: var(--shadow-depth) var(--shadow-depth) 0px var(--charcoal);
+            padding: 30px; display: flex; flex-direction: column;
+            gap: 15px; animation: snapIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .solution-node h2 { font-size: 1.8rem; font-weight: 900; line-height: 1.1; }
+        .solution-node p { font-size: 1.05rem; font-weight: 500; line-height: 1.5; flex-grow: 1; }
+        
+        .impact-badge {
+            background-color: var(--charcoal); color: var(--stark-white);
+            padding: 8px 12px; font-family: ui-monospace, monospace;
+            font-weight: bold; font-size: 0.9rem; align-self: flex-start;
+        }
+
+        /* NODE ACTIONS (New Interactive Buttons) */
+        .node-actions {
+            display: flex; gap: 10px; margin-top: 15px; width: 100%;
+        }
+
+        .node-btn {
+            flex: 1; text-align: center; padding: 12px 10px;
+            font-size: 0.9rem; font-weight: 800; text-transform: uppercase;
+            text-decoration: none; border: 2px solid var(--charcoal);
+            cursor: pointer; transition: all 0.1s ease-in-out;
+        }
+
+        .node-btn.primary { background-color: var(--stark-white); color: var(--charcoal); box-shadow: 4px 4px 0px var(--charcoal); }
+        .node-btn.primary:hover { background-color: var(--gold-accent); }
+        .node-btn.primary:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--charcoal); }
+
+        .node-btn.secondary { background-color: transparent; color: var(--stark-white); }
+        .node-btn.secondary:hover { background-color: rgba(24,24,27,0.2); }
+
+        /* ACTION BUTTON (Main Funnel Trigger) */
+        .action-btn {
+            display: block; width: 100%; background-color: var(--charcoal); color: var(--stark-white);
+            text-align: center; padding: 20px 24px; font-size: 1.25rem; font-weight: 900;
+            text-transform: uppercase; border: var(--border-width) solid var(--charcoal);
+            box-shadow: 6px 6px 0px rgba(0,0,0,0.5); transition: all 0.1s ease-in-out; cursor: pointer; font-family: inherit;
+        }
+        .action-btn:hover { background-color: var(--gold-accent); color: var(--charcoal); }
+        .action-btn:active { transform: translate(6px, 6px); box-shadow: 0px 0px 0px var(--charcoal); }
+
+        /* JAVASCRIPT STATE OVERRIDES */
+        #terminal.solution-mode .chaos-container { display: none; }
+        #terminal.solution-mode .solution-container { display: grid; }
+        #terminal.solution-mode .action-btn { background-color: transparent; color: var(--charcoal); box-shadow: none; border: 2px dashed var(--charcoal); }
+        #terminal.solution-mode .action-btn:hover { background-color: var(--friction-maroon); color: var(--stark-white); border-style: solid; box-shadow: 6px 6px 0px var(--charcoal);}
+        #terminal.solution-mode .status-dot { background-color: var(--sage-green); animation: none; }
+        
+        /* FULLSCREEN MODAL (Keeps video in ecosystem) */
+        .fullscreen-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(24, 24, 27, 0.95); z-index: 9999;
+            justify-content: center; align-items: center; flex-direction: column;
+        }
+        .fullscreen-modal iframe { width: 90vw; height: 50vw; max-height: 80vh; border: 4px solid var(--stark-white); box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+        .close-modal { color: var(--stark-white); font-family: ui-monospace, monospace; font-size: 1.2rem; margin-top: 20px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        @keyframes snapIn { 0% { transform: translateY(20px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+
+        @media (max-width: 768px) {
+            .solution-container { grid-template-columns: 1fr; }
+            .terminal-card { padding: 25px 20px; }
+            h1 { font-size: 2rem; }
+            .node-actions { flex-direction: column; }
+            .fullscreen-modal iframe { width: 100vw; height: 56.25vw; border-left: none; border-right: none;}
+        }
+    </style>
+</head>
+<body>
+
+    <div class="terminal-card" id="terminal">
+        
+        <div class="brand-header">
+            <span>JITNEYLOGIC // INFRASTRUCTURE</span>
+            <span class="status-indicator"><span class="status-dot"></span><span id="status-text">SYSTEM BLEEDING</span></span>
+        </div>
+
+        <div>
+            <h1 id="main-title">The Friction Tax</h1>
+            <p class="subtext" id="sub-title">Where your reps and managers are losing minutes (and margin) on every single call.</p>
+        </div>
+
+        <div class="canvas-area">
+            
+            <div class="chaos-container">
+                <div class="chaos-node">1. Multiple CRM Tabs</div>
+                <div class="chaos-node">2. Static Pricing Laminates</div>
+                <div class="chaos-node">3. Disconnected Scripting</div>
+                <div class="chaos-node">4. Manual Math Calculations</div>
+                <div class="chaos-node">5. Supervisor Slack Pings</div>
+                <div class="chaos-node">6. Scattered Sticky Notes</div>
+                <div class="chaos-node">7. CSV Export: Tier Pacing</div>
+                <div class="chaos-node">8. CSV Export: Payroll</div>
+                <div class="chaos-node">9. Manual Slack/Teams Hype</div>
+                <div class="chaos-node">10. Manual Discount Auditing</div>
+                <div class="chaos-node">11. Delayed BI Reporting</div>
+                <div class="chaos-node">12. Reactive Management</div>
+                <div class="chaos-node">13. Blind Marketing Launches</div>
+                <div class="chaos-node">14. Hallucinated AI Data</div>
+            </div>
+
+            <div class="solution-container">
+                
+                <div class="solution-node">
+                    <h2>1. The Closer Cockpit</h2>
+                    <p>Single-pane execution environment. Eliminates rep friction, automates pricing, and routes data flawlessly.</p>
+                    <div class="impact-badge">Reduces 10 Touchpoints to 1</div>
+                    <div class="node-actions">
+                        <a href="cockpit.html" class="node-btn primary" target="_blank">Run Terminal</a>
+                        <button class="node-btn secondary" onclick="openFullscreen('https://player.vimeo.com/video/1209732458?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1')">Watch Log</button>
+                    </div>
+                </div>
+
+                <div class="solution-node">
+                    <h2>2. Executive Dashboard</h2>
+                    <p>Live-time momentum. Replaces stale CSVs with instant visibility, engineered culture, and pristine pipeline tracking.</p>
+                    <div class="impact-badge">Reduces 4 Touchpoints to 1</div>
+                    <div class="node-actions">
+                        <a href="dashboard.html" class="node-btn primary" target="_blank">Run Terminal</a>
+                        <button class="node-btn secondary" onclick="openFullscreen('YOUR_DASHBOARD_VIDEO_LINK_HERE')">Watch Log</button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <button id="action-btn" class="action-btn" onclick="triggerEngine()">Deploy JitneyLogic Engine</button>
+
+    </div>
+
+    <div class="fullscreen-modal" id="videoModal">
+        <iframe id="modalIframe" src="" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+        <div class="close-modal" onclick="closeFullscreen()">[ X ] Close Log</div>
+    </div>
+
+    <script>
+        function triggerEngine() {
+            const terminal = document.getElementById('terminal');
+            const mainTitle = document.getElementById('main-title');
+            const subTitle = document.getElementById('sub-title');
+            const actionBtn = document.getElementById('action-btn');
+            const statusText = document.getElementById('status-text');
+
+            const isSolution = terminal.classList.toggle('solution-mode');
+
+            if (isSolution) {
+                mainTitle.innerText = 'The JitneyLogic Architecture';
+                subTitle.innerText = 'Automated. Consolidated. Frictionless.';
+                actionBtn.innerText = 'Reset Environment';
+                statusText.innerText = 'SYSTEM OPTIMIZED';
+            } else {
+                mainTitle.innerText = 'The Friction Tax';
+                subTitle.innerText = 'Where your reps and managers are losing minutes (and margin) on every single call.';
+                actionBtn.innerText = 'Deploy JitneyLogic Engine';
+                statusText.innerText = 'SYSTEM BLEEDING';
+            }
+        }
+
+        // Cinematic Video Overlay Logic
+        function openFullscreen(videoUrl) {
+            const modal = document.getElementById('videoModal');
+            const iframe = document.getElementById('modalIframe');
+            iframe.src = videoUrl;
+            modal.style.display = "flex";
+            if (iframe.requestFullscreen) { iframe.requestFullscreen(); }
+            else if (iframe.webkitRequestFullscreen) { iframe.webkitRequestFullscreen(); }
+        }
+
+        function closeFullscreen() {
+            const modal = document.getElementById('videoModal');
+            const iframe = document.getElementById('modalIframe');
+            modal.style.display = "none";
+            iframe.src = ""; 
+            if (document.exitFullscreen) { document.exitFullscreen(); }
+            else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+        }
+    </script>
+
+</body>
+</html>
