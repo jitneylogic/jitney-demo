@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Executive Performance Dashboard | RevOps Engine</title>
+    <style>
+        /* Unified Modern Matte Green UI Tokens */
+        :root {
+            --color-bg-dark: #2A3B31;       /* Deep, rich forest matte */
+            --color-box-translucent: rgba(255, 255, 255, 0.05); 
+            --color-border-deep: #1E5E3F;   
+            --color-sage-accent: #4C9170;   
+            --color-mint-soft: #8DC4AA;     
+            --color-white: #ffffff;         
+            --text-on-dark: #f8fafc;        
+            --gold-accent: #d97706;         
+            --silver-accent: #94a3b8;
+            --color-input-darkgreen: rgba(0,0,0,0.25);
+            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-inset: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        body { 
+            margin: 0; 
+            padding: 35px 40px; 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            background: var(--color-bg-dark); 
+            color: var(--text-on-dark); 
+            min-height: 100vh;
+            box-sizing: border-box;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        header {
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--color-sage-accent);
+            padding-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+            letter-spacing: -0.5px;
+            color: var(--color-white);
+            font-weight: 700;
+        }
+
+        h2 { 
+            margin-top: 35px; 
+            margin-bottom: 18px;
+            font-size: 15px; 
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--color-mint-soft);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+
+        .dept-dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 35px;
+        }
+
+        .dept-card {
+            background: var(--color-box-translucent);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .dept-card-header {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #ffffff;
+            border-left: 4px solid var(--color-sage-accent);
+            padding-left: 12px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .dept-metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .dept-metric-row:last-child { border-bottom: none; }
+        .dept-metric-label { color: rgba(248, 250, 252, 0.8); font-weight: 500; }
+        .dept-metric-val { font-family: 'SFMono-Regular', Consolas, monospace; font-weight: 700; font-size: 14px; color: var(--color-white); }
+        .dept-metric-row.revenue-focus .dept-metric-val { color: #4ade80; font-size: 16px; }
+
+        .timeframe-block {
+            background: var(--color-box-translucent);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .timeframe-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .timeframe-title::before {
+            content: "";
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--color-sage-accent);
+            border-radius: 50%;
+        }
+
+        .leaderboard-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            background: var(--color-input-darkgreen);
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        .leaderboard-table th {
+            color: var(--color-mint-soft);
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            padding: 12px 16px;
+            border-bottom: 2px solid var(--color-border-deep);
+            background: #1f2d25;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .leaderboard-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            vertical-align: middle;
+            color: rgba(248, 250, 252, 0.9);
+        }
+
+        .leaderboard-table tr:hover { background: rgba(255, 255, 255, 0.03); }
+
+        .rank-badge {
+            display: inline-block;
+            background: var(--color-border-deep);
+            color: #ffffff;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-right: 12px;
+            text-align: center;
+            min-width: 14px;
+        }
+
+        .rank-row-1 .rank-badge { background: var(--gold-accent); }
+        .rank-row-2 .rank-badge { background: var(--silver-accent); }
+
+        .user-highlight-row {
+            background: rgba(76, 145, 112, 0.15);
+            border-top: 1px solid var(--color-sage-accent);
+            border-bottom: 1px solid var(--color-sage-accent);
+            box-shadow: var(--shadow-inset);
+        }
+        
+        .team-highlight-row {
+            background: rgba(217, 119, 6, 0.1);
+            border-left: 4px solid var(--gold-accent);
+        }
+
+        .monospaced-cell { font-family: 'SFMono-Regular', Consolas, monospace; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Executive Performance Dashboard</h1>
+    </header>
+
+    <div class="dept-dashboard-grid">
+        <div class="dept-card">
+            <div class="dept-card-header">Department Standings: Today</div>
+            <div class="dept-metric-row"><span class="dept-metric-label">Calls Taken</span><span class="dept-metric-val" id="global-today-calls">142</span></div>
+            <div class="dept-metric-row"><span class="dept-metric-label">Calls Closed</span><span class="dept-metric-val" id="global-today-closed">41</span></div>
+            <div class="dept-metric-row"><span class="dept-metric-label">Close Rate</span><span class="dept-metric-val" id="global-today-rate">28.8%</span></div>
+            <div class="dept-metric-row revenue-focus"><span class="dept-metric-label">Total Revenue Generated</span><span class="dept-metric-val" id="global-today-rev">$24,350.20</span></div>
+            <div class="dept-metric-row"><span class="dept-metric-label">Revenue Per Call (RPC)</span><span class="dept-metric-val" id="global-today-rpc">$171.48</span></div>
+        </div>
+        <div class="dept-card">
+            <div class="dept-card-header">Department Standings: This Week</div>
+            <div class="dept-metric-row"><span class="dept-metric-label">Calls Taken</span><span class="dept-metric-val">582</span></div>
+            <div class="dept-metric-row"><span class="dept-metric-label">Calls Closed</span><span class="dept-metric-val">178</span></div>
+            <div class="dept-metric-row"><span class="dept-metric-label">Close Rate</span><span class="dept-metric-val">30.5%</span></div>
+            <div class="dept-metric-row revenue-focus"><span class="dept-metric-label">Total Revenue Generated</span><span class="dept-metric-val">$108,910.50</span></div>
+            <div class="dept-metric-row"><span class="dept-metric-label">Revenue Per Call (RPC)</span><span class="dept-metric-val">$187.13</span></div>
+        </div>
+    </div>
+
+    <h2>Squad Leaderboards</h2>
+    <div class="timeframe-block">
+        <div class="timeframe-title">Intraday Team Pacing <span id="intraday-team-date" style="margin-left: 6px; font-weight: 500; color: var(--color-mint-soft);"></span></div>
+        <div class="leaderboard-table-wrapper">
+            <table class="leaderboard-table" id="team-table">
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Squad / Manager</th>
+                        <th style="width: 12%;">Calls Taken</th>
+                        <th style="width: 12%;">Calls Closed</th>
+                        <th style="width: 14%;">Close Rate</th>
+                        <th style="width: 22%;">Total Team Revenue</th>
+                        <th style="width: 20%;">Team RPC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="rank-row-1" id="team-rank-1">
+                        <td><span class="rank-badge">1</span>Vanguard (Sarah)</td>
+                        <td class="monospaced-cell">45</td>
+                        <td class="monospaced-cell">15</td>
+                        <td class="monospaced-cell">33.3%</td>
+                        <td class="monospaced-cell" style="color:#4ade80;">$9,150.00</td>
+                        <td class="monospaced-cell">$203.33</td>
+                    </tr>
+                    <tr class="rank-row-2 team-highlight-row" id="team-rank-user">
+                        <td><span class="rank-badge">2</span>Apex (Your Team)</td>
+                        <td class="monospaced-cell" id="team-calls">38</td>
+                        <td class="monospaced-cell" id="team-closed">11</td>
+                        <td class="monospaced-cell" id="team-rate">28.9%</td>
+                        <td class="monospaced-cell" style="color:#4ade80;" id="team-rev">$6,450.00</td>
+                        <td class="monospaced-cell" id="team-rpc">$169.73</td>
+                    </tr>
+                    <tr id="team-rank-3">
+                        <td><span class="rank-badge">3</span>Nova (Marcus)</td>
+                        <td class="monospaced-cell">35</td>
+                        <td class="monospaced-cell">8</td>
+                        <td class="monospaced-cell">22.8%</td>
+                        <td class="monospaced-cell" style="color:#4ade80;">$4,800.50</td>
+                        <td class="monospaced-cell">$137.15</td>
+                    </tr>
+                    <tr id="team-rank-4">
+                        <td><span class="rank-badge">4</span>Titan (Elena)</td>
+                        <td class="monospaced-cell">24</td>
+                        <td class="monospaced-cell">7</td>
+                        <td class="monospaced-cell">29.1%</td>
+                        <td class="monospaced-cell" style="color:#4ade80;">$3,949.70</td>
+                        <td class="monospaced-cell">$164.57</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <h2>Individual Closer Standings</h2>
+    <div class="timeframe-block">
+        <div class="timeframe-title">Intraday Rep Performance</div>
+        <div class="leaderboard-table-wrapper">
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th style="width: 18%;">Rep Name</th>
+                        <th style="width: 12%;">Calls Taken</th>
+                        <th style="width: 12%;">Calls Closed</th>
+                        <th style="width: 13%;">Close Rate</th>
+                        <th style="width: 17%;">Total Revenue Generated</th>
+                        <th style="width: 14%;">Revenue Per Call</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="rank-row-1" id="rep-rank-1">
+                        <td><span class="rank-badge">1</span>Spencer</td>
+                        <td class="monospaced-cell">8</td>
+                        <td class="monospaced-cell">4</td>
+                        <td class="monospaced-cell">50.0%</td>
+                        <td class="monospaced-cell" style="color:#4ade80;">$4,840.50</td>
+                        <td class="monospaced-cell">$605.06</td>
+                    </tr>
+                    <tr class="rank-row-2 user-highlight-row" id="rep-rank-user">
+                        <td><span class="rank-badge">2</span>Tyler (You)</td>
+                        <td class="monospaced-cell">9</td>
+                        <td class="monospaced-cell">3</td>
+                        <td class="monospaced-cell">33.3%</td>
+                        <td class="monospaced-cell" style="color:#4ade80;" id="user-rev">$3,650.00</td>
+                        <td class="monospaced-cell">$405.56</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rank-badge">3</span>Nik</td>
+                        <td class="monospaced-cell">7</td>
+                        <td class="monospaced-cell">3</td>
+                        <td class="monospaced-cell">42.9%</td>
+                        <td class="monospaced-cell" style="color:#4ade80;">$3,460.20</td>
+                        <td class="monospaced-cell">$494.31</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rank-badge">4</span>Trevor</td>
+                        <td class="monospaced-cell">10</td>
+                        <td class="monospaced-cell">2</td>
+                        <td class="monospaced-cell">20.0%</td>
+                        <td class="monospaced-cell" style="color:#4ade80;">$2,399.50</td>
+                        <td class="monospaced-cell">$239.95</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Automatic Dynamic Date Calibration
+        window.addEventListener('DOMContentLoaded', () => {
+            const today = new Date();
+            const optionsToday = { year: 'numeric', month: 'short', day: 'numeric' };
+            document.getElementById('intraday-team-date').innerText = `(${today.toLocaleDateString(undefined, optionsToday)})`;
+        });
+
+        // 🔄 INTEGRATION PIPING: REAL-TIME REVENUE INGESTION
+        let globalStats = { calls: 142, closed: 41, revenue: 24350.20 };
+        let tylerStats = { calls: 9, closed: 3, revenue: 3650.00 };
+        let teamApexStats = { calls: 38, closed: 11, revenue: 6450.00 };
+
+        window.addEventListener('storage', function(event) {
+            if (event.key === 'jitney_broadcast_pipeline_deal' && event.newValue) {
+                const packet = JSON.parse(event.newValue);
+                const deal = packet.data;
+
+                // 1. Update Global Department
+                globalStats.calls += 1;
+                if (deal.outcome === "Sold") {
+                    globalStats.closed += 1;
+                    globalStats.revenue += deal.tcv;
+                }
+
+                document.getElementById('global-today-calls').innerText = globalStats.calls;
+                document.getElementById('global-today-closed').innerText = globalStats.closed;
+                document.getElementById('global-today-rate').innerText = ((globalStats.closed / globalStats.calls) * 100).toFixed(1) + "%";
+                document.getElementById('global-today-rev').innerText = "$" + globalStats.revenue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                document.getElementById('global-today-rpc').innerText = "$" + (globalStats.revenue / globalStats.calls).toFixed(2);
+
+                // 2. Update TEAM APEX Standings
+                teamApexStats.calls += 1;
+                if (deal.outcome === "Sold") {
+                    teamApexStats.closed += 1;
+                    teamApexStats.revenue += deal.tcv;
+                }
+                
+                document.getElementById('team-calls').innerText = teamApexStats.calls;
+                document.getElementById('team-closed').innerText = teamApexStats.closed;
+                document.getElementById('team-rate').innerText = ((teamApexStats.closed / teamApexStats.calls) * 100).toFixed(1) + "%";
+                document.getElementById('team-rev').innerText = "$" + teamApexStats.revenue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                document.getElementById('team-rpc').innerText = "$" + (teamApexStats.revenue / teamApexStats.calls).toFixed(2);
+
+                // Team Rank Swap Logic (Over $9,150 to beat Vanguard)
+                if (teamApexStats.revenue > 9150.00) {
+                    const rank1Team = document.getElementById('team-rank-1');
+                    const userTeam = document.getElementById('team-rank-user');
+                    if (userTeam && rank1Team && userTeam.nextElementSibling !== rank1Team) {
+                        userTeam.parentNode.insertBefore(userTeam, rank1Team);
+                        userTeam.querySelector('.rank-badge').innerText = "1";
+                        userTeam.classList.remove('rank-row-2');
+                        userTeam.classList.add('rank-row-1');
+                        rank1Team.querySelector('.rank-badge').innerText = "2";
+                        rank1Team.classList.remove('rank-row-1');
+                        rank1Team.classList.add('rank-row-2');
+                    }
+                }
+
+                // 3. Update INDIVIDUAL Rep Standings
+                tylerStats.calls += 1;
+                if (deal.outcome === "Sold") {
+                    tylerStats.closed += 1;
+                    tylerStats.revenue += deal.tcv;
+                }
+
+                const userRow = document.getElementById('rep-rank-user');
+                if (userRow) {
+                    const cells = userRow.querySelectorAll('.monospaced-cell');
+                    cells[0].innerText = tylerStats.calls;
+                    cells[1].innerText = tylerStats.closed;
+                    cells[2].innerText = ((tylerStats.closed / tylerStats.calls) * 100).toFixed(1) + "%";
+                    cells[3].innerText = "$" + tylerStats.revenue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    cells[4].innerText = "$" + (tylerStats.revenue / tylerStats.calls).toFixed(2);
+                }
+
+                // Individual Rank Swap Logic (Over $4,840.50 to beat Spencer)
+                if (tylerStats.revenue > 4840.50) {
+                    const rank1Rep = document.getElementById('rep-rank-1');
+                    if (rank1Rep && userRow && userRow.nextElementSibling !== rank1Rep) {
+                        userRow.parentNode.insertBefore(userRow, rank1Rep);
+                        userRow.querySelector('.rank-badge').innerText = "1";
+                        userRow.classList.remove('rank-row-2');
+                        userRow.classList.add('rank-row-1');
+                        rank1Rep.querySelector('.rank-badge').innerText = "2";
+                        rank1Rep.classList.remove('rank-row-1');
+                        rank1Rep.classList.add('rank-row-2');
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
