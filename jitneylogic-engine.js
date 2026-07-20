@@ -264,30 +264,97 @@ function syncEmailValue(val) {
 
 function parsePlaceComponents(place) {
     const get = (type) => {
-        const comp = (place.address_components || []).find(c => c.types.includes(type));
-        return comp ? comp.long_name : "";
+        const comp = (place.addressComponents || []).find(c => c.types.includes(type));
+        return comp ? comp.longText : "";
     };
     const streetNumber = get("street_number");
     const route = get("route");
     return {
         street: [streetNumber, route].filter(Boolean).join(" "),
         city: get("locality") || get("sublocality") || get("postal_town"),
-        state: (place.address_components || []).find(c => c.types.includes("administrative_area_level_1"))?.short_name || "",
+        state: (place.addressComponents || []).find(c => c.types.includes("administrative_area_level_1"))?.shortText || "",
         zip: get("postal_code")
     };
 }
 
+let addressSessionToken = null;
+let addressDebounceTimers = {};
+
+function closeAddressDropdown(inputEl) {
+    const existing = document.getElementById(inputEl.id + "-suggest-panel");
+    if (existing) existing.remove();
+}
+
+function renderAddressSuggestions(inputEl, suggestions) {
+    closeAddressDropdown(inputEl);
+    if (!suggestions.length) return;
+
+    const panel = document.createElement("div");
+    panel.id = inputEl.id + "-suggest-panel";
+    panel.style.cssText = "position:absolute; z-index:200; background:#fff; border:1px solid var(--color-sage-accent, #4C9170); border-radius:4px; box-shadow:0 10px 25px rgba(0,0,0,0.25); max-height:220px; overflow-y:auto; font-size:14px;";
+
+    const rect = inputEl.getBoundingClientRect();
+    panel.style.width = rect.width + "px";
+    panel.style.left = (rect.left + window.scrollX) + "px";
+    panel.style.top = (rect.bottom + window.scrollY + 2) + "px";
+
+    suggestions.forEach(suggestion => {
+        const row = document.createElement("div");
+        row.textContent = suggestion.placePrediction.text.text;
+        row.style.cssText = "padding:8px 10px; cursor:pointer; color:#1e293b;";
+        row.addEventListener("mouseenter", () => row.style.background = "#f1f5f9");
+        row.addEventListener("mouseleave", () => row.style.background = "#fff");
+        row.addEventListener("click", async () => {
+            const place = suggestion.placePrediction.toPlace();
+            await place.fetchFields({ fields: ["addressComponents", "formattedAddress"] });
+            currentAddressComponents = parsePlaceComponents(place);
+            syncAddressValue(place.formattedAddress || suggestion.placePrediction.text.text);
+            closeAddressDropdown(inputEl);
+            addressSessionToken = null; // session ends on selection
+        });
+        panel.appendChild(row);
+    });
+
+    document.body.appendChild(panel);
+}
+
+async function handleAddressInput(inputEl) {
+    const query = inputEl.value.trim();
+    if (query.length < 4) {
+        closeAddressDropdown(inputEl);
+        return;
+    }
+    try {
+        const { AutocompleteSuggestion, AutocompleteSessionToken } = await google.maps.importLibrary("places");
+        if (!addressSessionToken) addressSessionToken = new AutocompleteSessionToken();
+
+        const { suggestions } = await AutocompleteSuggestion.fetchAutocompleteSuggestions({
+            input: query,
+            includedRegionCodes: ["us"],
+            sessionToken: addressSessionToken
+        });
+        renderAddressSuggestions(inputEl, suggestions || []);
+    } catch (err) {
+        console.error("Address autocomplete request failed:", err);
+    }
+}
+
 function initAddressAutocomplete() {
-    const options = { types: ["address"], componentRestrictions: { country: "us" } };
     ["script-address-input", "right-address"].forEach(id => {
         const inputEl = document.getElementById(id);
-        if (!inputEl || !window.google) return;
-        const autocomplete = new google.maps.places.Autocomplete(inputEl, options);
-        autocomplete.addListener("place_changed", () => {
-            const place = autocomplete.getPlace();
-            if (!place || !place.address_components) return;
-            currentAddressComponents = parsePlaceComponents(place);
-            syncAddressValue(place.formatted_address || inputEl.value);
+        if (!inputEl) return;
+        inputEl.addEventListener("input", () => {
+            clearTimeout(addressDebounceTimers[id]);
+            addressDebounceTimers[id] = setTimeout(() => handleAddressInput(inputEl), 250);
+        });
+    });
+    document.addEventListener("click", (event) => {
+        ["script-address-input", "right-address"].forEach(id => {
+            const inputEl = document.getElementById(id);
+            const panel = document.getElementById(id + "-suggest-panel");
+            if (panel && inputEl && !inputEl.contains(event.target) && !panel.contains(event.target)) {
+                panel.remove();
+            }
         });
     });
 }
