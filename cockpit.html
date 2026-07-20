@@ -2,593 +2,386 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>JitneyLogic Closer Desktop</title>
-    
+    <title>Closer Workspace | RevOps Engine</title>
     <style>
-        /* Calm organic matte green hex tokens */
+        /* Modern, Clean Matte Green UI Tokens */
         :root {
-            --color-bg-dark: #384C3E;       /* Calming deep sage backdrop */
-            --color-box-translucent: rgba(255, 255, 255, 0.04); 
-            --color-border-deep: #1E5E3F;   /* Structured dark forest green borders */
-            --color-sage-accent: #4C9170;   /* Calming medium sage green */
-            --color-mint-soft: #8DC4AA;     /* Soft matte mint labels and subtexts */
-            --color-white: #ffffff;         /* Pure crisp white for script cards */
-            --text-on-dark: #f8fafc;        /* High-visibility clean off-white text */
-            --text-on-light: #384C3E;       /* Deep ink text for left panel scannability */
+            --color-bg-dark: #2A3B31;       /* Deep, rich forest matte */
+            --color-box-translucent: rgba(255, 255, 255, 0.05); 
+            --color-border-deep: #1E5E3F;   
+            --color-sage-accent: #4C9170;   /* High-conversion action color */
+            --color-mint-soft: #8DC4AA;     
+            --color-white: #ffffff;         
+            --text-on-dark: #f8fafc;        
+            --text-on-light: #1e293b;       /* Dark slate for high readability on white */
+            --gold-accent: #d97706;         
+            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-inset: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
         }
 
         body { 
-            margin: 0; 
-            padding: 0; 
-            font-family: system-ui, -apple-system, sans-serif; 
+            margin: 0; padding: 0; 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
             background: var(--color-bg-dark); 
-            display: flex; 
-            height: 100vh; 
+            display: flex; height: 100vh; overflow: hidden;
             color: var(--text-on-dark); 
         }
         
+        /* Left Panel - Guided Scripting Paper Workspace */
         #script-pane { 
             width: 45%; 
-            background: #ffffff; 
-            padding: 30px; 
+            background: #f8fafc; 
+            padding: 35px 40px; 
             border-right: 1px solid var(--color-border-deep); 
             box-sizing: border-box; 
             overflow-y: auto; 
-            color: var(--text-on-light); 
+            color: var(--text-on-light);
         }
         
+        /* Right Panel - Command Cockpit */
         #input-pane { 
             width: 55%; 
-            padding: 30px; 
+            padding: 35px 40px; 
             box-sizing: border-box; 
             overflow-y: auto; 
-            display: flex; 
-            flex-direction: column; 
-            background: var(--color-bg-dark);
+            display: flex; flex-direction: column; 
         }
         
         h2 { 
-            color: var(--text-on-dark); 
-            border-bottom: 2px solid var(--color-sage-accent); 
-            padding-bottom: 8px; 
-            margin-top: 0; 
-            font-size: 20px; 
-            letter-spacing: -0.3px;
+            margin-top: 0; margin-bottom: 20px;
+            font-size: 18px; font-weight: 700;
+            letter-spacing: 0.5px; text-transform: uppercase;
+            color: var(--color-mint-soft);
+            border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 10px;
         }
         
         #script-pane h2 { 
             color: var(--text-on-light); 
-            border-bottom: 2px solid var(--color-border-deep);
+            border-bottom: 2px solid var(--color-sage-accent);
         }
-        
+
+        /* --- SCRIPT CARDS (Optimized for Readability) --- */
         .script-block { 
             background: var(--color-white); 
-            border-left: 4px solid var(--color-sage-accent); 
-            padding: 20px; 
-            margin-bottom: 12px; 
-            font-size: 15px; 
-            line-height: 1.7; 
+            border-left: 5px solid var(--color-sage-accent); 
+            padding: 18px 24px; 
+            margin-bottom: 15px; 
+            font-size: 15px; line-height: 1.6; 
             color: var(--text-on-light); 
-            border-radius: 0 6px 6px 0;
-            box-shadow: 0 1px 4px rgba(6, 51, 29, 0.08);
+            border-radius: 0 8px 8px 0;
+            box-shadow: var(--shadow-soft);
+            transition: transform 0.1s ease;
         }
-        
-        .script-quote {
-            font-weight: 500;
-            color: var(--text-on-light);
-            display: block;
-        }
+        .script-block:hover { transform: translateX(2px); }
+        .script-quote { font-weight: 500; }
+        .script-highlight-text { color: var(--color-sage-accent); font-weight: 700; background: rgba(76, 145, 112, 0.1); padding: 0 4px; border-radius: 3px; }
+        .script-field-wrapper { margin-bottom: 25px; padding-left: 5px; }
 
-        .script-field-wrapper {
-            margin-bottom: 20px;
-            padding: 5px 0 5px 4px;
-        }
-
-        .script-input-inline {
-            background: #ffffff;
-            border: 1px solid var(--color-mint-soft);
-            padding: 10px;
-            border-radius: 4px;
-            font-size: 14px;
-            margin: 4px 0 0 0;
-            width: 100%;
-            box-sizing: border-box;
-            color: var(--text-on-light);
-        }
-        
-        .script-input-inline:focus {
-            border-color: var(--color-sage-accent);
-            outline: none;
-            box-shadow: 0 0 6px rgba(76, 145, 112, 0.2);
-        }
-
-        .script-highlight-text {
-            color: var(--color-border-deep);
-            font-weight: bold;
-        }
-
-        .form-section { 
-            margin-bottom: 25px; 
-            background: var(--color-box-translucent); 
-            padding: 20px; 
-            border-radius: 6px; 
-            border: 1px solid var(--color-border-deep); 
-        }
-        
-        .form-group { 
-            margin-bottom: 18px; 
-        }
-        
-        .grid-2 { display: flex; gap: 15px; }
-        .grid-2 .form-group { flex: 1; }
-        .grid-3 { display: flex; gap: 12px; }
-        .grid-3 .form-group { flex: 1; }
-
-        .copy-input-group {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-        .copy-input-group input, .copy-input-group select, .copy-input-group textarea {
-            flex-grow: 1;
-        }
-        .btn-copy-action {
-            background: var(--color-sage-accent);
-            color: #ffffff;
-            border: none;
-            padding: 10px 12px;
-            font-size: 11px;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-            width: auto !important;
-            transition: background 0.15s;
-        }
-        .btn-copy-action:hover {
-            background: var(--color-border-deep);
-        }
-
+        /* --- DASHBOARD METRICS (Tight Grid) --- */
         .metrics-dashboard {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 25px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;
         }
-
         .metrics-card {
-            background: rgba(255, 255, 255, 0.01);
-            border: 1px solid var(--color-border-deep);
-            border-radius: 6px;
-            padding: 15px;
+            background: var(--color-box-translucent);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px; padding: 18px;
+            box-shadow: var(--shadow-soft);
         }
-
         .metrics-card h3 {
-            margin: 0 0 10px 0;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--color-mint-soft);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            padding-bottom: 4px;
+            margin: 0 0 12px 0; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;
+            color: var(--color-mint-soft); border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 6px;
         }
-
         .metrics-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            margin-bottom: 6px;
-            color: var(--text-on-dark);
+            display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; color: rgba(248, 250, 252, 0.8);
         }
-        
-        .metrics-val {
-            font-family: monospace;
-            font-weight: bold;
-            color: var(--color-mint-soft);
-        }
+        .metrics-row:last-child { margin-bottom: 0; }
+        .metrics-val { font-family: 'SFMono-Regular', Consolas, monospace; font-weight: 700; color: #ffffff; }
+        .val-highlight { color: #4ade80; }
 
+        /* --- LIVE LEADERBOARD (Clean & Visceral) --- */
         .leaderboard-section {
-            background: var(--color-box-translucent);
-            border: 1px solid var(--color-border-deep);
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 25px;
+            background: var(--color-box-translucent); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px; padding: 18px; margin-bottom: 30px; box-shadow: var(--shadow-soft);
         }
-        .leaderboard-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 10px;
-        }
+        .leaderboard-grid { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
         .leaderboard-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.02);
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-size: 13px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0, 0, 0, 0.2); padding: 10px 14px; border-radius: 6px; font-size: 13px;
+            border: 1px solid transparent;
         }
-        .leaderboard-row.user-row {
-            border-color: var(--color-sage-accent);
-            background: rgba(76, 145, 112, 0.1);
-        }
+        .user-row { border-color: var(--color-sage-accent); background: rgba(76, 145, 112, 0.15); box-shadow: var(--shadow-inset); }
         .rep-rank-badge {
-            background: var(--color-border-deep);
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 11px;
-            font-weight: bold;
-            margin-right: 8px;
+            background: var(--color-border-deep); padding: 3px 8px; border-radius: 4px;
+            font-size: 11px; font-weight: 800; margin-right: 12px; color: #fff;
         }
+        .rank-1 .rep-rank-badge { background: var(--gold-accent); }
 
-        .tracker-log-section {
-            background: var(--color-box-translucent);
-            border: 1px solid var(--color-border-deep);
-            border-radius: 6px;
-            padding: 15px;
-            margin-top: 15px;
+        /* --- FORMS & INPUTS --- */
+        .form-section { 
+            background: var(--color-box-translucent); padding: 24px; 
+            border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 25px; 
         }
-        .tracker-table-container {
-            overflow-x: auto;
-            margin-top: 10px;
-        }
-        .tracker-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-            text-align: left;
-        }
-        .tracker-table th, .tracker-table td {
-            padding: 8px 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .tracker-table th {
-            color: var(--color-mint-soft);
-            text-transform: uppercase;
-            font-size: 10px;
-            letter-spacing: 0.5px;
-        }
-        .tracker-table tr:hover {
-            background: rgba(255, 255, 255, 0.02);
-        }
+        .grid-2 { display: flex; gap: 15px; margin-bottom: 18px; }
+        .grid-2 .form-group { flex: 1; margin-bottom: 0; }
+        .grid-3 { display: flex; gap: 15px; margin-bottom: 18px; }
+        .grid-3 .form-group { flex: 1; margin-bottom: 0; }
+        .form-group { margin-bottom: 18px; }
         
-        label { 
-            display: block; 
-            font-weight: bold; 
-            margin-bottom: 6px; 
-            font-size: 11px; 
-            text-transform: uppercase; 
-            color: var(--color-mint-soft); 
-            letter-spacing: 0.5px; 
-        }
-        
-        #script-pane label { color: #4a5568; }
+        label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 11px; text-transform: uppercase; color: var(--color-mint-soft); letter-spacing: 0.5px; }
+        #script-pane label { color: #64748b; }
         
         input, select, textarea { 
-            width: 100%; 
-            padding: 10px; 
-            border: 1px solid var(--color-border-deep); 
-            border-radius: 4px; 
-            box-sizing: border-box; 
-            font-size: 14px; 
-            background: #ffffff; 
-            font-family: inherit; 
-            color: var(--text-on-light); 
+            width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; 
+            font-size: 14px; background: #ffffff; font-family: inherit; color: var(--text-on-light); transition: all 0.2s; box-sizing: border-box;
         }
-        
         #input-pane input, #input-pane select, #input-pane textarea { 
-            border: 1px solid var(--color-border-deep); 
-            background: #ffffff;
-            color: #0f172a;
+            border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.15); color: #ffffff;
         }
-        
-        input:focus, select:focus, textarea:focus { 
-            border-color: var(--color-sage-accent); 
-            outline: none; 
-            box-shadow: 0 0 8px rgba(76, 145, 112, 0.3); 
+        input:focus, select:focus, textarea:focus { border-color: var(--color-sage-accent); outline: none; box-shadow: 0 0 0 3px rgba(76, 145, 112, 0.2); }
+        #input-pane input[readonly], #input-pane textarea[readonly] { background: rgba(0,0,0,0.3); color: var(--color-mint-soft); font-family: monospace; font-size: 14px;}
+
+        /* Dropdowns & Multi-select Z-Index Overlap Fixes */
+        .multiselect-container { position: relative; width: 100%; z-index: 10; }
+        .multiselect-container.active { z-index: 9999; }
+        .select-display-box { 
+            width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; 
+            font-size: 14px; background: #ffffff; color: #64748b; cursor: pointer; 
+            display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;
         }
-        
-        input[readonly] { 
-            background: rgba(255, 255, 255, 0.05); 
-            color: #ffffff; 
-            font-weight: bold; 
-            border-color: var(--color-border-deep); 
-            cursor: not-allowed; 
-        }
-        
-        .multiselect-container { position: relative; width: 100%; }
-        .select-display-box { width: 100%; padding: 10px; border: 1px solid var(--color-border-deep); border-radius: 4px; box-sizing: border-box; font-size: 14px; background: #ffffff; color: #333333; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
-        .multiselect-container.active .select-display-box { border-color: var(--color-sage-accent); }
+        #input-pane .select-display-box { background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.2); color: #ffffff; }
         
         .checkbox-dropdown-window { 
-            display: none; 
-            position: absolute; 
-            top: 100%; 
-            left: 0; 
-            width: 100%; 
-            background: #ffffff; 
-            border: 1px solid var(--color-sage-accent); 
-            border-radius: 4px; 
-            box-sizing: border-box; 
-            z-index: 100; 
-            max-height: 240px; 
-            overflow-y: auto; 
-            padding: 8px; 
-            margin-top: 2px; 
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4); 
+            display: none; position: absolute; top: 100%; left: 0; width: 100%; 
+            background: #ffffff; border: 1px solid var(--color-sage-accent); border-radius: 6px; 
+            z-index: 9999; max-height: 240px; overflow-y: auto; padding: 8px; margin-top: 4px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); 
+            box-sizing: border-box;
         }
-        .checkbox-dropdown-window label { display: flex; align-items: center; gap: 10px; font-weight: normal; text-transform: none; color: #1e293b; padding: 6px 8px; cursor: pointer; letter-spacing: normal; margin: 0; font-size: 14px; }
-        .checkbox-dropdown-window label:hover { background: var(--color-box-translucent); border-radius: 4px; }
+        #input-pane .checkbox-dropdown-window { background: #1e293b; border-color: rgba(255,255,255,0.2); }
+        .checkbox-dropdown-window label { 
+            display: flex; align-items: center; gap: 10px; font-weight: 500; text-transform: none; 
+            color: #1e293b; padding: 8px 10px; cursor: pointer; letter-spacing: normal; margin: 0; font-size: 14px; border-radius: 4px;
+        }
+        #input-pane .checkbox-dropdown-window label { color: #f8fafc; }
+        .checkbox-dropdown-window label:hover { background: #f1f5f9; }
+        #input-pane .checkbox-dropdown-window label:hover { background: rgba(255,255,255,0.1); }
         .checkbox-dropdown-window input[type="checkbox"] { width: auto; margin: 0; cursor: pointer; }
-        
-        .btn-container { display: flex; align-items: center; gap: 15px; margin-top: 10px; }
-        
-        button { 
-            flex-grow: 1; 
-            background: var(--color-sage-accent); 
-            color: white; 
-            border: none; 
-            padding: 14px; 
-            font-size: 14px; 
-            font-weight: bold; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            transition: background 0.2s, transform 0.1s; 
-            text-transform: uppercase; 
-            letter-spacing: 0.5px; 
+
+        /* Fast Action Buttons */
+        .copy-input-group { display: flex; gap: 8px; align-items: stretch; }
+        .btn-copy-action {
+            background: var(--color-sage-accent); color: #ffffff; border: none; padding: 0 16px; 
+            font-size: 11px; font-weight: 700; border-radius: 6px; cursor: pointer; text-transform: uppercase; 
+            letter-spacing: 0.5px; transition: background 0.15s; flex-shrink: 0;
         }
-        button:hover { background: var(--color-border-deep); }
-        button:active { transform: scale(0.99); }
-        
-        .pest-fact-bullet { margin: 6px 0 6px 20px; font-size: 14px; color: var(--text-on-light); display: block; line-height: 1.6; }
+        .btn-copy-action:hover { background: var(--color-border-deep); }
+
+        .btn-primary { 
+            width: 100%; background: var(--color-sage-accent); color: white; border: none; 
+            padding: 16px; font-size: 15px; font-weight: 800; border-radius: 6px; cursor: pointer; 
+            transition: all 0.2s; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(76, 145, 112, 0.3);
+        }
+        .btn-primary:hover { background: #3d7a5c; transform: translateY(-1px); box-shadow: 0 6px 15px rgba(76, 145, 112, 0.4); }
+        .btn-primary:active { transform: translateY(1px); }
+
+        .pest-fact-bullet { margin: 6px 0 6px 10px; font-size: 14px; display: flex; align-items: flex-start; gap: 8px; }
+        .pest-fact-bullet::before { content: "→"; color: var(--color-sage-accent); font-weight: bold; }
+
     </style>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAdT027lWYDDB6Ab58_h0JfvnehSt8UPF0&libraries=places&loading=async&callback=initAddressAutocomplete" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places&loading=async" async defer></script>
 </head>
 <body>
 
     <div id="script-pane">
-        <h2>Guided Sales Script</h2>
+        <h2>Call Flow & Scripting</h2>
         
         <div class="script-block">
-            <span class="script-quote">This is Tyler with JitneyLogic Pest Control, who do I have the pleasure speaking with today?</span>
+            <span class="script-quote">This is <span class="script-highlight-text cfg-rep-name"></span> on a recorded line, who do I have the pleasure of speaking with today?</span>
         </div>
         <div class="script-field-wrapper">
-            <label>Field: Customer First Name</label>
-            <input type="text" id="script-first-name" class="script-input-inline" placeholder="Type customer first name..." oninput="syncCustomerName(this.value)">
+            <label>Customer First Name</label>
+            <input type="text" id="script-first-name" placeholder="Enter first name..." oninput="syncCustomerName(this.value)">
         </div>
 
         <div class="script-block">
-            <span class="script-quote">Hey there <span class="inject-script-name script-highlight-text">____</span>, tell me, what's going on?</span>
+            <span class="script-quote">Hey <span class="script-highlight-text inject-script-name">____</span>, tell me exactly what's going on at the property.</span>
         </div>
         <div class="script-field-wrapper">
-            <label>Field: Script Pest Selection Dropdown (Check Multiple)</label>
+            <label>Active Target Infestations</label>
             <div class="multiselect-container" id="script-pest-dropdown-wrapper">
                 <div class="select-display-box" onclick="toggleScriptDropdownWindow(event)">
-                    <span id="display-script-selected-text" style="color: #64748b;">-- Select Active Infestations --</span>
-                    <span style="color: #64748b; font-size: 11px;">▼</span>
+                    <span id="display-script-selected-text">-- Select Targets --</span> <span>▼</span>
                 </div>
                 <div class="checkbox-dropdown-window" id="script-dropdown-checkbox-panel">
-                    <script>
-                        const scriptPestNames = [
-                            "American Cockroaches", "Ants", "Aphids", "Carpet Beetles", "Caterpillars", 
-                            "Centepedes", "Cicada Killers", "Citronella Ants", "Clothes Moths", "Clover Mites", 
-                            "Cluster Flies", "Crickets", "Digger Bees", "Drain Flies", "Earwigs", 
-                            "Firebrats", "Fruit Flies", "Gnats", "Grand Bees", "Ground Beetles", 
-                            "Honeybees", "House Flies", "Indian Meal Moths", "Lady Bugs", "Millipedes", 
-                            "Oriental Roaches", "Silverfish", "Sowbugs", "Spiders", "Springtails", 
-                            "Stink Bugs", "Wasps/Hornets",
-                            "Ticks, Fleas, Mosquitos", "German Roaches", "Rodent (Interior)", "Rodent (Exterior)", "Mole", "Carpenter Bees"
-                        ];
-                        scriptPestNames.sort().forEach(pest => {
-                            document.write(`<label><input type="checkbox" class="script-pest-cb" value="${pest}" onchange="updateScriptDisplayBoxText()"> ${pest}</label>`);
-                        });
-                    </script>
+                    <label><input type="checkbox" class="script-pest-cb" value="General Pests" onchange="updateScriptDisplayBoxText()"> General Pests</label>
+                    <label><input type="checkbox" class="script-pest-cb" value="Ticks, Fleas, Mosquitos" onchange="updateScriptDisplayBoxText()"> Ticks, Fleas, Mosquitos</label>
+                    <label><input type="checkbox" class="script-pest-cb" value="German Roaches" onchange="updateScriptDisplayBoxText()"> German Roaches</label>
+                    <label><input type="checkbox" class="script-pest-cb" value="Interior Rodent" onchange="updateScriptDisplayBoxText()"> Interior Rodent</label>
+                    <label><input type="checkbox" class="script-pest-cb" value="Exterior Rodent" onchange="updateScriptDisplayBoxText()"> Exterior Rodent</label>
+                    <label><input type="checkbox" class="script-pest-cb" value="Mole" onchange="updateScriptDisplayBoxText()"> Mole</label>
+                    <label><input type="checkbox" class="script-pest-cb" value="Carpenter Bees" onchange="updateScriptDisplayBoxText()"> Carpenter Bees</label>
                 </div>
             </div>
         </div>
 
         <div class="script-block">
-            <span class="script-quote">I'm sorry you're dealing with that. You've called the right place, we actually SPECIALIZE in <span class="inject-script-pest script-highlight-text">those pests</span>, so we can absolutely take care of that for you before it gets out of hand.</span>
-        </div>
-
-        <div class="script-block">
-            <span class="script-quote">Where are the pests located?</span>
+            <span class="script-quote">I completely understand. We actually specialize in <span class="script-highlight-text var-pests">those targets</span>, so we can intercept that before it breeds further. Where are you seeing the most activity?</span>
         </div>
         <div class="script-field-wrapper">
-            <label>Field: location of infestation</label>
-            <input type="text" id="script-location-input" class="script-input-inline" placeholder="e.g., kitchen area, foundation walls" oninput="updateConsolidatedAppointmentNotes()">
+            <label>Location of Infestation</label>
+            <input type="text" id="script-location-input" placeholder="e.g., Kitchen, Foundation" oninput="updateConsolidatedAppointmentNotes()">
         </div>
 
         <div class="script-block">
             <span class="script-quote">How long has this been going on?</span>
         </div>
         <div class="script-field-wrapper">
-            <label>Field: duration of infestation</label>
-            <input type="text" id="script-duration-input" class="script-input-inline" placeholder="e.g., 1 week, 3 months" oninput="updateConsolidatedAppointmentNotes()">
+            <label>Duration of Infestation</label>
+            <input type="text" id="script-duration-input" placeholder="e.g., 2 weeks, a few days" oninput="updateConsolidatedAppointmentNotes()">
         </div>
 
         <div class="script-block">
-            <span class="script-quote">Okay <span class="inject-script-name script-highlight-text">____</span>, I'm going to explain what we NEED to do to resolve your situation, we'll MAKE sure the price works for you, and we WILL be able to get someone out there today or tomorrow.</span>
-        </div>
-
-        <div class="script-block">
-            <span class="script-quote">Something important to know about those <span class="inject-script-pest script-highlight-text">pests</span> is...</span>
-            <div id="inject-pest-fact" style="margin-top: 5px;">
-                <span class="pest-fact-bullet italic text-slate-500">Select active infestations above to inject dynamic bullet parameters.</span>
-            </div>
-            <span class="script-quote" style="margin-top: 15px;">Does that make sense?</span>
-        </div>
-
-        <div class="script-block">
-            <span class="script-quote">What we NEED to do to resolve that situation is...</span>
-            <div id="inject-pest-resolution" style="margin-top: 5px;">
-                <span class="pest-fact-bullet italic text-slate-500">Awaiting vector selections.</span>
+            <span class="script-quote">Okay <span class="script-highlight-text inject-script-name">____</span>, I'm going to explain exactly how we resolve this, make sure the pricing makes sense, and get a truck out to you.</span>
+            
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #cbd5e1;">
+                <span style="font-size: 12px; font-weight: bold; color: #64748b; text-transform: uppercase;">Pest Facts:</span>
+                <div id="inject-pest-fact" style="margin-top: 8px; color: #475569;">
+                    <span style="font-style: italic; opacity: 0.6;">Select targets above to load operational facts...</span>
+                </div>
             </div>
         </div>
 
         <div class="script-block">
-            <span class="script-quote">To make sure I get a customized price for your property, can I get your address?</span>
+            <span class="script-quote">To guarantee I generate the correct regional pricing, what is the exact service address?</span>
         </div>
         <div class="script-field-wrapper">
-            <label>Field: Customer Address Input</label>
-            <input type="text" id="script-address-input" class="script-input-inline" placeholder="Street Address, City, State, Zip" oninput="syncAddressValue(this.value)">
+            <label>Service Address</label>
+            <input type="text" id="script-address-input" placeholder="123 Main St, City, State Zip" oninput="syncAddressValue(this.value)">
         </div>
 
         <div class="script-block">
-            <span class="script-quote">We love this area! Did you see a Jitney truck in your neighborhood? Is that why you called us?</span>
+            <span class="script-quote">I'm going to send you over a confirmation document. Would you like that texted or emailed to you?</span>
+        </div>
+        <div class="script-field-wrapper">
+            <label>Customer Email</label>
+            <input type="email" id="script-email-input" placeholder="customer@email.com" oninput="syncEmailValue(this.value)">
         </div>
 
         <div class="script-block">
-            <span class="script-quote">It looks like in your area, the initial service is normally <span id="inject-pitch-normal" class="script-highlight-text">$150.00</span> and then <span id="inject-pitch-monthly" class="script-highlight-text">$0.00</span> a month after that. However, we're running our summer promotion, so I can take $150 off that initial service, bringing it all the way down to <span id="inject-pitch-discounted" class="script-highlight-text">$0.00</span>, and that's still for everything! The best part is, anytime you need us we will be back out at NO ADDITIONAL COST as many times as you need. Okay?</span>
+            <span class="script-quote">Standard pricing in your zip code is normally <span class="script-highlight-text inject-pitch-normal">$0.00</span> to start, and <span class="script-highlight-text inject-pitch-monthly">$0.00</span> a month after. Because we have trucks running a route in your neighborhood this week, I'm dropping the initial investment down to <span class="script-highlight-text inject-pitch-discounted">$0.00</span>. That covers everything, with unlimited free re-services. Does that make sense?</span>
         </div>
 
         <div class="script-block">
-            <span class="script-quote">Great, it looks like I've got availability tomorrow, does morning or afternoon work?</span>
+            <span class="script-quote">I have a route opening tomorrow. Do you prefer a morning or afternoon arrival?</span>
         </div>
         <div class="grid-2 script-field-wrapper">
-            <div class="form-group">
-                <label>Field: Date Picker</label>
-                <input type="date" id="script-date-input" class="script-input-inline" onchange="syncDateValue(this.value)">
-            </div>
-            <div class="form-group">
-                <label>Field: Time Target Arrival Window</label>
-                <select id="script-window-input" class="script-input-inline" onchange="syncWindowValue(this.value)">
-                    <option value="AT">AT</option>
-                    <option value="10-2">10:00 AM - 2:00 PM</option>
-                    <option value="2-6">2:00 PM - 6:00 PM</option>
-                </select>
-            </div>
+            <input type="date" id="script-date-input" onchange="syncDateValue(this.value)">
+            <select id="script-window-input" onchange="syncWindowValue(this.value)">
+                <option value="Any Time">Any Time</option>
+                <option value="8:00 AM - 12:00 PM">8:00 AM - 12:00 PM</option>
+                <option value="12:00 PM - 4:00 PM">12:00 PM - 4:00 PM</option>
+                <option value="4:00 PM - 8:00 PM">4:00 PM - 8:00 PM</option>
+            </select>
         </div>
 
         <div class="script-block">
-            <span class="script-quote">I'm going to send you over a confirmation document that I need you to review before we schedule that appointment. How do you spell your last name?</span>
+            <span class="script-quote">I'm generating your service document now. <span class="script-highlight-text inject-script-name">____</span>, how do you spell your last name?</span>
         </div>
         <div class="script-field-wrapper">
-            <label>Field: Last Name Input</label>
-            <input type="text" id="script-last-name" class="script-input-inline" placeholder="Last Name" oninput="syncLastName(this.value)">
+            <label>Last Name</label>
+            <input type="text" id="script-last-name" placeholder="Last Name" oninput="syncLastName(this.value)">
         </div>
 
         <div class="script-block">
-            <span class="script-quote">Thank you <span class="inject-script-name script-highlight-text">____</span>, give me just a second to build out that document and input those discounts. When I'm done, would you like me to text or email it to you?</span>
-        </div>
-        <div class="script-field-wrapper">
-            <label>Field: Customer Email</label>
-            <input type="email" id="script-email-input" class="script-input-inline" placeholder="customer@email.com" oninput="syncEmailValue(this.value)">
+            <span class="script-quote">Great. I'm sending that over now. Please scroll to the bottom, type the letter 'X' in the signature box, and let me know when it clears.</span>
+            <div style="font-size: 11px; margin-top: 8px; color: #64748b;">*By typing 'X', you are providing your legally binding electronic signature.</div>
         </div>
 
         <div class="script-block">
-            <span class="script-quote">Great. I just got that built. When you pull that up, can you verify that your name and address are correct up top?</span>
-        </div>
-
-        <div class="script-block">
-            <span class="script-quote">Perfect, below you'll see the <span class="inject-script-pest script-highlight-text">targeted pests</span>, plus a few extras.</span>
-        </div>
-
-        <div class="script-block">
-            <span class="script-quote">Now let's verify those discounts I was able to get you! Your initial is <span id="inject-initial-text" class="script-highlight-text">$0.00</span> and then just <span id="inject-monthly-text" class="script-highlight-text">$0.00</span> for the year. Is that correct?</span>
-        </div>
-
-        <div class="script-block">
-            <span class="script-quote">After the 12 Months there will be no CANCELATION FEE, and the service just goes month to month.</span>
-        </div>
-
-        <div class="script-block">
-            <span class="script-quote">Great, if all of that looks good, what I'll need you to do is scroll to the bottom and sign in the big box, and then right under that there is a tiny little box that I'll need you to tap into and type the letter x. Let me know when you've got that done.</span>
-        </div>
-
-        <div class="script-block">
-            <span class="script-quote">Let's go ahead and put a form of payment on file, you can either do that on your end or I can do it on mine, whichever is easier.</span>
-        </div>
-
-        <div class="script-block">
-            <span class="script-quote">Great, we've got billing inputted. <span class="inject-script-name script-highlight-text">____</span>, we break up the initial service cost into two parts, we'll run a deposit of <span id="inject-deposit-text" class="script-highlight-text">$39</span> to save that appointment spot, and then once we come out and do the initial treatment we'll run the remaining <span id="inject-balance-text" class="script-highlight-text">$0.00</span>.</span>
-        </div>
-
-        <div class="script-block">
-            <span class="script-quote">Looks great! That cleared, now I'll go ahead and get you scheduled for <span id="inject-schedule-text" class="script-highlight-text">(DATE)</span></span>
-        </div>
-
-        <div class="script-block">
-            <span class="script-quote"><span class="inject-name-final script-highlight-text">Customer</span> We will see you <span id="inject-final-window" class="script-highlight-text">(DAY & TIME WINDOW)</span> for your <span id="inject-package-text" class="script-highlight-text">[package selection]</span>. If you see any of your targeted pests around the home, we'll come out for free re-services as needed. Do you have any other questions or does that all make sense?</span>
-        </div>
-
-        <div class="script-block">
-            <span class="script-quote">Great! Have a wonderful day!</span>
+            <span class="script-quote">That cleared. We will see you on <span class="script-highlight-text" id="inject-final-window">[Date & Window]</span> for your <span class="script-highlight-text" id="inject-package-text">[Package]</span> service. Welcome to the family.</span>
         </div>
     </div>
 
     <div id="input-pane">
         
+        <div class="leaderboard-section">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <label style="color:#ffffff; margin:0;">Live Office Leaderboard</label>
+                <label style="color:var(--color-mint-soft); margin:0;" id="intraday-date">Today</label>
+            </div>
+            <div class="leaderboard-grid">
+                <div class="leaderboard-row rank-1" id="leader-rank-1">
+                    <div><span class="rep-rank-badge">1</span>Spencer</div>
+                    <span class="metrics-val">$2,840.00</span>
+                </div>
+                <div class="leaderboard-row user-row" id="leader-rank-user">
+                    <div><span class="rep-rank-badge">2</span><span class="cfg-rep-name"></span> (You)</div>
+                    <span class="metrics-val val-highlight" id="leader-val-user">$0.00</span>
+                </div>
+                <div class="leaderboard-row">
+                    <div><span class="rep-rank-badge">3</span>Nik</div>
+                    <span class="metrics-val">$1,150.00</span>
+                </div>
+            </div>
+        </div>
+
         <div class="metrics-dashboard">
             <div class="metrics-card">
-                <h3>Day Level Performance</h3>
+                <h3>Daily Production</h3>
                 <div class="metrics-row"><span>Calls Taken:</span><span id="day-calls" class="metrics-val">0</span></div>
-                <div class="metrics-row"><span>Calls Sold:</span><span id="day-sold" class="metrics-val">0</span></div>
-                <div class="metrics-row"><span>Close Rate:</span><span id="day-rate" class="metrics-val">0.0%</span></div>
-                <div class="metrics-row"><span>Total TCV Sold:</span><span id="day-tcv" class="metrics-val">$0.00</span></div>
-                <div class="metrics-row"><span>Avg Contract Size:</span><span id="day-acv" class="metrics-val">$0.00</span></div>
-                <div class="metrics-row"><span>RPC:</span><span id="day-rpc" class="metrics-val">$0.00</span></div>
-                <div class="metrics-row"><span>Projected Comm:</span><span id="day-comm" class="metrics-val">$0.00</span></div>
+                <div class="metrics-row"><span>Closed / Rate:</span><span class="metrics-val"><span id="day-sold">0</span> (<span id="day-rate">0.0%</span>)</span></div>
+                <div class="metrics-row"><span>Total TCV:</span><span id="day-tcv" class="metrics-val val-highlight">$0.00</span></div>
+                <div class="metrics-row"><span>Avg Contract (ACV):</span><span id="day-acv" class="metrics-val">$0.00</span></div>
+                <div class="metrics-row"><span>Rev Per Call (RPC):</span><span id="day-rpc" class="metrics-val">$0.00</span></div>
+                <div class="metrics-row" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; margin-top: 8px;">
+                    <span style="color:#fff;">Est. Commission:</span><span id="day-comm" class="metrics-val val-highlight">$0.00</span>
+                </div>
             </div>
             <div class="metrics-card">
-                <h3>Week Level Performance</h3>
+                <h3>Weekly Pacing</h3>
                 <div class="metrics-row"><span>Calls Taken:</span><span id="week-calls" class="metrics-val">0</span></div>
-                <div class="metrics-row"><span>Calls Sold:</span><span id="week-sold" class="metrics-val">0</span></div>
-                <div class="metrics-row"><span>Close Rate:</span><span id="week-rate" class="metrics-val">0.0%</span></div>
-                <div class="metrics-row"><span>Total TCV Sold:</span><span id="week-tcv" class="metrics-val">$0.00</span></div>
-                <div class="metrics-row"><span>Avg Contract Size:</span><span id="week-acv" class="metrics-val">$0.00</span></div>
-                <div class="metrics-row"><span>RPC:</span><span id="week-rpc" class="metrics-val">$0.00</span></div>
-                <div class="metrics-row"><span>Projected Comm:</span><span id="week-comm" class="metrics-val">$0.00</span></div>
+                <div class="metrics-row"><span>Closed / Rate:</span><span class="metrics-val"><span id="week-sold">0</span> (<span id="week-rate">0.0%</span>)</span></div>
+                <div class="metrics-row"><span>Total TCV:</span><span id="week-tcv" class="metrics-val val-highlight">$0.00</span></div>
+                <div class="metrics-row"><span>Avg Contract (ACV):</span><span id="week-acv" class="metrics-val">$0.00</span></div>
+                <div class="metrics-row"><span>Rev Per Call (RPC):</span><span id="week-rpc" class="metrics-val">$0.00</span></div>
+                <div class="metrics-row" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; margin-top: 8px;">
+                    <span style="color:#fff;">Est. Commission:</span><span id="week-comm" class="metrics-val val-highlight">$0.00</span>
+                </div>
             </div>
         </div>
 
-        <div class="leaderboard-section">
-            <label style="color:#ffffff; font-size:12px; margin-bottom:5px;">Live Office Leaderboard (Today's TCV Pacing)</label>
-            <div class="leaderboard-grid">
-                <div class="leaderboard-row" id="leader-rank-1"><div><span class="rep-rank-badge" style="background:#d97706;">1</span>Spencer</div><span class="metrics-val" id="leader-val-1">$2,840.50</span></div>
-                <div class="leaderboard-row user-row" id="leader-rank-user"><div><span class="rep-rank-badge" style="background:var(--color-sage-accent);">2</span>Tyler (You)</div><span class="metrics-val" id="leader-val-user">$0.00</span></div>
-                <div class="leaderboard-row" id="leader-rank-3"><div><span class="rep-rank-badge">3</span>Nik</div><span class="metrics-val">$1,150.00</span></div>
-                <div class="leaderboard-row" id="leader-rank-4"><div><span class="rep-rank-badge">4</span>Trevor</div><span class="metrics-val">$699.98</span></div>
-            </div>
-        </div>
-
-        <h2>Agreement Details</h2>
+        <h2>Agreement & Pricing Console</h2>
         <form id="closer-portal-form" onsubmit="fireRevenuePipelineTracking(event)">
             
             <div class="form-section">
                 <div class="grid-2">
                     <div class="form-group">
-                        <label>Pest Dropdown Selection Matrix</label>
+                        <label>Pest Logic Matrix</label>
                         <div class="multiselect-container" id="pest-dropdown-wrapper">
                             <div class="select-display-box" onclick="toggleDropdownWindow(event)">
-                                <span id="display-selected-text" style="color: #64748b;">-- Select Active Infestations --</span>
-                                <span style="color: #64748b; font-size: 11px;">▼</span>
+                                <span id="display-selected-text" style="opacity:0.6;">-- Map Targets --</span> <span>▼</span>
                             </div>
                             <div class="checkbox-dropdown-window" id="dropdown-checkbox-panel">
-                                <label><input type="checkbox" class="pest-checkbox" data-display="General Pests" value="Option 1" onchange="updateDisplayBoxText()"> General Pests</label>
-                                <label><input type="checkbox" class="pest-checkbox" data-display="Ticks, Fleas, Mosquitos" value="Option 2" onchange="updateDisplayBoxText()"> Ticks, Fleas, Mosquitos</label>
-                                <label><input type="checkbox" class="pest-checkbox" data-display="German Roaches" value="Option 3" onchange="updateDisplayBoxText()"> German Roaches</label>
-                                <label><input type="checkbox" class="pest-checkbox" data-display="Interior Rodent" value="Option 4" onchange="updateDisplayBoxText()"> Interior Rodent</label>
-                                <label><input type="checkbox" class="pest-checkbox" data-display="Exterior Rodent" value="Option 5" onchange="updateDisplayBoxText()"> Exterior Rodent</label>
-                                <label><input type="checkbox" class="pest-checkbox" data-display="Mole" value="Option 6" onchange="updateDisplayBoxText()"> Mole</label>
-                                <label><input type="checkbox" class="pest-checkbox" data-display="Carpenter Bees" value="Option 7" onchange="updateDisplayBoxText()"> Carpenter Bees</label>
+                                <label><input type="checkbox" class="pest-checkbox" data-display="General Pests" onchange="updateDisplayBoxText()"> General Pests</label>
+                                <label><input type="checkbox" class="pest-checkbox" data-display="Ticks, Fleas, Mosquitos" onchange="updateDisplayBoxText()"> Ticks, Fleas, Mosquitos</label>
+                                <label><input type="checkbox" class="pest-checkbox" data-display="German Roaches" onchange="updateDisplayBoxText()"> German Roaches</label>
+                                <label><input type="checkbox" class="pest-checkbox" data-display="Interior Rodent" onchange="updateDisplayBoxText()"> Interior Rodent</label>
+                                <label><input type="checkbox" class="pest-checkbox" data-display="Exterior Rodent" onchange="updateDisplayBoxText()"> Exterior Rodent</label>
+                                <label><input type="checkbox" class="pest-checkbox" data-display="Mole" onchange="updateDisplayBoxText()"> Mole</label>
+                                <label><input type="checkbox" class="pest-checkbox" data-display="Carpenter Bees" onchange="updateDisplayBoxText()"> Carpenter Bees</label>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Package Selection Output</label>
+                        <label>Approved Package</label>
                         <select id="package-select" onchange="runDynamicGuardrails()">
-                            <option value="">-- Awaiting Combination Selection --</option>
-                            <option value="GreenGuard Basic">GreenGuard Basic</option>
-                            <option value="GreenGuard Select PC/RB">GreenGuard Select PC/RB</option>
-                            <option value="GreenGuard Select PC/TFM">GreenGuard Select PC/TFM</option>
-                            <option value="GreenGuard Select RB/TFM">GreenGuard Select RB/TFM</option>
-                            <option value="GreenGuard Essential PC/RB/TFMx4">GreenGuard Essential PC/RB/TFMx4</option>
-                            <option value="GreenGuard Premier PC/RB/TFMx7">GreenGuard Premier PC/RB/TFMx7</option>
+                            <option value="">-- Awaiting Input --</option>
+                            <option value="HomeBase Basic">HomeBase Basic</option>
+                            <option value="HomeBase Standard PC/RB">HomeBase Standard PC/RB</option>
+                            <option value="HomeBase Standard PC/TFM">HomeBase Standard PC/TFM</option>
+                            <option value="HomeBase Standard RB/TFM">HomeBase Standard RB/TFM</option>
+                            <option value="HomeBase Essential PC/RB/TFMx4">HomeBase Essential PC/RB/TFMx4</option>
+                            <option value="HomeBase Premium PC/RB/TFMx7">HomeBase Premium PC/RB/TFMx7</option>
                             <option value="German Roaches">German Roaches</option>
                             <option value="Interior Rodent">Interior Rodent</option>
                             <option value="Mole">Mole</option>
@@ -604,197 +397,155 @@
                             <option value="German Roaches + Mole + Interior Rodent">German Roaches + Mole + Interior Rodent</option>
                             <option value="Carpenter Bees + Mole + Interior Rodent">Carpenter Bees + Mole + Interior Rodent</option>
                             <option value="German Roaches + Carpenter Bees + Mole + Interior Rodent">German Roaches + Carpenter Bees + Mole + Interior Rodent</option>
-                            <option value="GreenGuard Basic + German Roaches">GreenGuard Basic + German Roaches</option>
-                            <option value="GreenGuard Basic + Interior Rodent">GreenGuard Basic + Interior Rodent</option>
-                            <option value="GreenGuard Basic + Mole">GreenGuard Basic + Mole</option>
-                            <option value="GreenGuard Basic + Carpenter Bees">GreenGuard Basic + Carpenter Bees</option>
-                            <option value="GreenGuard Select PC/RB + German Roaches">GreenGuard Select PC/RB + German Roaches</option>
-                            <option value="GreenGuard Select PC/RB + Interior Rodent">GreenGuard Select PC/RB + Interior Rodent</option>
-                            <option value="GreenGuard Select PC/RB + Mole">GreenGuard Select PC/RB + Mole</option>
-                            <option value="GreenGuard Select PC/RB + Carpenter Bees">GreenGuard Select PC/RB + Carpenter Bees</option>
-                            <option value="GreenGuard Select PC/TFM + German Roaches">GreenGuard Select PC/TFM + German Roaches</option>
-                            <option value="GreenGuard Select PC/TFM + Interior Rodent">GreenGuard Select PC/TFM + Interior Rodent</option>
-                            <option value="GreenGuard Select PC/TFM + Mole">GreenGuard Select PC/TFM + Mole</option>
-                            <option value="GreenGuard Select PC/TFM + Carpenter Bees">GreenGuard Select PC/TFM + Carpenter Bees</option>
-                            <option value="GreenGuard Select RB/TFM + German Roaches">GreenGuard Select RB/TFM + German Roaches</option>
-                            <option value="GreenGuard Select RB/TFM + Interior Rodent">GreenGuard Select RB/TFM + Interior Rodent</option>
-                            <option value="GreenGuard Select RB/TFM + Mole">GreenGuard Select RB/TFM + Mole</option>
-                            <option value="GreenGuard Select RB/TFM + Carpenter Bees">GreenGuard Select RB/TFM + Carpenter Bees</option>
-                            <option value="GreenGuard Essential PC/RB/TFMx4 + German Roaches">GreenGuard Essential PC/RB/TFMx4 + German Roaches</option>
-                            <option value="GreenGuard Essential PC/RB/TFMx4 + Interior Rodent">GreenGuard Essential PC/RB/TFMx4 + Interior Rodent</option>
-                            <option value="GreenGuard Essential PC/RB/TFMx4 + Mole">GreenGuard Essential PC/RB/TFMx4 + Mole</option>
-                            <option value="GreenGuard Essential PC/RB/TFMx4 + Carpenter Bees">GreenGuard Essential PC/RB/TFMx4 + Carpenter Bees</option>
-                            <option value="GreenGuard Premier PC/RB/TFMx7 + German Roaches">GreenGuard Premier PC/RB/TFMx7 + German Roaches</option>
-                            <option value="GreenGuard Premier PC/RB/TFMx7 + Interior Rodent">GreenGuard Premier PC/RB/TFMx7 + Interior Rodent</option>
-                            <option value="GreenGuard Premier PC/RB/TFMx7 + Mole">GreenGuard Premier PC/RB/TFMx7 + Mole</option>
-                            <option value="GreenGuard Premier PC/RB/TFMx7 + Carpenter Bees">GreenGuard Premier PC/RB/TFMx7 + Carpenter Bees</option>
+                            <option value="HomeBase Basic + German Roaches">HomeBase Basic + German Roaches</option>
+                            <option value="HomeBase Basic + Interior Rodent">HomeBase Basic + Interior Rodent</option>
+                            <option value="HomeBase Basic + Mole">HomeBase Basic + Mole</option>
+                            <option value="HomeBase Basic + Carpenter Bees">HomeBase Basic + Carpenter Bees</option>
+                            <option value="HomeBase Standard PC/RB + German Roaches">HomeBase Standard PC/RB + German Roaches</option>
+                            <option value="HomeBase Standard PC/RB + Interior Rodent">HomeBase Standard PC/RB + Interior Rodent</option>
+                            <option value="HomeBase Standard PC/RB + Mole">HomeBase Standard PC/RB + Mole</option>
+                            <option value="HomeBase Standard PC/RB + Carpenter Bees">HomeBase Standard PC/RB + Carpenter Bees</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="grid-2">
                     <div class="form-group">
-                        <label>Initial Price</label>
+                        <label>Initial Investment</label>
                         <select id="initial-price" onchange="executeRealtimeCalculations()"></select>
                     </div>
                     <div class="form-group">
-                        <label>Monthly Price</label>
+                        <label>Monthly Investment</label>
                         <select id="monthly-price" onchange="executeRealtimeCalculations()"></select>
                     </div>
                 </div>
 
-                <div class="grid-3" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; margin-top: 5px;">
+                <div class="grid-3" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; margin-top: 10px;">
                     <div class="form-group">
-                        <label>Total Contract Value (TCV)</label>
+                        <label>Total Contract (TCV)</label>
                         <input type="text" id="tcv-display" readonly value="$0.00">
                     </div>
                     <div class="form-group">
-                        <label>Commission %</label>
-                        <input type="number" id="commission-input" value="10" min="0" max="100" step="0.5" oninput="executeRealtimeCalculations()">
+                        <label>Comm Tier (%)</label>
+                        <input type="number" id="commission-input" value="10" min="0" max="100" step="0.5" oninput="executeRealtimeCalculations()" style="background:rgba(255,255,255,0.1); color:#fff; border-color:rgba(255,255,255,0.2);">
                     </div>
                     <div class="form-group">
-                        <label>Estimated Payout</label>
-                        <input type="text" id="payout-display" readonly value="$0.00">
+                        <label>Calculated Payout</label>
+                        <input type="text" id="payout-display" readonly value="$0.00" style="color:#4ade80;">
                     </div>
                 </div>
             </div>
 
-            <h2>Customer Information</h2>
+            <h2>Customer Record (CRM Sync)</h2>
             <div class="form-section">
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label>Customer Phone Number</label>
-                        <input type="tel" id="phone" placeholder="(801) 555-0199" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Customer Account Number</label>
-                        <input type="text" id="account-number" placeholder="FR-1002934" required>
-                    </div>
-                </div>
-                
                 <div class="grid-2">
                     <div class="form-group">
                         <label>First Name</label>
                         <div class="copy-input-group">
-                            <input type="text" id="first-name" placeholder="John" required oninput="syncCustomerName(this.value)">
+                            <input type="text" id="first-name" required oninput="syncCustomerName(this.value)">
                             <button type="button" class="btn-copy-action" onclick="copyField('first-name')">Copy</button>
                         </div>
                     </div>
                     <div class="form-group">
                         <label>Last Name</label>
                         <div class="copy-input-group">
-                            <input type="text" id="last-name" placeholder="Doe" required oninput="syncLastName(this.value)">
+                            <input type="text" id="last-name" required oninput="syncLastName(this.value)">
                             <button type="button" class="btn-copy-action" onclick="copyField('last-name')">Copy</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Customer Email</label>
-                    <div class="copy-input-group">
-                        <input type="email" id="customer-email" placeholder="customer@email.com" oninput="syncEmailValue(this.value)">
-                        <button type="button" class="btn-copy-action" onclick="copyField('customer-email')">Copy</button>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Consolidated Appointment Notes (FieldRoutes Ready)</label>
-                    <div class="copy-input-group">
-                        <textarea id="appointment-notes-consolidated" rows="2" readonly style="background: rgba(255,255,255,0.05); color:#ffffff; font-weight:bold;" placeholder="waiting on inputs..."></textarea>
-                        <button type="button" class="btn-copy-action" onclick="copyField('appointment-notes-consolidated')">Copy</button>
-                    </div>
-                </div>
-
-                <div class="form-section" style="margin-left:0; margin-right:0; padding:12px; background:rgba(0,0,0,0.15); border-color: var(--color-border-deep);">
-                    <div class="form-group" style="margin-bottom:0;">
-                        <label>Customer Address</label>
-                        <div class="copy-input-group">
-                            <input type="text" id="right-address" placeholder="Street Address, City, State, Zip" required oninput="syncAddressValue(this.value)">
-                            <button type="button" class="btn-copy-action" onclick="copyField('right-address')">Copy</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="grid-2">
                     <div class="form-group">
-                        <label>Initial Service Date</label>
+                        <label>Customer Phone</label>
+                        <input type="tel" id="phone" placeholder="(801) 555-0199" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Customer Email</label>
+                        <div class="copy-input-group">
+                            <input type="email" id="customer-email" placeholder="customer@email.com" oninput="syncEmailValue(this.value)">
+                            <button type="button" class="btn-copy-action" onclick="copyField('customer-email')">Copy</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>FR Account Number</label>
+                        <div class="copy-input-group">
+                            <input type="text" id="account-number" placeholder="Auto-filled after Create Customer" readonly>
+                            <button type="button" class="btn-copy-action" onclick="copyField('account-number')">Copy</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Service Address</label>
+                        <div class="copy-input-group">
+                            <input type="text" id="right-address" required oninput="syncAddressValue(this.value)">
+                            <button type="button" class="btn-copy-action" onclick="copyField('right-address')">Copy</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button type="button" class="btn-primary" id="create-customer-btn" onclick="fireCreateCustomer()">Create Customer</button>
+                    <div id="create-customer-status" style="margin-top:8px; font-size:12px; color:var(--color-mint-soft);"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Consolidated CRM Notes</label>
+                    <div class="copy-input-group">
+                        <textarea id="appointment-notes-consolidated" rows="2" readonly placeholder="Awaiting script inputs to build note block..."></textarea>
+                        <button type="button" class="btn-copy-action" onclick="copyField('appointment-notes-consolidated')">Copy</button>
+                    </div>
+                </div>
+
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label>Service Date</label>
                         <input type="date" id="appointment-date" required onchange="syncDateValue(this.value)">
                     </div>
                     <div class="form-group">
-                        <label>Arrival Time Window</label>
+                        <label>Arrival Window</label>
                         <select id="time-window" onchange="syncWindowValue(this.value)">
-                            <option value="AT">AT</option>
-                            <option value="10-2">10:00 AM - 2:00 PM</option>
-                            <option value="2-6">2:00 PM - 6:00 PM</option>
+                            <option value="Any Time">Any Time</option>
+                            <option value="8:00 AM - 12:00 PM">8:00 AM - 12:00 PM</option>
+                            <option value="12:00 PM - 4:00 PM">12:00 PM - 4:00 PM</option>
+                            <option value="4:00 PM - 8:00 PM">4:00 PM - 8:00 PM</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Call Outcome</label>
+                        <select id="call-outcome" required style="border-color: var(--color-sage-accent);">
+                            <option value="">-- Status --</option>
+                            <option value="Sold">Sold</option>
+                            <option value="Scheduled Callback">Callback</option>
+                            <option value="Not Sold">Lost</option>
                         </select>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>Outcome</label>
-                    <select id="call-outcome" required>
-                        <option value="">-- Choose Call State Selection --</option>
-                        <option value="Sold">Sold</option>
-                        <option value="Scheduled Callback">Scheduled Callback</option>
-                        <option value="Not Sold">Not Sold</option>
-                    </select>
-                </div>
                 
-                <div class="btn-container" style="margin-top: 10px;">
-                    <button type="submit">Submit Call Details Matrix</button>
-                </div>
+                <button type="submit" class="btn-primary">Commit Transaction</button>
             </div>
         </form>
-
-        <div class="tracker-log-section">
-            <h3 style="margin: 0 0 10px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--color-mint-soft); border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 4px;">Personal Session Activity Tracker Ledger</h3>
-            <div class="tracker-table-container">
-                <table class="tracker-table">
-                    <thead>
-                        <tr>
-                            <th>Time</th>
-                            <th>Customer Name</th>
-                            <th>Account #</th>
-                            <th>Package</th>
-                            <th>TCV Value</th>
-                            <th>Payout</th>
-                            <th>Outcome</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tracker-log-tbody">
-                        <tr>
-                            <td colspan="7" style="text-align: center; color: var(--color-mint-soft); font-style: italic; padding: 15px 0;">No logs processed inside current session queue.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
     </div>
 
     <script src="jitneylogic-engine.js"></script>
     <script>
         // =====================================================================
-        // CLIENT CONFIG — this is the ONLY block that should need to change
-        // when onboarding a new client onto the JitneyLogic platform.
-        // Everything else (pricing math, address autocomplete, leaderboard,
-        // dropdown UI, standard field syncing) lives in jitneylogic-engine.js
-        // and is identical across every client.
+        // CLIENT CONFIG — the only block that should need to change when
+        // onboarding a new client. Everything else lives in jitneylogic-engine.js.
         // =====================================================================
         window.JITNEYLOGIC_CONFIG = {
-            // This client's deployed pricing Vault (Cloud Run) URL.
             vaultUrl: "https://jitneyvault-889415757227.us-central1.run.app/",
+            ardenusUrl: "https://REPLACE-WITH-ARDENUS-ENDPOINT.example.com/",
 
-            // Maps THIS client's package dropdown option text (left side,
-            // exactly matching the <option value="..."> strings in the HTML
-            // below) to the canonical package name the Vault knows about
-            // (right side, must match the Vault's PRICE_MATRIX keys exactly).
             packageDisplayToVault: {
-                "GreenGuard Basic": "HomeBase Basic",
-                "GreenGuard Select PC/RB": "HomeBase Standard PC/RB",
-                "GreenGuard Select PC/TFM": "HomeBase Standard PC/TFM",
-                "GreenGuard Select RB/TFM": "HomeBase Standard RB/TFM",
-                "GreenGuard Essential PC/RB/TFMx4": "HomeBase Essential PC/RB/TFMx4",
-                "GreenGuard Premier PC/RB/TFMx7": "HomeBase Premium PC/RB/TFMx7",
+                "HomeBase Basic": "HomeBase Basic",
+                "HomeBase Standard PC/RB": "HomeBase Standard PC/RB",
+                "HomeBase Standard PC/TFM": "HomeBase Standard PC/TFM",
+                "HomeBase Standard RB/TFM": "HomeBase Standard RB/TFM",
+                "HomeBase Essential PC/RB/TFMx4": "HomeBase Essential PC/RB/TFMx4",
+                "HomeBase Premium PC/RB/TFMx7": "HomeBase Premium PC/RB/TFMx7",
                 "German Roaches": "German Roaches",
                 "Interior Rodent": "Interior Rodent",
                 "Mole": "Mole",
@@ -810,136 +561,66 @@
                 "German Roaches + Mole + Interior Rodent": "German Roaches + Mole + Interior Rodent",
                 "Carpenter Bees + Mole + Interior Rodent": "Carpenter Bees + Mole + Interior Rodent",
                 "German Roaches + Carpenter Bees + Mole + Interior Rodent": "German Roaches + Carpenter Bees + Mole + Interior Rodent",
-                "GreenGuard Basic + German Roaches": "HomeBase Basic + German Roaches",
-                "GreenGuard Basic + Interior Rodent": "HomeBase Basic + Interior Rodent",
-                "GreenGuard Basic + Mole": "HomeBase Basic + Mole",
-                "GreenGuard Basic + Carpenter Bees": "HomeBase Basic + Carpenter Bees",
-                "GreenGuard Select PC/RB + German Roaches": "HomeBase Standard PC/RB + German Roaches",
-                "GreenGuard Select PC/RB + Interior Rodent": "HomeBase Standard PC/RB + Interior Rodent",
-                "GreenGuard Select PC/RB + Mole": "HomeBase Standard PC/RB + Mole",
-                "GreenGuard Select PC/RB + Carpenter Bees": "HomeBase Standard PC/RB + Carpenter Bees"
+                "HomeBase Basic + German Roaches": "HomeBase Basic + German Roaches",
+                "HomeBase Basic + Interior Rodent": "HomeBase Basic + Interior Rodent",
+                "HomeBase Basic + Mole": "HomeBase Basic + Mole",
+                "HomeBase Basic + Carpenter Bees": "HomeBase Basic + Carpenter Bees",
+                "HomeBase Standard PC/RB + German Roaches": "HomeBase Standard PC/RB + German Roaches",
+                "HomeBase Standard PC/RB + Interior Rodent": "HomeBase Standard PC/RB + Interior Rodent",
+                "HomeBase Standard PC/RB + Mole": "HomeBase Standard PC/RB + Mole",
+                "HomeBase Standard PC/RB + Carpenter Bees": "HomeBase Standard PC/RB + Carpenter Bees"
             },
 
-            // Deposit tiers: if the selected package name (lowercased) contains
-            // any of a rule's keywords, that rule's deposit amount applies.
-            // Rules are checked in order; last match wins. Falls back to
-            // defaultDeposit if nothing matches.
             depositRules: [
                 { keywords: ["german roaches", "rodent", "carpenter bee", "mole"], amount: 99 }
             ],
             defaultDeposit: 39
         };
 
-        // Pest Database & Objection Handling Facts — specific to this client's offering
+        const clientOnboardingConfig = { repName: "Tyler" };
+
         const pestFactsDb = {
-            "American Cockroaches": "American Cockroaches track deep structural plumbing vectors entering basement frameworks to identify decay nutrients.",
-            "Ants": "Ants utilize chemical pheromone micro-highways organizing sub-surface grid lanes right into your home storage assets.",
-            "Aphids": "Aphids compromise architectural landscaping ecosystems by nesting underneath foliage layers.",
-            "Carpet Beetles": "Carpet Beetles lay hidden eggs deep inside natural interior fabric weaves completely fracturing fiber grids.",
-            "Caterpillars": "Caterpillars strip primary landscaping boundaries breaching external vegetation micro-shields.",
-            "Centepedes": "Centepedes migrate horizontally inside baseboards pursuing wet structural vectors looking for lower prey rows.",
-            "Cicada Killers": "Cicada Killers drill deep holes beneath structural walkways dismantling your top-soil sand frameworks.",
-            "Citronella Ants": "Citronella Ants nest under moisture foundation seals creating heavy citrus-scented nesting nodes.",
-            "Clothes Moths": "Clothes Moths harbor inside dark unvetted staging chests ruining textile products.",
-            "Clover Mites": "Clover Mites group inside external concrete framing bricks ascending silently up window structures.",
-            "Cluster Flies": "Cluster Flies track fall warmth signals nesting inside attic insulation cavities.",
-            "Crickets": "Crickets create baseline nesting points inside lower dark crawl spaces.",
-            "Digger Bees": "Digger Bees bore structural mud routes through turf boundaries undermining baseline soil density parameters.",
-            "Drain Flies": "Drain Flies line micro organic slime grids inside utility pipe parameters reproducing inside waste channels.",
-            "Earwigs": "Earwigs require high-humidity darker fields clustering inside landscaping bark blocks.",
-            "Firebrats": "Firebrats look for hot water boiler spaces breeding inside utility channel insulation.",
-            "Fruit Flies": "Fruit Flies track sweet decay vectors laying thousands of egg cells near kitchen garbage arrays.",
-            "Gnats": "Gnats thrive near swampy vegetation lines tracking indoor plant soil hydration systems.",
-            "Grand Bees": "Grand Bees bore raw geometric tunnels inside external wood siding elements causing moisture leaks.",
-            "Ground Beetles": "Ground Beetles follow foundation boundaries tracking low-level crawl vectors to enter assets.",
-            "Honeybees": "Honeybees establish long-term honey structures inside wall lines altering property infrastructure parameters.",
-            "House Flies": "House Flies breach open portal frames depositing tracking pathogens on structural surface counters.",
-            "Indian Meal Moths": "Indian Meal Moths target dry pantry grain packs weaving internal silk cocoon matrices.",
-            "Lady Bugs": "Lady Bugs gather across warm southwest exterior walls swarming micro fractures to hibernate.",
-            "Millipedes": "Millipedes exit water-saturated exterior top-soils creeping across lower threshold base channels.",
-            "Oriental Roaches": "Oriental Roaches find dark water-line spaces moving up plumbing parameters to exit drains.",
-            "Silverfish": "Silverfish digest wallpaper starches nesting within structural bathroom framing layers.",
-            "Sowbugs": "Sowbugs feed on organic composting elements tracking wet soil pipelines straight inside.",
-            "Spiders": "Spiders pursue active biological vectors, setting up perimeter hunting lines.",
-            "Springtails": "Springtails crowd high-humidity framing walls jumping through molding lines near internal leaking plumbing blocks.",
-            "Stink Bugs": "Stink Bugs swarm exterior siding frames tunneling down window parameters.",
-            "Wasps/Hornets": "Wasps/Hornets construct structural nests along roof parameters guarding entry ways.",
+            "General Pests": "General occasional invaders — ants, spiders, and similar pests — create ongoing nuisance activity around entry points and foundations.",
             "Ticks, Fleas, Mosquitos": "Ticks, Fleas, and Mosquitos hide within dense exterior grass layers nesting near organic yard debris pipelines.",
             "German Roaches": "German Cockroaches possess an acute chemical resistance multiplying inside appliance nodes and interior molding joints.",
-            "Rodent (Interior)": "Interior Mice and Rats colonize wall insulation tracks chewing utility wiring and tearing soft subflooring segments.",
-            "Rodent (Exterior)": "Exterior Rodents tunnel along foundation perimeters tracking drainage networks to locate structural breach gaps.",
+            "Interior Rodent": "Interior Mice and Rats colonize wall insulation tracks chewing utility wiring and tearing soft subflooring segments.",
+            "Exterior Rodent": "Exterior Rodents tunnel along foundation perimeters tracking drainage networks to locate structural breach gaps.",
             "Mole": "Moles drill systematic underground networks directly beneath turf grass, fracturing root system density grids.",
             "Carpenter Bees": "Carpenter Bees execute precision geometric nesting shafts straight into structural raw wood structures."
         };
 
+        function initTurnkeyEnvironment() {
+            document.querySelectorAll('.cfg-rep-name').forEach(el => el.innerText = clientOnboardingConfig.repName);
+            const dateStr = new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+            const dateEl = document.getElementById('intraday-date');
+            if (dateEl) dateEl.innerText = dateStr;
+        }
+
         function parseScriptPestLogicHandshake() {
-            const checkedPests = Array.from(document.querySelectorAll('.script-pest-cb:checked')).map(cb => cb.value);
-            const targets = document.querySelectorAll('.inject-script-pest');
-            
-            document.querySelectorAll('.pest-checkbox').forEach(cb => cb.checked = false);
+            const checked = Array.from(document.querySelectorAll('.script-pest-cb:checked')).map(cb => cb.value);
+            document.querySelectorAll('.pest-checkbox').forEach(cb => {
+                cb.checked = checked.includes(cb.getAttribute('data-display'));
+            });
 
-            if (checkedPests.length > 0) {
-                const formattedListText = checkedPests.join(' and ');
-                targets.forEach(el => el.innerText = formattedListText);
+            document.querySelectorAll('.var-pests').forEach(el => {
+                el.innerText = checked.length > 0 ? checked.join(' and ') : 'those targets';
+            });
 
-                let compiledFacts = "";
-                let compiledResolutions = "";
-                let possessesPremiumPests = false;
-
-                const premiumAssignments = {
-                    "Ticks, Fleas, Mosquitos": "Option 2",
-                    "German Roaches": "Option 3",
-                    "Rodent (Interior)": "Option 4",
-                    "Rodent (Exterior)": "Option 5",
-                    "Mole": "Option 6",
-                    "Carpenter Bees": "Option 7"
-                };
-
-                checkedPests.forEach(pest => {
-                    if (pest in pestFactsDb) {
-                        compiledFacts += `<span class="pest-fact-bullet">• <strong>${pest}:</strong> ${pestFactsDb[pest]}</span>`;
-                        compiledResolutions += `<span class="pest-fact-bullet">• <strong>${pest} Protocol:</strong> Deploy custom target treatments inside active vector tracks.</span>`;
-                    }
-                    
-                    if (pest in premiumAssignments) {
-                        possessesPremiumPests = true;
-                        const targetOptionValue = premiumAssignments[pest];
-                        const matchingRightCheckbox = document.querySelector(`.pest-checkbox[value="${targetOptionValue}"]`);
-                        if(matchingRightCheckbox) matchingRightCheckbox.checked = true;
-                    }
-                });
-
-                const totalBasePestsCount = checkedPests.filter(p => !(p in premiumAssignments)).length;
-                if (totalBasePestsCount > 0) {
-                    document.querySelector('.pest-checkbox[value="Option 1"]').checked = true;
+            let factsHtml = "";
+            checked.forEach(p => {
+                if (pestFactsDb[p]) {
+                    factsHtml += `<div class="pest-fact-bullet"><strong>${p}:</strong> ${pestFactsDb[p]}</div>`;
                 }
+            });
+            document.getElementById('inject-pest-fact').innerHTML = factsHtml || `<span style="font-style: italic; opacity: 0.6;">Select targets above to load operational facts...</span>`;
 
-                document.getElementById('inject-pest-fact').innerHTML = compiledFacts;
-                document.getElementById('inject-pest-resolution').innerHTML = compiledResolutions;
-
-                updateDisplayBoxText();
-                
-                const rightPackageSelect = document.getElementById('package-select');
-                if (document.querySelector('.pest-checkbox[value="Option 1"]').checked && !possessesPremiumPests) {
-                    rightPackageSelect.value = "GreenGuard Select PC/TFM";
-                    runDynamicGuardrails();
-                } else {
-                    evaluatePestCombinationMatrix();
-                }
-
-            } else {
-                targets.forEach(el => el.innerText = "those pests");
-                document.getElementById('inject-pest-fact').innerHTML = `<span class="pest-fact-bullet italic text-slate-500">Select active infestations above to inject dynamic bullet parameters.</span>`;
-                document.getElementById('inject-pest-resolution').innerHTML = `<span class="pest-fact-bullet italic text-slate-500">Awaiting vector selections.</span>`;
-                updateDisplayBoxText();
-                document.getElementById('package-select').value = "";
-                runDynamicGuardrails();
-            }
-
+            updateDisplayBoxText();
+            evaluatePestCombinationMatrix();
             updateConsolidatedAppointmentNotes();
         }
 
-        // Initialize script logic layers on page initialization window paths
+        initTurnkeyEnvironment();
+        initAddressAutocomplete();
         runDynamicGuardrails();
         updateConsolidatedAppointmentNotes();
     </script>
