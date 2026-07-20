@@ -401,13 +401,19 @@ function executeRealtimeCalculations() {
 
     document.getElementById('tcv-display').value = "$" + totalContractValue.toFixed(2);
     document.getElementById('payout-display').value = "$" + calculatedPayoutValue.toFixed(2);
-    document.getElementById('inject-initial-text').innerText = "$" + initialValue.toFixed(2);
-    document.getElementById('inject-monthly-text').innerText = "$" + monthlyValue.toFixed(2);
+
+    const setIfPresent = (id, text) => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = text;
+    };
+
+    setIfPresent('inject-initial-text', "$" + initialValue.toFixed(2));
+    setIfPresent('inject-monthly-text', "$" + monthlyValue.toFixed(2));
 
     const normalInitialMarkup = initialValue + 150;
-    document.getElementById('inject-pitch-normal').innerText = "$" + normalInitialMarkup.toFixed(2);
-    document.getElementById('inject-pitch-monthly').innerText = "$" + monthlyValue.toFixed(2);
-    document.getElementById('inject-pitch-discounted').innerText = "$" + initialValue.toFixed(2);
+    setIfPresent('inject-pitch-normal', "$" + normalInitialMarkup.toFixed(2));
+    setIfPresent('inject-pitch-monthly', "$" + monthlyValue.toFixed(2));
+    setIfPresent('inject-pitch-discounted', "$" + initialValue.toFixed(2));
 
     let depositAmount = config.defaultDeposit ?? 39;
     const lowerPackageStr = currentPackage.toLowerCase();
@@ -418,13 +424,89 @@ function executeRealtimeCalculations() {
     });
 
     const balanceRemaining = Math.max(0, initialValue - depositAmount);
-    document.getElementById('inject-deposit-text').innerText = "$" + depositAmount;
-    document.getElementById('inject-balance-text').innerText = "$" + balanceRemaining.toFixed(2);
+    setIfPresent('inject-deposit-text', "$" + depositAmount);
+    setIfPresent('inject-balance-text', "$" + balanceRemaining.toFixed(2));
 }
 
 // =========================================================================
-// CALL SUBMISSION / LEADERBOARD TRACKING
+// CREATE CUSTOMER — sends the account+lead payload to Ardenus (Stage 2 of
+// the sales flow). Independent of final sale outcome; can be called on a
+// call that never closes.
 // =========================================================================
+async function fireCreateCustomer() {
+    const config = getConfig();
+    const statusEl = document.getElementById('create-customer-status');
+    const btn = document.getElementById('create-customer-btn');
+
+    const requiredEls = {
+        "First Name": document.getElementById('first-name').value.trim(),
+        "Last Name": document.getElementById('last-name').value.trim(),
+        "Phone": document.getElementById('phone').value.trim(),
+        "Address": document.getElementById('right-address').value.trim(),
+        "Package": document.getElementById('package-select').value
+    };
+    const missing = Object.entries(requiredEls).filter(([, v]) => !v).map(([k]) => k);
+    if (missing.length > 0) {
+        statusEl.style.color = "#f59e0b";
+        statusEl.innerText = "Missing before creating customer: " + missing.join(", ");
+        return;
+    }
+
+    if (!window.currentCallId) {
+        window.currentCallId = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random());
+    }
+
+    const payload = {
+        event_type: "create_account_and_lead",
+        transaction_id: window.currentCallId,
+        submitted_at: new Date().toISOString(),
+        account: {
+            first_name: document.getElementById('first-name').value.trim(),
+            last_name: document.getElementById('last-name').value.trim(),
+            phone: document.getElementById('phone').value.trim(),
+            email: document.getElementById('customer-email').value.trim() || null,
+            address: currentAddressComponents || { street: document.getElementById('right-address').value.trim(), city: "", state: "", zip: "" }
+        },
+        lead: {
+            package_type: document.getElementById('package-select').value,
+            initial_price: parseFloat(document.getElementById('initial-price').value) || 0,
+            monthly_price: parseFloat(document.getElementById('monthly-price').value) || 0,
+            appointment_notes: document.getElementById('appointment-notes-consolidated').value
+        }
+    };
+
+    btn.disabled = true;
+    statusEl.style.color = "var(--color-mint-soft)";
+    statusEl.innerText = "Creating customer in FieldRoutes...";
+
+    try {
+        const resp = await fetch(config.ardenusUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+        const data = await resp.json();
+
+        if (!resp.ok || data.status !== "success") {
+            throw new Error(data.message || "Ardenus returned an error.");
+        }
+
+        document.getElementById('account-number').value = data.fieldroutes_account_number;
+        window.currentFieldroutesAccountNumber = data.fieldroutes_account_number;
+        statusEl.style.color = "#4ade80";
+        statusEl.innerText = "Customer created — Account #" + data.fieldroutes_account_number;
+
+    } catch (err) {
+        console.error("Create Customer failed:", err);
+        statusEl.style.color = "#ef4444";
+        statusEl.innerText = "Failed to create customer: " + err.message;
+    } finally {
+        btn.disabled = false;
+    }
+}
+window.fireCreateCustomer = fireCreateCustomer;
+
+
 function fireRevenuePipelineTracking(event) {
     event.preventDefault();
 
@@ -472,22 +554,24 @@ function fireRevenuePipelineTracking(event) {
     }
 
     const logTableBody = document.getElementById('tracker-log-tbody');
-    if (stats.dayCalls === 1) { logTableBody.innerHTML = ""; }
+    if (logTableBody) {
+        if (stats.dayCalls === 1) { logTableBody.innerHTML = ""; }
 
-    const timestampString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const resultStyleBadge = outcome === "Sold" ? "color:#4ade80; font-weight:bold;" : (outcome === "Scheduled Callback" ? "color:#f59e0b;" : "color:#ef4444;");
+        const timestampString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const resultStyleBadge = outcome === "Sold" ? "color:#4ade80; font-weight:bold;" : (outcome === "Scheduled Callback" ? "color:#f59e0b;" : "color:#ef4444;");
 
-    logTableBody.insertAdjacentHTML('afterbegin', `
-        <tr>
-            <td>${timestampString}</td>
-            <td><strong>${clientFirst} ${clientLast}</strong></td>
-            <td style="font-family:monospace;">${clientAccount}</td>
-            <td>${assignedPackage}</td>
-            <td style="font-weight:bold;">$${currentTcvValue.toFixed(2)}</td>
-            <td style="color:var(--color-mint-soft); font-weight:bold;">$${commissionEarned.toFixed(2)}</td>
-            <td style="${resultStyleBadge}">${outcome}</td>
-        </tr>
-    `);
+        logTableBody.insertAdjacentHTML('afterbegin', `
+            <tr>
+                <td>${timestampString}</td>
+                <td><strong>${clientFirst} ${clientLast}</strong></td>
+                <td style="font-family:monospace;">${clientAccount}</td>
+                <td>${assignedPackage}</td>
+                <td style="font-weight:bold;">$${currentTcvValue.toFixed(2)}</td>
+                <td style="color:var(--color-mint-soft); font-weight:bold;">$${commissionEarned.toFixed(2)}</td>
+                <td style="${resultStyleBadge}">${outcome}</td>
+            </tr>
+        `);
+    }
 
     // TODO: this is also where the jitneylogger call-log POST and the
     // conditional Ardenus "Save Customer" payload get wired in — not yet
@@ -512,6 +596,10 @@ function fireRevenuePipelineTracking(event) {
     syncEmailValue("");
     syncAddressValue("");
     currentAddressComponents = null;
+    document.getElementById('account-number').value = "";
+    document.getElementById('create-customer-status').innerText = "";
+    window.currentCallId = null;
+    window.currentFieldroutesAccountNumber = null;
     syncScheduleDetails();
     runDynamicGuardrails();
     parseScriptPestLogicHandshake();
