@@ -585,7 +585,7 @@ function initAuthGate() {
         currentRepClaims = { rep_id: tokenResult.claims.rep_id, rep_name: tokenResult.claims.rep_name };
 
         if (loginGate) loginGate.style.display = "none";
-        if (appContent) appContent.style.display = "block";
+        if (appContent) appContent.style.display = "flex";
 
         const displayEl = document.getElementById('logged-in-rep-display');
         if (displayEl) displayEl.innerText = `${currentRepClaims.rep_name} (${currentRepClaims.rep_id})`;
