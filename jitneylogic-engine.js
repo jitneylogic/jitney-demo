@@ -641,6 +641,87 @@ function initLiveLeaderboard() {
 }
 window.initLiveLeaderboard = initLiveLeaderboard;
 
+// =========================================================================
+// EXECUTIVE DASHBOARD — same Firestore data as the cockpit leaderboard,
+// different presentation (office-wide department cards + a full rep table,
+// no "current user" concept since an executive isn't any one rep).
+// =========================================================================
+function renderDepartmentCard(prefix, statsDoc) {
+    const callsTaken = (statsDoc && statsDoc.calls_taken) || 0;
+    const callsSold = (statsDoc && statsDoc.calls_sold) || 0;
+    const revenue = (statsDoc && statsDoc.total_revenue) || 0;
+
+    const setText = (id, text) => { const el = document.getElementById(id); if (el) el.innerText = text; };
+    setText(`${prefix}-calls`, callsTaken);
+    setText(`${prefix}-closed`, callsSold);
+    setText(`${prefix}-rate`, callsTaken > 0 ? ((callsSold / callsTaken) * 100).toFixed(1) + "%" : "0.0%");
+    setText(`${prefix}-rev`, "$" + revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+    setText(`${prefix}-rpc`, callsTaken > 0 ? "$" + (revenue / callsTaken).toFixed(2) : "$0.00");
+}
+
+function renderRepStandingsTable(statsDoc) {
+    const tbody = document.getElementById('rep-standings-tbody');
+    if (!tbody) return;
+
+    const repBreakdown = (statsDoc && statsDoc.rep_breakdown) || {};
+    const rows = Object.entries(repBreakdown)
+        .map(([repId, data]) => ({
+            repId,
+            displayName: data.display_name || repId,
+            callsTaken: data.calls_taken || 0,
+            callsSold: data.calls_sold || 0,
+            revenue: data.revenue || 0
+        }))
+        .sort((a, b) => b.revenue - a.revenue);
+
+    if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; opacity:0.6;">Waiting for today's activity...</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = rows.map((row, index) => {
+        const rate = row.callsTaken > 0 ? ((row.callsSold / row.callsTaken) * 100).toFixed(1) + "%" : "0.0%";
+        const rpc = row.callsTaken > 0 ? "$" + (row.revenue / row.callsTaken).toFixed(2) : "$0.00";
+        const rankClass = index === 0 ? "rank-row-1" : (index === 1 ? "rank-row-2" : "");
+        return `
+            <tr class="${rankClass}">
+                <td><span class="rank-badge">${index + 1}</span>${row.displayName}</td>
+                <td class="monospaced-cell">${row.callsTaken}</td>
+                <td class="monospaced-cell">${row.callsSold}</td>
+                <td class="monospaced-cell">${rate}</td>
+                <td class="monospaced-cell" style="color:#4ade80;">$${row.revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                <td class="monospaced-cell">${rpc}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function initExecutiveDashboard() {
+    const config = getConfig();
+    if (!config.firebaseConfig || !window.firebase) {
+        console.error("Firebase config missing or Firebase SDK not loaded — executive dashboard disabled.");
+        return;
+    }
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(config.firebaseConfig);
+    }
+    const db = firebase.firestore();
+    const { daily, weekly } = dateKeysForToday();
+
+    db.collection('daily_stats').doc(daily).onSnapshot(doc => {
+        const data = doc.data();
+        renderDepartmentCard('global-today', data);
+        renderRepStandingsTable(data);
+    }, err => console.error("Daily stats listener error:", err));
+
+    db.collection('weekly_stats').doc(weekly).onSnapshot(doc => {
+        renderDepartmentCard('global-week', doc.data());
+    }, err => console.error("Weekly stats listener error:", err));
+}
+window.initExecutiveDashboard = initExecutiveDashboard;
+
+
 
 function fireRevenuePipelineTracking(event) {
     event.preventDefault();
