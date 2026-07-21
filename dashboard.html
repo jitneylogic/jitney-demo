@@ -311,7 +311,7 @@
         // Firebase project and use the same business timezone, since this
         // reads the exact stats documents the cockpit writes.
         window.JITNEYLOGIC_CONFIG = {
-             firebaseConfig: {
+          firebaseConfig: {
                 apiKey: "AIzaSyDkWrGWcepdHlkzkeSGWLiIrV0Kxsul4nE",
   authDomain: "jitneylogic-beta.firebaseapp.com",
   projectId: "jitneylogic-beta",
@@ -320,7 +320,8 @@
   appId: "1:889415757227:web:9e54a600eb654bb30276ee",
   measurementId: "G-4JECF3BX6E"
             },
-            businessTimezone: "America/Denver"
+            businessTimezone: "America/Denver",
+            leaderboardMetric: "revenue" // must match the cockpit's setting
         };
 
         window.addEventListener('DOMContentLoaded', () => {
