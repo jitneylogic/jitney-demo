@@ -183,10 +183,10 @@ function updateDisplayBoxText() {
     const textDisplayNode = document.getElementById('display-selected-text');
     if (checkedBoxes.length > 0) {
         textDisplayNode.innerText = checkedBoxes.join(', ');
-        textDisplayNode.style.color = '#333333';
+        textDisplayNode.style.opacity = '1';
     } else {
         textDisplayNode.innerText = '-- Select Active Infestations --';
-        textDisplayNode.style.color = '#64748b';
+        textDisplayNode.style.opacity = '0.6';
     }
 }
 
