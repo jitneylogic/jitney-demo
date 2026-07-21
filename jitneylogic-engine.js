@@ -480,9 +480,10 @@ async function fireCreateCustomer() {
     statusEl.innerText = "Creating customer in FieldRoutes...";
 
     try {
+        const authHeader = await getAuthHeader();
         const resp = await fetch(config.ardenusUrl, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", ...authHeader },
             body: JSON.stringify(payload)
         });
         const data = await resp.json();
@@ -508,30 +509,91 @@ window.fireCreateCustomer = fireCreateCustomer;
 
 
 // =========================================================================
-// REP IDENTITY — interim mechanism until real per-rep login exists (Phase 4).
-// Persisted per-browser via localStorage so a rep testing on their own
-// laptop keeps a stable identity across page reloads.
+// REP AUTHENTICATION — real login via Firebase Auth. rep_id/rep_name come
+// from custom claims set at account-creation time (see the rep-admin
+// script), never from anything the rep can type or edit in the browser.
 // =========================================================================
+let currentRepClaims = null;
+
 function getRepId() {
-    return localStorage.getItem('jitney_rep_id') || 'UNASSIGNED';
+    return (currentRepClaims && currentRepClaims.rep_id) || null;
 }
 function getRepName() {
-    return localStorage.getItem('jitney_rep_name') || 'Unassigned Rep';
+    return (currentRepClaims && currentRepClaims.rep_name) || null;
 }
-function loadRepIdentity() {
-    const nameEl = document.getElementById('rep-identity-name');
-    const idEl = document.getElementById('rep-identity-id');
-    if (nameEl) nameEl.value = localStorage.getItem('jitney_rep_name') || '';
-    if (idEl) idEl.value = localStorage.getItem('jitney_rep_id') || '';
+
+async function getAuthHeader() {
+    const user = firebase.auth().currentUser;
+    if (!user) return {};
+    const token = await user.getIdToken();
+    return { "Authorization": "Bearer " + token };
 }
-function saveRepIdentity() {
-    const nameEl = document.getElementById('rep-identity-name');
-    const idEl = document.getElementById('rep-identity-id');
-    if (nameEl) localStorage.setItem('jitney_rep_name', nameEl.value.trim());
-    if (idEl) localStorage.setItem('jitney_rep_id', idEl.value.trim());
+
+function attemptLogin() {
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    const errorEl = document.getElementById('login-error');
+    errorEl.innerText = "";
+
+    firebase.auth().signInWithEmailAndPassword(email, password)
+        .catch(err => { errorEl.innerText = err.message; });
 }
-window.loadRepIdentity = loadRepIdentity;
-window.saveRepIdentity = saveRepIdentity;
+
+function attemptLogout() {
+    firebase.auth().signOut();
+}
+window.attemptLogin = attemptLogin;
+window.attemptLogout = attemptLogout;
+
+function startAppAfterLogin() {
+    initTurnkeyEnvironment();
+    initAddressAutocomplete();
+    initLiveLeaderboard();
+    runDynamicGuardrails();
+    updateConsolidatedAppointmentNotes();
+}
+
+function initAuthGate() {
+    const config = getConfig();
+    if (!config.firebaseConfig || !window.firebase) {
+        console.error("Firebase config missing or SDK not loaded — cannot initialize login.");
+        return;
+    }
+    if (!firebase.apps.length) {
+        firebase.initializeApp(config.firebaseConfig);
+    }
+
+    firebase.auth().onAuthStateChanged(async (user) => {
+        const loginGate = document.getElementById('login-gate');
+        const appContent = document.getElementById('app-content');
+
+        if (!user) {
+            currentRepClaims = null;
+            if (loginGate) loginGate.style.display = "flex";
+            if (appContent) appContent.style.display = "none";
+            return;
+        }
+
+        const tokenResult = await user.getIdTokenResult();
+        if (!tokenResult.claims.rep_id || !tokenResult.claims.rep_name) {
+            document.getElementById('login-error').innerText =
+                "This account has no rep profile attached. Contact your administrator.";
+            firebase.auth().signOut();
+            return;
+        }
+
+        currentRepClaims = { rep_id: tokenResult.claims.rep_id, rep_name: tokenResult.claims.rep_name };
+
+        if (loginGate) loginGate.style.display = "none";
+        if (appContent) appContent.style.display = "block";
+
+        const displayEl = document.getElementById('logged-in-rep-display');
+        if (displayEl) displayEl.innerText = `${currentRepClaims.rep_name} (${currentRepClaims.rep_id})`;
+
+        startAppAfterLogin();
+    });
+}
+window.initAuthGate = initAuthGate;
 
 // =========================================================================
 // LIVE LEADERBOARD — Firestore realtime listener. Reads only; all writes
@@ -723,7 +785,7 @@ window.initExecutiveDashboard = initExecutiveDashboard;
 
 
 
-function fireRevenuePipelineTracking(event) {
+async function fireRevenuePipelineTracking(event) {
     event.preventDefault();
 
     const outcome = document.getElementById('call-outcome').value;
@@ -758,9 +820,10 @@ function fireRevenuePipelineTracking(event) {
 
     const config = getConfig();
     if (config.loggerUrl) {
+        const authHeader = await getAuthHeader();
         fetch(config.loggerUrl, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", ...authHeader },
             body: JSON.stringify(loggerPayload)
         }).catch(err => console.error("jitneylogger POST failed:", err));
         // Not awaited on purpose — the realtime listener will reflect the
