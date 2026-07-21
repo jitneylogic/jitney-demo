@@ -46,6 +46,12 @@
             overflow-y: auto; 
             display: flex; flex-direction: column; 
         }
+
+        #app-content {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
         
         h2 { 
             margin-top: 0; margin-bottom: 20px;
@@ -565,7 +571,7 @@
             // SDK setup and configuration → Config. Safe to be public — this is
             // the client identifier, not a secret; access is controlled by
             // firestore.rules, not by hiding this object.
-             firebaseConfig: {
+         firebaseConfig: {
                 apiKey: "AIzaSyDkWrGWcepdHlkzkeSGWLiIrV0Kxsul4nE",
   authDomain: "jitneylogic-beta.firebaseapp.com",
   projectId: "jitneylogic-beta",
@@ -574,7 +580,6 @@
   appId: "1:889415757227:web:9e54a600eb654bb30276ee",
   measurementId: "G-4JECF3BX6E"
             },
-
             packageDisplayToVault: {
                 "HomeBase Basic": "HomeBase Basic",
                 "HomeBase Standard PC/RB": "HomeBase Standard PC/RB",
