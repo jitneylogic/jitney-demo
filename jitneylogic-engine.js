@@ -507,6 +507,125 @@ async function fireCreateCustomer() {
 window.fireCreateCustomer = fireCreateCustomer;
 
 
+// =========================================================================
+// REP IDENTITY — interim mechanism until real per-rep login exists (Phase 4).
+// Persisted per-browser via localStorage so a rep testing on their own
+// laptop keeps a stable identity across page reloads.
+// =========================================================================
+function getRepId() {
+    return localStorage.getItem('jitney_rep_id') || 'UNASSIGNED';
+}
+function getRepName() {
+    return localStorage.getItem('jitney_rep_name') || 'Unassigned Rep';
+}
+function loadRepIdentity() {
+    const nameEl = document.getElementById('rep-identity-name');
+    const idEl = document.getElementById('rep-identity-id');
+    if (nameEl) nameEl.value = localStorage.getItem('jitney_rep_name') || '';
+    if (idEl) idEl.value = localStorage.getItem('jitney_rep_id') || '';
+}
+function saveRepIdentity() {
+    const nameEl = document.getElementById('rep-identity-name');
+    const idEl = document.getElementById('rep-identity-id');
+    if (nameEl) localStorage.setItem('jitney_rep_name', nameEl.value.trim());
+    if (idEl) localStorage.setItem('jitney_rep_id', idEl.value.trim());
+}
+window.loadRepIdentity = loadRepIdentity;
+window.saveRepIdentity = saveRepIdentity;
+
+// =========================================================================
+// LIVE LEADERBOARD — Firestore realtime listener. Reads only; all writes
+// go through jitneylogger's Admin SDK, which is the only thing with
+// permission to write under the locked-down firestore.rules.
+// =========================================================================
+function dateKeysForToday() {
+    const d = new Date();
+    const daily = d.toISOString().slice(0, 10);
+    const target = new Date(d.valueOf());
+    const dayNr = (d.getUTCDay() + 6) % 7;
+    target.setUTCDate(target.getUTCDate() - dayNr + 3);
+    const firstThursday = new Date(Date.UTC(target.getUTCFullYear(), 0, 4));
+    const weekNr = 1 + Math.round(((target - firstThursday) / 86400000 - 3 + ((firstThursday.getUTCDay() + 6) % 7)) / 7);
+    const weekly = `${target.getUTCFullYear()}-W${String(weekNr).padStart(2, "0")}`;
+    return { daily, weekly };
+}
+
+function renderPersonalStats(prefix, statsDoc) {
+    const repBreakdown = (statsDoc && statsDoc.rep_breakdown && statsDoc.rep_breakdown[getRepId()]) || {};
+    const callsTaken = repBreakdown.calls_taken || 0;
+    const callsSold = repBreakdown.calls_sold || 0;
+    const revenue = repBreakdown.revenue || 0;
+
+    const setText = (id, text) => { const el = document.getElementById(id); if (el) el.innerText = text; };
+    setText(`${prefix}-calls`, callsTaken);
+    setText(`${prefix}-sold`, callsSold);
+    setText(`${prefix}-rate`, callsTaken > 0 ? ((callsSold / callsTaken) * 100).toFixed(1) + "%" : "0.0%");
+    setText(`${prefix}-tcv`, "$" + revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+    setText(`${prefix}-acv`, callsSold > 0 ? "$" + (revenue / callsSold).toFixed(2) : "$0.00");
+    setText(`${prefix}-rpc`, callsTaken > 0 ? "$" + (revenue / callsTaken).toFixed(2) : "$0.00");
+    // Commission isn't tracked server-side (rate varies per deal) — leaving
+    // day-comm/week-comm at whatever the last local calculation showed.
+}
+
+function renderLeaderboard(dailyStatsDoc) {
+    const container = document.getElementById('leaderboard-grid');
+    if (!container) return;
+
+    const repBreakdown = (dailyStatsDoc && dailyStatsDoc.rep_breakdown) || {};
+    const rows = Object.entries(repBreakdown)
+        .map(([repId, data]) => ({
+            repId,
+            displayName: data.display_name || repId,
+            revenue: data.revenue || 0
+        }))
+        .sort((a, b) => b.revenue - a.revenue);
+
+    if (rows.length === 0) {
+        container.innerHTML = `<div class="leaderboard-row"><span style="opacity:0.6;">Waiting for today's activity...</span></div>`;
+        return;
+    }
+
+    const currentRepId = getRepId();
+    container.innerHTML = rows.map((row, index) => {
+        const isUser = row.repId === currentRepId;
+        const rankClass = index === 0 ? "rank-1" : "";
+        const userClass = isUser ? "user-row" : "";
+        const label = isUser ? `${row.displayName} (You)` : row.displayName;
+        return `
+            <div class="leaderboard-row ${rankClass} ${userClass}">
+                <div><span class="rep-rank-badge">${index + 1}</span>${label}</div>
+                <span class="metrics-val ${isUser ? 'val-highlight' : ''}">$${row.revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+function initLiveLeaderboard() {
+    const config = getConfig();
+    if (!config.firebaseConfig || !window.firebase) {
+        console.error("Firebase config missing or Firebase SDK not loaded — live leaderboard disabled.");
+        return;
+    }
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(config.firebaseConfig);
+    }
+    const db = firebase.firestore();
+    const { daily, weekly } = dateKeysForToday();
+
+    db.collection('daily_stats').doc(daily).onSnapshot(doc => {
+        const data = doc.data();
+        renderPersonalStats('day', data);
+        renderLeaderboard(data);
+    }, err => console.error("Daily stats listener error:", err));
+
+    db.collection('weekly_stats').doc(weekly).onSnapshot(doc => {
+        renderPersonalStats('week', doc.data());
+    }, err => console.error("Weekly stats listener error:", err));
+}
+window.initLiveLeaderboard = initLiveLeaderboard;
+
+
 function fireRevenuePipelineTracking(event) {
     event.preventDefault();
 
@@ -514,49 +633,45 @@ function fireRevenuePipelineTracking(event) {
     const assignedPackage = document.getElementById('package-select').value || "No Package Mapped";
     const currentTcvValue = parseFloat(document.getElementById('tcv-display').value.replace('$', '')) || 0;
     const commissionEarned = parseFloat(document.getElementById('payout-display').value.replace('$', '')) || 0;
+    const initialValue = parseFloat(document.getElementById('initial-price').value) || 0;
+    const monthlyValue = parseFloat(document.getElementById('monthly-price').value) || 0;
 
     const clientFirst = document.getElementById('first-name').value.trim() || "Unknown";
     const clientLast = document.getElementById('last-name').value.trim() || "Client";
     const clientAccount = document.getElementById('account-number').value.trim() || "N/A";
 
-    stats.dayCalls += 1; stats.weekCalls += 1;
-    if (outcome === "Sold") {
-        stats.daySold += 1; stats.weekSold += 1;
-        stats.dayTcv += currentTcvValue; stats.weekTcv += currentTcvValue;
-        stats.dayComm += commissionEarned; stats.weekComm += commissionEarned;
+    if (!window.currentCallId) {
+        window.currentCallId = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random());
     }
 
-    document.getElementById('day-calls').innerText = stats.dayCalls;
-    document.getElementById('day-sold').innerText = stats.daySold;
-    document.getElementById('day-rate').innerText = stats.dayCalls > 0 ? ((stats.daySold / stats.dayCalls) * 100).toFixed(1) + "%" : "0.0%";
-    document.getElementById('day-tcv').innerText = "$" + stats.dayTcv.toFixed(2);
-    document.getElementById('day-acv').innerText = stats.daySold > 0 ? "$" + (stats.dayTcv / stats.daySold).toFixed(2) : "$0.00";
-    document.getElementById('day-rpc').innerText = stats.dayCalls > 0 ? "$" + (stats.dayTcv / stats.dayCalls).toFixed(2) : "$0.00";
-    document.getElementById('day-comm').innerText = "$" + stats.dayComm.toFixed(2);
+    const loggerPayload = {
+        call_id: window.currentCallId,
+        rep_id: getRepId(),
+        rep_name: getRepName(),
+        pest_type: Array.from(document.querySelectorAll('.pest-checkbox:checked')).map(cb => cb.getAttribute('data-display')).join(', ') || null,
+        zip_code: (currentAddressComponents && currentAddressComponents.zip) || null,
+        package_quoted: assignedPackage,
+        agreement_length_quoted: null,
+        initial_price_quoted: initialValue,
+        monthly_price_quoted: monthlyValue,
+        lead_source: document.getElementById('lead-source') ? document.getElementById('lead-source').value : null,
+        outcome: outcome,
+        fieldroutes_account_number: window.currentFieldroutesAccountNumber || null
+    };
 
-    document.getElementById('week-calls').innerText = stats.weekCalls;
-    document.getElementById('week-sold').innerText = stats.weekSold;
-    document.getElementById('week-rate').innerText = stats.weekCalls > 0 ? ((stats.weekSold / stats.weekCalls) * 100).toFixed(1) + "%" : "0.0%";
-    document.getElementById('week-tcv').innerText = "$" + stats.weekTcv.toFixed(2);
-    document.getElementById('week-acv').innerText = stats.weekSold > 0 ? "$" + (stats.weekTcv / stats.weekSold).toFixed(2) : "$0.00";
-    document.getElementById('week-rpc').innerText = stats.weekCalls > 0 ? "$" + (stats.weekTcv / stats.weekCalls).toFixed(2) : "$0.00";
-    document.getElementById('week-comm').innerText = "$" + stats.weekComm.toFixed(2);
-
-    document.getElementById('leader-val-user').innerText = "$" + stats.dayTcv.toFixed(2);
-    if (stats.dayTcv > 2840.50) {
-        const rank1Row = document.getElementById('leader-rank-1');
-        const userRow = document.getElementById('leader-rank-user');
-        userRow.parentNode.insertBefore(userRow, rank1Row);
-        userRow.querySelector('.rep-rank-badge').innerText = "1";
-        userRow.querySelector('.rep-rank-badge').style.background = "#d97706";
-        rank1Row.querySelector('.rep-rank-badge').innerText = "2";
-        rank1Row.querySelector('.rep-rank-badge').style.background = "var(--color-sage-accent)";
+    const config = getConfig();
+    if (config.loggerUrl) {
+        fetch(config.loggerUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(loggerPayload)
+        }).catch(err => console.error("jitneylogger POST failed:", err));
+        // Not awaited on purpose — the realtime listener will reflect the
+        // write within a moment; we don't want to block form reset on it.
     }
 
     const logTableBody = document.getElementById('tracker-log-tbody');
     if (logTableBody) {
-        if (stats.dayCalls === 1) { logTableBody.innerHTML = ""; }
-
         const timestampString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const resultStyleBadge = outcome === "Sold" ? "color:#4ade80; font-weight:bold;" : (outcome === "Scheduled Callback" ? "color:#f59e0b;" : "color:#ef4444;");
 
@@ -572,10 +687,6 @@ function fireRevenuePipelineTracking(event) {
             </tr>
         `);
     }
-
-    // TODO: this is also where the jitneylogger call-log POST and the
-    // conditional Ardenus "Save Customer" payload get wired in — not yet
-    // built as of this version of the engine.
 
     document.getElementById('closer-portal-form').reset();
     document.getElementById('script-location-input').value = "";
