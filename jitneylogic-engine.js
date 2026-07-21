@@ -538,11 +538,27 @@ window.saveRepIdentity = saveRepIdentity;
 // go through jitneylogger's Admin SDK, which is the only thing with
 // permission to write under the locked-down firestore.rules.
 // =========================================================================
+function getLocalDateKey(d, timeZone) {
+    const parts = new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(d);
+    const map = {};
+    parts.forEach(p => { map[p.type] = p.value; });
+    return `${map.year}-${map.month}-${map.day}`;
+}
+
 function dateKeysForToday() {
+    const config = getConfig();
+    const timeZone = config.businessTimezone || "America/Denver";
     const d = new Date();
-    const daily = d.toISOString().slice(0, 10);
-    const target = new Date(d.valueOf());
-    const dayNr = (d.getUTCDay() + 6) % 7;
+    const daily = getLocalDateKey(d, timeZone);
+
+    // Build a UTC-equivalent Date from the LOCAL calendar date, so week-number
+    // math (which needs a stable Date object) is based on Utah's calendar day,
+    // not whatever UTC day happens to be at this exact instant.
+    const [y, m, day] = daily.split('-').map(Number);
+    const localAsUtc = new Date(Date.UTC(y, m - 1, day));
+
+    const target = new Date(localAsUtc.valueOf());
+    const dayNr = (localAsUtc.getUTCDay() + 6) % 7;
     target.setUTCDate(target.getUTCDate() - dayNr + 3);
     const firstThursday = new Date(Date.UTC(target.getUTCFullYear(), 0, 4));
     const weekNr = 1 + Math.round(((target - firstThursday) / 86400000 - 3 + ((firstThursday.getUTCDay() + 6) % 7)) / 7);
