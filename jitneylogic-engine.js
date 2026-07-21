@@ -279,10 +279,34 @@ function parsePlaceComponents(place) {
 
 let addressSessionToken = null;
 let addressDebounceTimers = {};
+let addressHighlightIndex = {}; // keyed by input id — which suggestion row is currently highlighted
 
 function closeAddressDropdown(inputEl) {
     const existing = document.getElementById(inputEl.id + "-suggest-panel");
     if (existing) existing.remove();
+    addressHighlightIndex[inputEl.id] = -1;
+}
+
+async function selectAddressSuggestion(inputEl, suggestion) {
+    const place = suggestion.placePrediction.toPlace();
+    await place.fetchFields({ fields: ["addressComponents", "formattedAddress"] });
+    currentAddressComponents = parsePlaceComponents(place);
+    syncAddressValue(place.formattedAddress || suggestion.placePrediction.text.text);
+    closeAddressDropdown(inputEl);
+    addressSessionToken = null; // session ends on selection
+}
+
+function updateAddressHighlight(inputEl) {
+    const panel = document.getElementById(inputEl.id + "-suggest-panel");
+    if (!panel) return;
+    const rows = Array.from(panel.children);
+    const activeIndex = addressHighlightIndex[inputEl.id] ?? -1;
+    rows.forEach((row, i) => {
+        row.style.background = (i === activeIndex) ? "#f1f5f9" : "#fff";
+    });
+    if (activeIndex >= 0 && rows[activeIndex]) {
+        rows[activeIndex].scrollIntoView({ block: "nearest" });
+    }
 }
 
 function renderAddressSuggestions(inputEl, suggestions) {
@@ -298,24 +322,21 @@ function renderAddressSuggestions(inputEl, suggestions) {
     panel.style.left = (rect.left + window.scrollX) + "px";
     panel.style.top = (rect.bottom + window.scrollY + 2) + "px";
 
-    suggestions.forEach(suggestion => {
+    suggestions.forEach((suggestion, index) => {
         const row = document.createElement("div");
         row.textContent = suggestion.placePrediction.text.text;
         row.style.cssText = "padding:8px 10px; cursor:pointer; color:#1e293b;";
-        row.addEventListener("mouseenter", () => row.style.background = "#f1f5f9");
-        row.addEventListener("mouseleave", () => row.style.background = "#fff");
-        row.addEventListener("click", async () => {
-            const place = suggestion.placePrediction.toPlace();
-            await place.fetchFields({ fields: ["addressComponents", "formattedAddress"] });
-            currentAddressComponents = parsePlaceComponents(place);
-            syncAddressValue(place.formattedAddress || suggestion.placePrediction.text.text);
-            closeAddressDropdown(inputEl);
-            addressSessionToken = null; // session ends on selection
+        row.addEventListener("mouseenter", () => {
+            addressHighlightIndex[inputEl.id] = index;
+            updateAddressHighlight(inputEl);
         });
+        row.addEventListener("click", () => selectAddressSuggestion(inputEl, suggestion));
         panel.appendChild(row);
     });
 
+    panel._suggestions = suggestions; // stash for keyboard access
     document.body.appendChild(panel);
+    addressHighlightIndex[inputEl.id] = -1;
 }
 
 async function handleAddressInput(inputEl) {
@@ -339,6 +360,33 @@ async function handleAddressInput(inputEl) {
     }
 }
 
+function handleAddressKeydown(event, inputEl) {
+    const panel = document.getElementById(inputEl.id + "-suggest-panel");
+    if (!panel || !panel._suggestions || panel._suggestions.length === 0) return;
+
+    const count = panel._suggestions.length;
+    const current = addressHighlightIndex[inputEl.id] ?? -1;
+
+    if (event.key === "ArrowDown") {
+        event.preventDefault();
+        addressHighlightIndex[inputEl.id] = (current + 1) % count;
+        updateAddressHighlight(inputEl);
+    } else if (event.key === "ArrowUp") {
+        event.preventDefault();
+        addressHighlightIndex[inputEl.id] = (current - 1 + count) % count;
+        updateAddressHighlight(inputEl);
+    } else if (event.key === "Enter") {
+        if (current >= 0) {
+            event.preventDefault();
+            selectAddressSuggestion(inputEl, panel._suggestions[current]);
+        }
+        // If nothing is highlighted yet, let Enter behave normally (e.g. submit
+        // elsewhere) rather than silently swallowing the keypress.
+    } else if (event.key === "Escape") {
+        closeAddressDropdown(inputEl);
+    }
+}
+
 function initAddressAutocomplete() {
     ["script-address-input", "right-address"].forEach(id => {
         const inputEl = document.getElementById(id);
@@ -347,6 +395,7 @@ function initAddressAutocomplete() {
             clearTimeout(addressDebounceTimers[id]);
             addressDebounceTimers[id] = setTimeout(() => handleAddressInput(inputEl), 250);
         });
+        inputEl.addEventListener("keydown", (event) => handleAddressKeydown(event, inputEl));
     });
     document.addEventListener("click", (event) => {
         ["script-address-input", "right-address"].forEach(id => {
@@ -645,18 +694,36 @@ function renderPersonalStats(prefix, statsDoc) {
     // day-comm/week-comm at whatever the last local calculation showed.
 }
 
+// Which stat ranks the leaderboard — set via config.leaderboardMetric.
+// "revenue" (default), "calls_sold", or "close_rate".
+function getLeaderboardMetricValue(data) {
+    const config = getConfig();
+    const metric = config.leaderboardMetric || "revenue";
+    const callsTaken = data.calls_taken || 0;
+    const callsSold = data.calls_sold || 0;
+    const revenue = data.revenue || 0;
+
+    if (metric === "calls_sold") {
+        return { value: callsSold, display: String(callsSold) };
+    }
+    if (metric === "close_rate") {
+        const rate = callsTaken > 0 ? (callsSold / callsTaken) * 100 : 0;
+        return { value: rate, display: rate.toFixed(1) + "%" };
+    }
+    return { value: revenue, display: "$" + revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) };
+}
+
 function renderLeaderboard(dailyStatsDoc) {
     const container = document.getElementById('leaderboard-grid');
     if (!container) return;
 
     const repBreakdown = (dailyStatsDoc && dailyStatsDoc.rep_breakdown) || {};
     const rows = Object.entries(repBreakdown)
-        .map(([repId, data]) => ({
-            repId,
-            displayName: data.display_name || repId,
-            revenue: data.revenue || 0
-        }))
-        .sort((a, b) => b.revenue - a.revenue);
+        .map(([repId, data]) => {
+            const metric = getLeaderboardMetricValue(data);
+            return { repId, displayName: data.display_name || repId, metricValue: metric.value, metricDisplay: metric.display };
+        })
+        .sort((a, b) => b.metricValue - a.metricValue);
 
     if (rows.length === 0) {
         container.innerHTML = `<div class="leaderboard-row"><span style="opacity:0.6;">Waiting for today's activity...</span></div>`;
@@ -672,7 +739,7 @@ function renderLeaderboard(dailyStatsDoc) {
         return `
             <div class="leaderboard-row ${rankClass} ${userClass}">
                 <div><span class="rep-rank-badge">${index + 1}</span>${label}</div>
-                <span class="metrics-val ${isUser ? 'val-highlight' : ''}">$${row.revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span class="metrics-val ${isUser ? 'val-highlight' : ''}">${row.metricDisplay}</span>
             </div>
         `;
     }).join('');
@@ -732,9 +799,10 @@ function renderRepStandingsTable(statsDoc) {
             displayName: data.display_name || repId,
             callsTaken: data.calls_taken || 0,
             callsSold: data.calls_sold || 0,
-            revenue: data.revenue || 0
+            revenue: data.revenue || 0,
+            metricValue: getLeaderboardMetricValue(data).value
         }))
-        .sort((a, b) => b.revenue - a.revenue);
+        .sort((a, b) => b.metricValue - a.metricValue);
 
     if (rows.length === 0) {
         tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; opacity:0.6;">Waiting for today's activity...</td></tr>`;
@@ -789,6 +857,26 @@ async function fireRevenuePipelineTracking(event) {
     event.preventDefault();
 
     const outcome = document.getElementById('call-outcome').value;
+
+    // Every call needs a phone number and an outcome (enforced via HTML
+    // `required`, already checked by the browser before we get here).
+    // A "Sold" outcome additionally requires the full customer record,
+    // since that's what actually gets used to create the account/schedule
+    // the job. A lost/callback call doesn't need any of this.
+    if (outcome === "Sold") {
+        const missing = [];
+        if (!document.getElementById('first-name').value.trim()) missing.push("First Name");
+        if (!document.getElementById('last-name').value.trim()) missing.push("Last Name");
+        if (!document.getElementById('right-address').value.trim()) missing.push("Service Address");
+        if (!document.getElementById('appointment-date').value) missing.push("Service Date");
+        if (!document.getElementById('package-select').value) missing.push("Package");
+
+        if (missing.length > 0) {
+            alert("Before marking this call Sold, please fill in: " + missing.join(", "));
+            return;
+        }
+    }
+
     const assignedPackage = document.getElementById('package-select').value || "No Package Mapped";
     const currentTcvValue = parseFloat(document.getElementById('tcv-display').value.replace('$', '')) || 0;
     const commissionEarned = parseFloat(document.getElementById('payout-display').value.replace('$', '')) || 0;
