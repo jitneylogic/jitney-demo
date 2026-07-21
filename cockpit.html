@@ -220,6 +220,11 @@
     <div id="app-content" style="display:none;">
     <div id="script-pane">
         <h2>Call Flow & Scripting</h2>
+
+        <div class="script-field-wrapper">
+            <label>Customer Phone Number</label>
+            <input type="tel" id="script-phone-input" placeholder="(801) 555-0199" oninput="syncPhoneValue(this.value)">
+        </div>
         
         <div class="script-block">
             <span class="script-quote">This is <span class="script-highlight-text cfg-rep-name"></span> on a recorded line, who do I have the pleasure of speaking with today?</span>
@@ -484,7 +489,7 @@
                 <div class="grid-2">
                     <div class="form-group">
                         <label>Customer Phone</label>
-                        <input type="tel" id="phone" placeholder="(801) 555-0199" required>
+                        <input type="tel" id="phone" placeholder="(801) 555-0199" required oninput="syncPhoneValue(this.value)">
                     </div>
                     <div class="form-group">
                         <label>Customer Email</label>
@@ -571,7 +576,7 @@
             // SDK setup and configuration → Config. Safe to be public — this is
             // the client identifier, not a secret; access is controlled by
             // firestore.rules, not by hiding this object.
-             firebaseConfig: {
+           firebaseConfig: {
                 apiKey: "AIzaSyDkWrGWcepdHlkzkeSGWLiIrV0Kxsul4nE",
   authDomain: "jitneylogic-beta.firebaseapp.com",
   projectId: "jitneylogic-beta",
@@ -580,6 +585,7 @@
   appId: "1:889415757227:web:9e54a600eb654bb30276ee",
   measurementId: "G-4JECF3BX6E"
             },
+
 
             packageDisplayToVault: {
                 "HomeBase Basic": "HomeBase Basic",
