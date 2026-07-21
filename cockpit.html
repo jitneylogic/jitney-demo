@@ -191,9 +191,27 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAdT027lWYDDB6Ab58_h0JfvnehSt8UPF0&libraries=places&loading=async" async defer></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
 </head>
 <body>
 
+    <div id="login-gate" style="display:flex; align-items:center; justify-content:center; height:100vh; width:100vw; position:fixed; top:0; left:0; background:var(--color-bg-dark); z-index:1000;">
+        <div style="background:var(--color-box-translucent); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:30px; width:320px; box-shadow:var(--shadow-soft);">
+            <h2 style="margin-top:0;">Rep Login</h2>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="login-email" placeholder="you@company.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="login-password" placeholder="••••••••">
+            </div>
+            <button type="button" class="btn-primary" onclick="attemptLogin()">Log In</button>
+            <div id="login-error" style="margin-top:10px; font-size:12px; color:#ef4444;"></div>
+        </div>
+    </div>
+
+    <div id="app-content" style="display:none;">
     <div id="script-pane">
         <h2>Call Flow & Scripting</h2>
         
@@ -307,17 +325,12 @@
     <div id="input-pane">
 
         <div class="leaderboard-section" style="margin-bottom:15px;">
-            <div style="display: flex; justify-content: space-between; align-items:center; gap:15px;">
-                <div class="grid-2" style="margin:0; flex:1;">
-                    <div class="form-group" style="margin:0;">
-                        <label>Rep Name</label>
-                        <input type="text" id="rep-identity-name" oninput="saveRepIdentity()" placeholder="Your name">
-                    </div>
-                    <div class="form-group" style="margin:0;">
-                        <label>Rep ID</label>
-                        <input type="text" id="rep-identity-id" oninput="saveRepIdentity()" placeholder="e.g. TG-001">
-                    </div>
+            <div style="display: flex; justify-content: space-between; align-items:center;">
+                <div>
+                    <label style="margin:0;">Logged in as</label>
+                    <div id="logged-in-rep-display" style="font-size:16px; font-weight:700; color:#fff;">—</div>
                 </div>
+                <button type="button" class="btn-copy-action" onclick="attemptLogout()">Log Out</button>
             </div>
         </div>
         
@@ -552,7 +565,7 @@
             // SDK setup and configuration → Config. Safe to be public — this is
             // the client identifier, not a secret; access is controlled by
             // firestore.rules, not by hiding this object.
-            firebaseConfig: {
+             firebaseConfig: {
                 apiKey: "AIzaSyDkWrGWcepdHlkzkeSGWLiIrV0Kxsul4nE",
   authDomain: "jitneylogic-beta.firebaseapp.com",
   projectId: "jitneylogic-beta",
@@ -561,6 +574,7 @@
   appId: "1:889415757227:web:9e54a600eb654bb30276ee",
   measurementId: "G-4JECF3BX6E"
             },
+
             packageDisplayToVault: {
                 "HomeBase Basic": "HomeBase Basic",
                 "HomeBase Standard PC/RB": "HomeBase Standard PC/RB",
@@ -641,12 +655,8 @@
             updateConsolidatedAppointmentNotes();
         }
 
-        initTurnkeyEnvironment();
-        loadRepIdentity();
-        initAddressAutocomplete();
-        initLiveLeaderboard();
-        runDynamicGuardrails();
-        updateConsolidatedAppointmentNotes();
+        initAuthGate();
     </script>
+    </div>
 </body>
 </html>
