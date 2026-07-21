@@ -217,17 +217,20 @@
         </div>
         <div class="dept-card">
             <div class="dept-card-header">Department Standings: This Week</div>
-            <div class="dept-metric-row"><span class="dept-metric-label">Calls Taken</span><span class="dept-metric-val">582</span></div>
-            <div class="dept-metric-row"><span class="dept-metric-label">Calls Closed</span><span class="dept-metric-val">178</span></div>
-            <div class="dept-metric-row"><span class="dept-metric-label">Close Rate</span><span class="dept-metric-val">30.5%</span></div>
-            <div class="dept-metric-row revenue-focus"><span class="dept-metric-label">Total Revenue Generated</span><span class="dept-metric-val">$108,910.50</span></div>
-            <div class="dept-metric-row"><span class="dept-metric-label">Revenue Per Call (RPC)</span><span class="dept-metric-val">$187.13</span></div>
+            <div class="dept-metric-row"><span class="dept-metric-label">Calls Taken</span><span class="dept-metric-val" id="global-week-calls">0</span></div>
+            <div class="dept-metric-row"><span class="dept-metric-label">Calls Closed</span><span class="dept-metric-val" id="global-week-closed">0</span></div>
+            <div class="dept-metric-row"><span class="dept-metric-label">Close Rate</span><span class="dept-metric-val" id="global-week-rate">0.0%</span></div>
+            <div class="dept-metric-row revenue-focus"><span class="dept-metric-label">Total Revenue Generated</span><span class="dept-metric-val" id="global-week-rev">$0.00</span></div>
+            <div class="dept-metric-row"><span class="dept-metric-label">Revenue Per Call (RPC)</span><span class="dept-metric-val" id="global-week-rpc">$0.00</span></div>
         </div>
     </div>
 
     <h2>Squad Leaderboards</h2>
     <div class="timeframe-block">
         <div class="timeframe-title">Intraday Team Pacing <span id="intraday-team-date" style="margin-left: 6px; font-weight: 500; color: var(--color-mint-soft);"></span></div>
+        <div style="background: rgba(217,119,6,0.15); border: 1px solid var(--gold-accent); color: #fbbf24; padding: 10px 14px; border-radius: 6px; font-size: 12px; margin-bottom: 14px;">
+            ⚠ Team grouping isn't configured yet — the numbers below are placeholder/demo data, not live figures.
+        </div>
         <div class="leaderboard-table-wrapper">
             <table class="leaderboard-table" id="team-table">
                 <thead>
@@ -293,135 +296,40 @@
                         <th style="width: 14%;">Revenue Per Call</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr class="rank-row-1" id="rep-rank-1">
-                        <td><span class="rank-badge">1</span>Spencer</td>
-                        <td class="monospaced-cell">8</td>
-                        <td class="monospaced-cell">4</td>
-                        <td class="monospaced-cell">50.0%</td>
-                        <td class="monospaced-cell" style="color:#4ade80;">$4,840.50</td>
-                        <td class="monospaced-cell">$605.06</td>
-                    </tr>
-                    <tr class="rank-row-2 user-highlight-row" id="rep-rank-user">
-                        <td><span class="rank-badge">2</span>Tyler (You)</td>
-                        <td class="monospaced-cell">9</td>
-                        <td class="monospaced-cell">3</td>
-                        <td class="monospaced-cell">33.3%</td>
-                        <td class="monospaced-cell" style="color:#4ade80;" id="user-rev">$3,650.00</td>
-                        <td class="monospaced-cell">$405.56</td>
-                    </tr>
-                    <tr>
-                        <td><span class="rank-badge">3</span>Nik</td>
-                        <td class="monospaced-cell">7</td>
-                        <td class="monospaced-cell">3</td>
-                        <td class="monospaced-cell">42.9%</td>
-                        <td class="monospaced-cell" style="color:#4ade80;">$3,460.20</td>
-                        <td class="monospaced-cell">$494.31</td>
-                    </tr>
-                    <tr>
-                        <td><span class="rank-badge">4</span>Trevor</td>
-                        <td class="monospaced-cell">10</td>
-                        <td class="monospaced-cell">2</td>
-                        <td class="monospaced-cell">20.0%</td>
-                        <td class="monospaced-cell" style="color:#4ade80;">$2,399.50</td>
-                        <td class="monospaced-cell">$239.95</td>
-                    </tr>
+                <tbody id="rep-standings-tbody">
+                    <tr><td colspan="6" style="text-align:center; opacity:0.6;">Waiting for today's activity...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+    <script src="jitneylogic-engine.js"></script>
     <script>
-        // Automatic Dynamic Date Calibration
+        // Same config values as the cockpit — must point at the same
+        // Firebase project and use the same business timezone, since this
+        // reads the exact stats documents the cockpit writes.
+        window.JITNEYLOGIC_CONFIG = {
+             firebaseConfig: {
+                apiKey: "AIzaSyDkWrGWcepdHlkzkeSGWLiIrV0Kxsul4nE",
+  authDomain: "jitneylogic-beta.firebaseapp.com",
+  projectId: "jitneylogic-beta",
+  storageBucket: "jitneylogic-beta.firebasestorage.app",
+  messagingSenderId: "889415757227",
+  appId: "1:889415757227:web:9e54a600eb654bb30276ee",
+  measurementId: "G-4JECF3BX6E"
+            },
+            businessTimezone: "America/Denver"
+        };
+
         window.addEventListener('DOMContentLoaded', () => {
             const today = new Date();
             const optionsToday = { year: 'numeric', month: 'short', day: 'numeric' };
             document.getElementById('intraday-team-date').innerText = `(${today.toLocaleDateString(undefined, optionsToday)})`;
         });
 
-        // 🔄 INTEGRATION PIPING: REAL-TIME REVENUE INGESTION
-        let globalStats = { calls: 142, closed: 41, revenue: 24350.20 };
-        let tylerStats = { calls: 9, closed: 3, revenue: 3650.00 };
-        let teamApexStats = { calls: 38, closed: 11, revenue: 6450.00 };
-
-        window.addEventListener('storage', function(event) {
-            if (event.key === 'jitney_broadcast_pipeline_deal' && event.newValue) {
-                const packet = JSON.parse(event.newValue);
-                const deal = packet.data;
-
-                // 1. Update Global Department
-                globalStats.calls += 1;
-                if (deal.outcome === "Sold") {
-                    globalStats.closed += 1;
-                    globalStats.revenue += deal.tcv;
-                }
-
-                document.getElementById('global-today-calls').innerText = globalStats.calls;
-                document.getElementById('global-today-closed').innerText = globalStats.closed;
-                document.getElementById('global-today-rate').innerText = ((globalStats.closed / globalStats.calls) * 100).toFixed(1) + "%";
-                document.getElementById('global-today-rev').innerText = "$" + globalStats.revenue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                document.getElementById('global-today-rpc').innerText = "$" + (globalStats.revenue / globalStats.calls).toFixed(2);
-
-                // 2. Update TEAM APEX Standings
-                teamApexStats.calls += 1;
-                if (deal.outcome === "Sold") {
-                    teamApexStats.closed += 1;
-                    teamApexStats.revenue += deal.tcv;
-                }
-                
-                document.getElementById('team-calls').innerText = teamApexStats.calls;
-                document.getElementById('team-closed').innerText = teamApexStats.closed;
-                document.getElementById('team-rate').innerText = ((teamApexStats.closed / teamApexStats.calls) * 100).toFixed(1) + "%";
-                document.getElementById('team-rev').innerText = "$" + teamApexStats.revenue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                document.getElementById('team-rpc').innerText = "$" + (teamApexStats.revenue / teamApexStats.calls).toFixed(2);
-
-                // Team Rank Swap Logic (Over $9,150 to beat Vanguard)
-                if (teamApexStats.revenue > 9150.00) {
-                    const rank1Team = document.getElementById('team-rank-1');
-                    const userTeam = document.getElementById('team-rank-user');
-                    if (userTeam && rank1Team && userTeam.nextElementSibling !== rank1Team) {
-                        userTeam.parentNode.insertBefore(userTeam, rank1Team);
-                        userTeam.querySelector('.rank-badge').innerText = "1";
-                        userTeam.classList.remove('rank-row-2');
-                        userTeam.classList.add('rank-row-1');
-                        rank1Team.querySelector('.rank-badge').innerText = "2";
-                        rank1Team.classList.remove('rank-row-1');
-                        rank1Team.classList.add('rank-row-2');
-                    }
-                }
-
-                // 3. Update INDIVIDUAL Rep Standings
-                tylerStats.calls += 1;
-                if (deal.outcome === "Sold") {
-                    tylerStats.closed += 1;
-                    tylerStats.revenue += deal.tcv;
-                }
-
-                const userRow = document.getElementById('rep-rank-user');
-                if (userRow) {
-                    const cells = userRow.querySelectorAll('.monospaced-cell');
-                    cells[0].innerText = tylerStats.calls;
-                    cells[1].innerText = tylerStats.closed;
-                    cells[2].innerText = ((tylerStats.closed / tylerStats.calls) * 100).toFixed(1) + "%";
-                    cells[3].innerText = "$" + tylerStats.revenue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                    cells[4].innerText = "$" + (tylerStats.revenue / tylerStats.calls).toFixed(2);
-                }
-
-                // Individual Rank Swap Logic (Over $4,840.50 to beat Spencer)
-                if (tylerStats.revenue > 4840.50) {
-                    const rank1Rep = document.getElementById('rep-rank-1');
-                    if (rank1Rep && userRow && userRow.nextElementSibling !== rank1Rep) {
-                        userRow.parentNode.insertBefore(userRow, rank1Rep);
-                        userRow.querySelector('.rank-badge').innerText = "1";
-                        userRow.classList.remove('rank-row-2');
-                        userRow.classList.add('rank-row-1');
-                        rank1Rep.querySelector('.rank-badge').innerText = "2";
-                        rank1Rep.classList.remove('rank-row-1');
-                        rank1Rep.classList.add('rank-row-2');
-                    }
-                }
-            }
-        });
+        initExecutiveDashboard();
     </script>
 </body>
 </html>
