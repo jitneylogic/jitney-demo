@@ -262,6 +262,11 @@ function syncEmailValue(val) {
     document.getElementById('customer-email').value = val;
 }
 
+function syncPhoneValue(val) {
+    document.getElementById('script-phone-input').value = val;
+    document.getElementById('phone').value = val;
+}
+
 function parsePlaceComponents(place) {
     const get = (type) => {
         const comp = (place.addressComponents || []).find(c => c.types.includes(type));
@@ -953,6 +958,7 @@ async function fireRevenuePipelineTracking(event) {
     syncCustomerName("");
     syncLastName("");
     syncEmailValue("");
+    syncPhoneValue("");
     syncAddressValue("");
     currentAddressComponents = null;
     document.getElementById('account-number').value = "";
