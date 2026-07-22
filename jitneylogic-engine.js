@@ -695,8 +695,13 @@ function renderPersonalStats(prefix, statsDoc) {
     setText(`${prefix}-tcv`, "$" + revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
     setText(`${prefix}-acv`, callsSold > 0 ? "$" + (revenue / callsSold).toFixed(2) : "$0.00");
     setText(`${prefix}-rpc`, callsTaken > 0 ? "$" + (revenue / callsTaken).toFixed(2) : "$0.00");
-    // Commission isn't tracked server-side (rate varies per deal) — leaving
-    // day-comm/week-comm at whatever the last local calculation showed.
+
+    // Approximation: applies the CURRENT commission-input rate against total
+    // revenue. Accurate if commission % stays consistent; doesn't retroactively
+    // account for calls logged under a different rate. Good enough for now —
+    // the precise fix is tracking commission per-call server-side (fast-follow).
+    const commissionPercent = parseFloat(document.getElementById('commission-input')?.value) || 0;
+    setText(`${prefix}-comm`, "$" + (revenue * (commissionPercent / 100)).toFixed(2));
 }
 
 // Which stat ranks the leaderboard — set via config.leaderboardMetric.
@@ -750,6 +755,15 @@ function renderLeaderboard(dailyStatsDoc) {
     }).join('');
 }
 
+let latestDailyStatsDoc = null;
+let latestWeeklyStatsDoc = null;
+
+function refreshCommissionDisplay() {
+    if (latestDailyStatsDoc !== null) renderPersonalStats('day', latestDailyStatsDoc);
+    if (latestWeeklyStatsDoc !== null) renderPersonalStats('week', latestWeeklyStatsDoc);
+}
+window.refreshCommissionDisplay = refreshCommissionDisplay;
+
 function initLiveLeaderboard() {
     const config = getConfig();
     if (!config.firebaseConfig || !window.firebase) {
@@ -765,12 +779,14 @@ function initLiveLeaderboard() {
 
     db.collection('daily_stats').doc(daily).onSnapshot(doc => {
         const data = doc.data();
+        latestDailyStatsDoc = data;
         renderPersonalStats('day', data);
         renderLeaderboard(data);
     }, err => console.error("Daily stats listener error:", err));
 
     db.collection('weekly_stats').doc(weekly).onSnapshot(doc => {
-        renderPersonalStats('week', doc.data());
+        latestWeeklyStatsDoc = doc.data();
+        renderPersonalStats('week', latestWeeklyStatsDoc);
     }, err => console.error("Weekly stats listener error:", err));
 }
 window.initLiveLeaderboard = initLiveLeaderboard;
