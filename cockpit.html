@@ -458,7 +458,7 @@
                     </div>
                     <div class="form-group">
                         <label>Comm Tier (%)</label>
-                        <input type="number" id="commission-input" value="10" min="0" max="100" step="0.5" oninput="executeRealtimeCalculations()" style="background:rgba(255,255,255,0.1); color:#fff; border-color:rgba(255,255,255,0.2);">
+                        <input type="number" id="commission-input" value="10" min="0" max="100" step="0.5" oninput="executeRealtimeCalculations(); refreshCommissionDisplay();" style="background:rgba(255,255,255,0.1); color:#fff; border-color:rgba(255,255,255,0.2);">
                     </div>
                     <div class="form-group">
                         <label>Calculated Payout</label>
@@ -585,7 +585,6 @@
   appId: "1:889415757227:web:9e54a600eb654bb30276ee",
   measurementId: "G-4JECF3BX6E"
             },
-
 
             packageDisplayToVault: {
                 "HomeBase Basic": "HomeBase Basic",
