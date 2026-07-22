@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sales Rep Accounts Ledger | RevOps Engine</title>
+    <style>
+        /* Modern, Clean Matte Green UI Tokens */
+        :root {
+            --color-bg-dark: #2A3B31;       /* Deep, rich forest matte */
+            --color-box-translucent: rgba(255, 255, 255, 0.05); 
+            --color-border-deep: #1E5E3F;   
+            --color-sage-accent: #4C9170;   /* High-conversion action color */
+            --color-mint-soft: #8DC4AA;     
+            --color-white: #ffffff;         
+            --text-on-dark: #f8fafc;        
+            --text-on-light: #1e293b;       
+            --color-input-darkgreen: rgba(0,0,0,0.25); /* Deep inset color for tables/inputs */
+            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        body { 
+            margin: 0; 
+            padding: 35px 40px; 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            background: var(--color-bg-dark); 
+            color: var(--text-on-dark); 
+            min-height: 100vh;
+            box-sizing: border-box;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        header {
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--color-sage-accent);
+            padding-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+            letter-spacing: -0.5px;
+            color: var(--color-white);
+            font-weight: 700;
+        }
+
+        .summary-dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .summary-card {
+            background: var(--color-box-translucent);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .summary-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--color-mint-soft);
+            font-weight: 600;
+        }
+
+        .summary-value {
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .ledger-container {
+            background: var(--color-box-translucent);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+
+        .section-title::before {
+            content: "";
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--color-sage-accent);
+            border-radius: 50%;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            background: var(--color-input-darkgreen);
+        }
+
+        .ledger-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        .ledger-table th {
+            color: var(--color-mint-soft);
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            padding: 12px 16px;
+            border-bottom: 2px solid var(--color-border-deep);
+            background: #1f2d25; /* Slightly darker header for contrast */
+            font-weight: 600;
+        }
+
+        .ledger-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            vertical-align: middle;
+            color: rgba(248, 250, 252, 0.9);
+        }
+
+        .ledger-table tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        /* Status interactive select styles (Modern SaaS Badge Look) */
+        select.status-select-inline {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 12px;
+            border-radius: 20px; /* Pill shape for tags */
+            font-size: 11px;
+            font-family: inherit;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            width: 160px;
+            appearance: none; /* remove default arrow for cleaner look */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            text-align: center;
+        }
+        
+        select.status-select-inline:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Dynamic Colors for specific states */
+        .status-sold { background: rgba(74, 222, 128, 0.15) !important; color: #4ade80 !important; border-color: rgba(74, 222, 128, 0.3) !important; }
+        .status-pending { background: rgba(245, 158, 11, 0.15) !important; color: #f59e0b !important; border-color: rgba(245, 158, 11, 0.3) !important; }
+        .status-lost { background: rgba(239, 68, 68, 0.15) !important; color: #ef4444 !important; border-color: rgba(239, 68, 68, 0.3) !important; }
+        
+        .monospaced { font-family: 'SFMono-Regular', Consolas, monospace; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Personal Call and Sale Ledger</h1>
+    </header>
+
+    <div class="summary-dashboard-grid">
+        <div class="summary-card">
+            <span class="summary-label">Total Accounts Managed</span>
+            <span class="summary-value" id="stat-total-accounts">0</span>
+        </div>
+        <div class="summary-card">
+            <span class="summary-label">Active Sold Contracts</span>
+            <span class="summary-value" id="stat-sold-accounts">0</span>
+        </div>
+        <div class="summary-card">
+            <span class="summary-label">Net Session Revenue</span>
+            <span class="summary-value" style="color:#4ade80;" id="stat-net-revenue">$0.00</span>
+        </div>
+        <div class="summary-card">
+            <span class="summary-label">Projected Commissions</span>
+            <span class="summary-value" style="color:var(--color-mint-soft);" id="stat-commissions">$0.00</span>
+        </div>
+    </div>
+
+    <div class="ledger-container">
+        <div class="section-title">Settled Revenue Contracts Log</div>
+        <div class="table-wrapper">
+            <table class="ledger-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Customer Profile</th>
+                        <th>Account Number</th>
+                        <th>Contract Tier</th>
+                        <th>TCV Valuation</th>
+                        <th>Est. Payout</th>
+                        <th>Service Window</th>
+                    </tr>
+                </thead>
+                <tbody id="sales-ledger-tbody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="ledger-container">
+        <div class="section-title">Open Callbacks & Pipeline Logs</div>
+        <div class="table-wrapper">
+            <table class="ledger-table">
+                <thead>
+                    <tr>
+                        <th>Account Number</th>
+                        <th>Customer Name</th>
+                        <th>Phone Number</th>
+                        <th>Potential Commissions</th> <th>Fulfillment Log Summary</th>
+                        <th>Pipeline Workflow Status</th>
+                    </tr>
+                </thead>
+                <tbody id="callback-ledger-tbody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Mock Data Array Ledger - Preloaded for pitch visual appeal
+        let mockSalesLog = [
+            { time: "09:14 AM", name: "Sarah Jenkins", account: "FR-5501928", package: "Standard", tcv: 809.88, comm: 121.48, window: "12:00 PM - 4:00 PM" },
+            { time: "11:42 AM", name: "Robert Chen", account: "FR-5501931", package: "Premium", tcv: 1079.88, comm: 161.98, window: "4:00 PM - 8:00 PM" },
+            { time: "01:15 PM", name: "Amanda Ross", account: "FR-5501940", package: "Basic", tcv: 679.88, comm: 101.98, window: "Any Time" }
+        ];
+
+        let mockCallbackLog = [
+            { id: 101, account: "CB-90218", name: "David Miller", phone: "(801) 555-3921", comm: 121.48, notes: "David requested an afternoon confirmation touch point once home layout dimensions are validated with spouse.", status: "Follow Up Pending" },
+            { id: 102, account: "CB-90225", name: "Elena Rostova", phone: "(614) 555-8832", comm: 161.98, notes: "German Roach infestation validation confirmed. Rep pitch anchored on immediate deposit parameters.", status: "Follow Up #1" },
+            { id: 103, account: "CB-90239", name: "Marcus Vance", phone: "(512) 555-0144", comm: 101.98, notes: "Not Sold on initial interaction loop; call dropped during initial summer promotion value reframe structure.", status: "Follow Up #2" }
+        ];
+
+        // UI Compilation and Math Accumulation Engine Rows
+        function recalculateLedgerState() {
+            let totalAccounts = mockSalesLog.length + mockCallbackLog.length;
+            let soldAccounts = mockSalesLog.length;
+            
+            let netRevenue = mockSalesLog.reduce((sum, item) => sum + item.tcv, 0);
+            let totalComm = mockSalesLog.reduce((sum, item) => sum + item.comm, 0);
+
+            // Append totals directly to counter nodes
+            document.getElementById('stat-total-accounts').innerText = totalAccounts;
+            document.getElementById('stat-sold-accounts').innerText = soldAccounts;
+            document.getElementById('stat-net-revenue').innerText = "$" + netRevenue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('stat-commissions').innerText = "$" + totalComm.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+
+        function renderTableStructures() {
+            // 1. Populate Settled Revenue Table rows
+            const salesTbody = document.getElementById('sales-ledger-tbody');
+            salesTbody.innerHTML = "";
+            
+            mockSalesLog.forEach(sale => {
+                const markup = `
+                    <tr>
+                        <td style="color:var(--color-mint-soft);">${sale.time}</td>
+                        <td><strong style="color: #fff;">${sale.name}</strong></td>
+                        <td class="monospaced" style="font-weight:bold;">${sale.account || 'N/A'}</td>
+                        <td><span style="background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; font-size: 11px; text-transform: uppercase; font-weight: bold;">${sale.package}</span></td>
+                        <td class="monospaced" style="font-weight:bold; color: #fff;">$${sale.tcv.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td class="monospaced" style="color:#4ade80; font-weight:bold;">$${sale.comm.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>${sale.window}</td>
+                    </tr>
+                `;
+                salesTbody.insertAdjacentHTML('beforeend', markup);
+            });
+
+            // 2. Populate Pending Callbacks Log rows
+            const callbackTbody = document.getElementById('callback-ledger-tbody');
+            callbackTbody.innerHTML = "";
+
+            mockCallbackLog.forEach(cb => {
+                let cbStyleClass = "status-select-inline";
+                if(cb.status === 'Sold') cbStyleClass += " status-sold";
+                if(cb.status.includes('Follow Up')) cbStyleClass += " status-pending";
+                if(cb.status === 'Not Interested' || cb.status === 'Lost') cbStyleClass += " status-lost";
+
+                const callbackMarkup = `
+                    <tr>
+                        <td class="monospaced" style="font-weight:bold;">${cb.account || 'N/A'}</td>
+                        <td><strong style="color: #fff;">${cb.name}</strong></td>
+                        <td>${cb.phone || 'N/A'}</td>
+                        <td class="monospaced" style="color: #f59e0b; font-weight: bold;">$${(cb.comm || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>
+                            <div style="max-width:380px; padding-right:15px; line-height:1.5; color:rgba(255,255,255,0.7);">
+                                ${cb.notes}
+                            </div>
+                        </td>
+                        <td>
+                            <select class="${cbStyleClass}" onchange="updateCallbackStatus(${cb.id}, this)">
+                                <option value="Follow Up Pending" ${cb.status === 'Follow Up Pending' ? 'selected' : ''}>Follow Up Pending</option>
+                                <option value="Follow Up #1" ${cb.status === 'Follow Up #1' ? 'selected' : ''}>Follow Up #1</option>
+                                <option value="Follow Up #2" ${cb.status === 'Follow Up #2' ? 'selected' : ''}>Follow Up #2</option>
+                                <option value="Follow Up #3" ${cb.status === 'Follow Up #3' ? 'selected' : ''}>Follow Up #3</option>
+                                <option value="Not Interested" ${cb.status === 'Not Interested' || cb.status === 'Lost' ? 'selected' : ''}>Not Interested</option>
+                                <option value="Sold" ${cb.status === 'Sold' ? 'selected' : ''}>Sold</option>
+                            </select>
+                        </td>
+                    </tr>
+                `;
+                callbackTbody.insertAdjacentHTML('beforeend', callbackMarkup);
+            });
+        }
+
+        // Live Select Node Tracker Status updates
+        function updateCallbackStatus(callbackId, selectElement) {
+            const chosenValue = selectElement.value;
+            
+            // Reapply style context highlights dynamically on selection changes
+            selectElement.className = "status-select-inline";
+            if(chosenValue === 'Sold') selectElement.classList.add('status-sold');
+            if(chosenValue.includes('Follow Up')) selectElement.classList.add('status-pending');
+            if(chosenValue === 'Not Interested' || chosenValue === 'Lost') selectElement.classList.add('status-lost');
+
+            const targetIndex = mockCallbackLog.findIndex(item => item.id === callbackId);
+            if(targetIndex !== -1) {
+                mockCallbackLog[targetIndex].status = chosenValue;
+            }
+            recalculateLedgerState();
+        }
+
+        // Trigger compilation cycles upon interface load execution window states
+        renderTableStructures();
+        recalculateLedgerState();
+
+        // =========================================================================
+        // 🔄 INTEGRATION PIPING: CROSS-TAB WORKSPACE BROADCAST LISTENER
+        // =========================================================================
+        window.addEventListener('storage', function(event) {
+            if (event.key === 'jitney_broadcast_pipeline_deal' && event.newValue) {
+                const packet = JSON.parse(event.newValue);
+                const deal = packet.data;
+
+                if (deal.outcome === "Sold") {
+                    // Prepend record directly into the Settled Revenue Contracts Log table
+                    mockSalesLog.unshift({
+                        time: deal.timestamp,
+                        name: `${deal.firstName} ${deal.lastName}`.trim() || 'Unknown Customer',
+                        account: deal.accountNumber,
+                        package: deal.package,
+                        tcv: deal.tcv,
+                        comm: deal.comm,
+                        window: deal.window
+                    });
+                } else if (deal.outcome === "Scheduled Callback" || deal.outcome === "Not Sold" || deal.outcome === "Lost") {
+                    // Prepend record directly into the Open Callbacks & Pipeline Logs table
+                    mockCallbackLog.unshift({
+                        id: Date.now(),
+                        account: deal.accountNumber,
+                        name: `${deal.firstName} ${deal.lastName}`.trim() || 'Unknown Customer',
+                        phone: deal.accountNumber, // Note: using account field as phone fallback based on main script
+                        comm: deal.comm, // Stores the opportunity cost pipeline value
+                        notes: deal.notes,
+                        status: deal.outcome === "Scheduled Callback" ? "Follow Up Pending" : "Not Interested"
+                    });
+                }
+
+                // Execute UI refresh and math aggregation loops
+                renderTableStructures();
+                recalculateLedgerState();
+            }
+        });
+    </script>
+
+</body>
+</html>
