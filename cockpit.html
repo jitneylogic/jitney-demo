@@ -567,6 +567,10 @@
         // onboarding a new client. Everything else lives in jitneylogic-engine.js.
         // =====================================================================
         window.JITNEYLOGIC_CONFIG = {
+            // Must match the document ID under the `pricing_rules` collection
+            // in Firestore (see seed-pricing.js). This is the only thing that
+            // tells the shared Vault which client's pricing to use.
+            clientId: "demo-pest-co",
             vaultUrl: "https://jitneyvault-889415757227.us-central1.run.app/",
             loggerUrl: "https://jitneylogger-889415757227.us-central1.run.app/",
             businessTimezone: "America/Denver", // Utah — change per client (must match jitneylogger's BUSINESS_TIMEZONE)
