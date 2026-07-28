@@ -774,21 +774,26 @@ function initLiveLeaderboard() {
         console.error("Firebase config missing or Firebase SDK not loaded — live leaderboard disabled.");
         return;
     }
+    if (!config.clientId) {
+        console.error("JITNEYLOGIC_CONFIG.clientId is not set — live leaderboard disabled.");
+        return;
+    }
 
     if (!firebase.apps.length) {
         firebase.initializeApp(config.firebaseConfig);
     }
     const db = firebase.firestore();
+    const clientRef = db.collection('clients').doc(config.clientId);
     const { daily, weekly } = dateKeysForToday();
 
-    db.collection('daily_stats').doc(daily).onSnapshot(doc => {
+    clientRef.collection('daily_stats').doc(daily).onSnapshot(doc => {
         const data = doc.data();
         latestDailyStatsDoc = data;
         renderPersonalStats('day', data);
         renderLeaderboard(data);
     }, err => console.error("Daily stats listener error:", err));
 
-    db.collection('weekly_stats').doc(weekly).onSnapshot(doc => {
+    clientRef.collection('weekly_stats').doc(weekly).onSnapshot(doc => {
         latestWeeklyStatsDoc = doc.data();
         renderPersonalStats('week', latestWeeklyStatsDoc);
     }, err => console.error("Weekly stats listener error:", err));
@@ -857,20 +862,25 @@ function initExecutiveDashboard() {
         console.error("Firebase config missing or Firebase SDK not loaded — executive dashboard disabled.");
         return;
     }
+    if (!config.clientId) {
+        console.error("JITNEYLOGIC_CONFIG.clientId is not set — executive dashboard disabled.");
+        return;
+    }
 
     if (!firebase.apps.length) {
         firebase.initializeApp(config.firebaseConfig);
     }
     const db = firebase.firestore();
+    const clientRef = db.collection('clients').doc(config.clientId);
     const { daily, weekly } = dateKeysForToday();
 
-    db.collection('daily_stats').doc(daily).onSnapshot(doc => {
+    clientRef.collection('daily_stats').doc(daily).onSnapshot(doc => {
         const data = doc.data();
         renderDepartmentCard('global-today', data);
         renderRepStandingsTable(data);
     }, err => console.error("Daily stats listener error:", err));
 
-    db.collection('weekly_stats').doc(weekly).onSnapshot(doc => {
+    clientRef.collection('weekly_stats').doc(weekly).onSnapshot(doc => {
         renderDepartmentCard('global-week', doc.data());
     }, err => console.error("Weekly stats listener error:", err));
 }
@@ -918,6 +928,7 @@ async function fireRevenuePipelineTracking(event) {
 
     const loggerPayload = {
         call_id: window.currentCallId,
+        client_id: getConfig().clientId,
         rep_id: getRepId(),
         rep_name: getRepName(),
         pest_type: Array.from(document.querySelectorAll('.pest-checkbox:checked')).map(cb => cb.getAttribute('data-display')).join(', ') || null,
