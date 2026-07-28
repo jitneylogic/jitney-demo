@@ -42,11 +42,15 @@ async function fetchVaultQuote(payload) {
         console.error("JITNEYLOGIC_CONFIG.vaultUrl is not set.");
         return null;
     }
+    if (!config.clientId) {
+        console.error("JITNEYLOGIC_CONFIG.clientId is not set — the Vault can't look up pricing without it.");
+        return null;
+    }
     try {
         const resp = await fetch(config.vaultUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({ ...payload, client_id: config.clientId })
         });
         const data = await resp.json();
         if (!resp.ok || data.status !== "success") return null;
