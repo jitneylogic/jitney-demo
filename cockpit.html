@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Closer Workspace | RevOps Engine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Modern, Clean Matte Green UI Tokens */
+        /* Modern, Calm Matte Green UI Tokens — v2 redesign */
         :root {
-            --color-bg-dark: #2A3B31;       /* Deep, rich forest matte */
+            --color-bg-dark: #223129;       /* Deep, rich forest matte */
             --color-box-translucent: rgba(255, 255, 255, 0.05); 
             --color-border-deep: #1E5E3F;   
             --color-sage-accent: #4C9170;   /* High-conversion action color */
@@ -14,28 +16,50 @@
             --color-white: #ffffff;         
             --text-on-dark: #f8fafc;        
             --text-on-light: #1e293b;       /* Dark slate for high readability on white */
-            --gold-accent: #d97706;         
+            --gold-accent: #D9A441;
+            --gold-dim: rgba(217,164,65,0.14);
             --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --shadow-inset: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+
+            /* Script pane — defaults to warm dark, toggled to light via .light-mode */
+            --sp-bg: #1C1917;
+            --sp-panel-bg: #26221F;
+            --sp-input-bg: rgba(255,255,255,0.05);
+            --sp-hairline: rgba(255,255,255,0.1);
+            --sp-text: rgba(243,241,236,0.95);
+            --sp-text-dim: rgba(243,241,236,0.55);
+            --sp-dynamic: #EFC97A;
+            --sp-h2-color: rgba(243,241,236,0.95);
+        }
+        #script-pane.light-mode {
+            --sp-bg: #FAF8F4;
+            --sp-panel-bg: #FFFFFF;
+            --sp-input-bg: #FFFFFF;
+            --sp-hairline: rgba(0,0,0,0.12);
+            --sp-text: #262220;
+            --sp-text-dim: #8A8177;
+            --sp-dynamic: #8A5A12;
+            --sp-h2-color: #262220;
         }
 
         body { 
             margin: 0; padding: 0; 
-            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            font-family: 'Manrope', system-ui, -apple-system, sans-serif; 
             background: var(--color-bg-dark); 
             display: flex; height: 100vh; overflow: hidden;
             color: var(--text-on-dark); 
         }
         
-        /* Left Panel - Guided Scripting Paper Workspace */
+        /* Left Panel - Guided Scripting Workspace */
         #script-pane { 
             width: 45%; 
-            background: #f8fafc; 
+            background: var(--sp-bg); 
             padding: 35px 40px; 
-            border-right: 1px solid var(--color-border-deep); 
+            border-right: 1px solid var(--sp-hairline); 
             box-sizing: border-box; 
             overflow-y: auto; 
-            color: var(--text-on-light);
+            color: var(--sp-text);
+            transition: background 0.2s ease, color 0.2s ease;
         }
         
         /* Right Panel - Command Cockpit */
@@ -53,34 +77,34 @@
             height: 100vh;
         }
         
+        h1, h2 { font-family: 'Fraunces', serif; }
+
         h2 { 
             margin-top: 0; margin-bottom: 20px;
-            font-size: 18px; font-weight: 700;
-            letter-spacing: 0.5px; text-transform: uppercase;
+            font-size: 19px; font-weight: 500;
+            letter-spacing: -0.01em;
             color: var(--color-mint-soft);
             border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 10px;
         }
         
         #script-pane h2 { 
-            color: var(--text-on-light); 
+            color: var(--sp-h2-color); 
             border-bottom: 2px solid var(--color-sage-accent);
         }
 
         /* --- SCRIPT CARDS (Optimized for Readability) --- */
         .script-block { 
-            background: var(--color-white); 
-            border-left: 5px solid var(--color-sage-accent); 
+            background: var(--sp-panel-bg); 
+            border-left: 2px solid var(--color-sage-accent); 
             padding: 18px 24px; 
             margin-bottom: 15px; 
-            font-size: 15px; line-height: 1.6; 
-            color: var(--text-on-light); 
-            border-radius: 0 8px 8px 0;
-            box-shadow: var(--shadow-soft);
-            transition: transform 0.1s ease;
+            font-size: 16px; line-height: 1.65; 
+            color: var(--sp-text); 
+            border-radius: 0 10px 10px 0;
+            transition: background 0.2s ease, color 0.2s ease;
         }
-        .script-block:hover { transform: translateX(2px); }
-        .script-quote { font-weight: 500; }
-        .script-highlight-text { color: var(--color-sage-accent); font-weight: 700; background: rgba(76, 145, 112, 0.1); padding: 0 4px; border-radius: 3px; }
+        .script-quote { font-weight: 400; }
+        .script-highlight-text { color: var(--sp-dynamic); font-weight: 700; }
         .script-field-wrapper { margin-bottom: 25px; padding-left: 5px; }
 
         /* --- DASHBOARD METRICS (Tight Grid) --- */
@@ -90,8 +114,7 @@
         .metrics-card {
             background: var(--color-box-translucent);
             border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px; padding: 18px;
-            box-shadow: var(--shadow-soft);
+            border-radius: 12px; padding: 18px;
         }
         .metrics-card h3 {
             margin: 0 0 12px 0; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;
@@ -102,30 +125,31 @@
         }
         .metrics-row:last-child { margin-bottom: 0; }
         .metrics-val { font-family: 'SFMono-Regular', Consolas, monospace; font-weight: 700; color: #ffffff; }
-        .val-highlight { color: #4ade80; }
+        .val-highlight { color: var(--gold-accent); font-family: 'Fraunces', serif; }
 
         /* --- LIVE LEADERBOARD (Clean & Visceral) --- */
         .leaderboard-section {
             background: var(--color-box-translucent); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px; padding: 18px; margin-bottom: 30px; box-shadow: var(--shadow-soft);
+            border-radius: 12px; padding: 18px; margin-bottom: 30px;
         }
         .leaderboard-grid { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
         .leaderboard-row {
             display: flex; justify-content: space-between; align-items: center;
-            background: rgba(0, 0, 0, 0.2); padding: 10px 14px; border-radius: 6px; font-size: 13px;
+            background: rgba(0, 0, 0, 0.2); padding: 10px 14px; border-radius: 8px; font-size: 13px;
             border: 1px solid transparent;
         }
-        .user-row { border-color: var(--color-sage-accent); background: rgba(76, 145, 112, 0.15); box-shadow: var(--shadow-inset); }
+        .user-row { border-color: var(--gold-accent); background: var(--gold-dim); }
         .rep-rank-badge {
-            background: var(--color-border-deep); padding: 3px 8px; border-radius: 4px;
-            font-size: 11px; font-weight: 800; margin-right: 12px; color: #fff;
+            background: rgba(255,255,255,0.08); padding: 3px 8px; border-radius: 5px;
+            font-size: 11px; font-weight: 800; margin-right: 12px; color: rgba(248, 250, 252, 0.8);
         }
-        .rank-1 .rep-rank-badge { background: var(--gold-accent); }
+        .rank-1 .rep-rank-badge { background: var(--gold-accent); color: #2B1F09; }
+        .user-row .rep-rank-badge { background: var(--gold-accent); color: #2B1F09; }
 
         /* --- FORMS & INPUTS --- */
         .form-section { 
             background: var(--color-box-translucent); padding: 24px; 
-            border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 25px; 
+            border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 25px; 
         }
         .grid-2 { display: flex; gap: 15px; margin-bottom: 18px; }
         .grid-2 .form-group { flex: 1; margin-bottom: 0; }
@@ -134,14 +158,17 @@
         .form-group { margin-bottom: 18px; }
         
         label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 11px; text-transform: uppercase; color: var(--color-mint-soft); letter-spacing: 0.5px; }
-        #script-pane label { color: #64748b; }
+        #script-pane label { color: var(--sp-text-dim); }
         
         input, select, textarea { 
-            width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; 
+            width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; 
             font-size: 14px; background: #ffffff; font-family: inherit; color: var(--text-on-light); transition: all 0.2s; box-sizing: border-box;
         }
         #input-pane input, #input-pane select, #input-pane textarea { 
             border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.15); color: #ffffff;
+        }
+        #script-pane input, #script-pane select, #script-pane textarea {
+            border: 1px solid var(--sp-hairline); background: var(--sp-input-bg); color: var(--sp-text);
         }
         input:focus, select:focus, textarea:focus { border-color: var(--color-sage-accent); outline: none; box-shadow: 0 0 0 3px rgba(76, 145, 112, 0.2); }
         #input-pane input[readonly], #input-pane textarea[readonly] { background: rgba(0,0,0,0.3); color: var(--color-mint-soft); font-family: monospace; font-size: 14px;}
@@ -150,48 +177,61 @@
         .multiselect-container { position: relative; width: 100%; z-index: 10; }
         .multiselect-container.active { z-index: 9999; }
         .select-display-box { 
-            width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; 
+            width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; 
             font-size: 14px; background: #ffffff; color: #64748b; cursor: pointer; 
             display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;
         }
         #input-pane .select-display-box { background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.2); color: #ffffff; }
+        #script-pane .select-display-box { background: var(--sp-input-bg); border: 1px solid var(--sp-hairline); color: var(--sp-text-dim); }
         
         .checkbox-dropdown-window { 
             display: none; position: absolute; top: 100%; left: 0; width: 100%; 
-            background: #ffffff; border: 1px solid var(--color-sage-accent); border-radius: 6px; 
+            background: #ffffff; border: 1px solid var(--color-sage-accent); border-radius: 8px; 
             z-index: 9999; max-height: 240px; overflow-y: auto; padding: 8px; margin-top: 4px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); 
             box-sizing: border-box;
         }
         #input-pane .checkbox-dropdown-window { background: #1e293b; border-color: rgba(255,255,255,0.2); }
+        #script-pane .checkbox-dropdown-window { background: var(--sp-panel-bg); border-color: var(--color-sage-accent); }
         .checkbox-dropdown-window label { 
             display: flex; align-items: center; gap: 10px; font-weight: 500; text-transform: none; 
             color: #1e293b; padding: 8px 10px; cursor: pointer; letter-spacing: normal; margin: 0; font-size: 14px; border-radius: 4px;
         }
         #input-pane .checkbox-dropdown-window label { color: #f8fafc; }
+        #script-pane .checkbox-dropdown-window label { color: var(--sp-text); }
         .checkbox-dropdown-window label:hover { background: #f1f5f9; }
         #input-pane .checkbox-dropdown-window label:hover { background: rgba(255,255,255,0.1); }
+        #script-pane .checkbox-dropdown-window label:hover { background: var(--sp-hairline); }
         .checkbox-dropdown-window input[type="checkbox"] { width: auto; margin: 0; cursor: pointer; }
 
         /* Fast Action Buttons */
         .copy-input-group { display: flex; gap: 8px; align-items: stretch; }
         .btn-copy-action {
             background: var(--color-sage-accent); color: #ffffff; border: none; padding: 0 16px; 
-            font-size: 11px; font-weight: 700; border-radius: 6px; cursor: pointer; text-transform: uppercase; 
+            font-size: 11px; font-weight: 700; border-radius: 8px; cursor: pointer; text-transform: uppercase; 
             letter-spacing: 0.5px; transition: background 0.15s; flex-shrink: 0;
         }
         .btn-copy-action:hover { background: var(--color-border-deep); }
 
         .btn-primary { 
             width: 100%; background: var(--color-sage-accent); color: white; border: none; 
-            padding: 16px; font-size: 15px; font-weight: 800; border-radius: 6px; cursor: pointer; 
+            padding: 16px; font-size: 15px; font-weight: 700; border-radius: 8px; cursor: pointer; 
             transition: all 0.2s; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px;
-            box-shadow: 0 4px 12px rgba(76, 145, 112, 0.3);
         }
-        .btn-primary:hover { background: #3d7a5c; transform: translateY(-1px); box-shadow: 0 6px 15px rgba(76, 145, 112, 0.4); }
+        .btn-primary:hover { background: #3d7a5c; transform: translateY(-1px); }
         .btn-primary:active { transform: translateY(1px); }
 
         .pest-fact-bullet { margin: 6px 0 6px 10px; font-size: 14px; display: flex; align-items: flex-start; gap: 8px; }
         .pest-fact-bullet::before { content: "→"; color: var(--color-sage-accent); font-weight: bold; }
+
+        /* --- SCRIPT PANE THEME TOGGLE --- */
+        .theme-toggle-wrapper { margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--sp-hairline); display: flex; justify-content: center; }
+        .theme-toggle { display: flex; background: var(--sp-hairline); border-radius: 20px; padding: 3px; gap: 2px; }
+        .theme-toggle button {
+            border: none; background: transparent; padding: 7px 16px; border-radius: 16px;
+            font-family: 'Manrope', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer;
+            color: var(--sp-text-dim);
+        }
+        .theme-toggle button.active { background: var(--color-sage-accent); color: #fff; }
 
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAdT027lWYDDB6Ab58_h0JfvnehSt8UPF0&libraries=places&loading=async" async defer></script>
@@ -350,6 +390,13 @@
 
         <div class="script-block">
             <span class="script-quote">That cleared. We will see you on <span class="script-highlight-text" id="inject-final-window">[Date & Window]</span> for your <span class="script-highlight-text" id="inject-package-text">[Package]</span> service. Welcome to the family.</span>
+        </div>
+
+        <div class="theme-toggle-wrapper">
+            <div class="theme-toggle">
+                <button type="button" id="theme-btn-dark" onclick="setScriptPaneTheme('dark')">Dark</button>
+                <button type="button" id="theme-btn-light" onclick="setScriptPaneTheme('light')">Light</button>
+            </div>
         </div>
     </div>
 
@@ -694,6 +741,16 @@
             evaluatePestCombinationMatrix();
             updateConsolidatedAppointmentNotes();
         }
+
+        function setScriptPaneTheme(mode) {
+            const pane = document.getElementById('script-pane');
+            pane.classList.toggle('light-mode', mode === 'light');
+            document.getElementById('theme-btn-dark').classList.toggle('active', mode !== 'light');
+            document.getElementById('theme-btn-light').classList.toggle('active', mode === 'light');
+            localStorage.setItem('jitneylogic_script_pane_theme', mode);
+        }
+        window.setScriptPaneTheme = setScriptPaneTheme;
+        setScriptPaneTheme(localStorage.getItem('jitneylogic_script_pane_theme') || 'dark');
 
         initAuthGate();
     </script>
