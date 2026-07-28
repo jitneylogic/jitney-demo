@@ -214,6 +214,9 @@
             </div>
             <button type="button" class="btn-primary" onclick="attemptLogin()">Log In</button>
             <div id="login-error" style="margin-top:10px; font-size:12px; color:#ef4444;"></div>
+            <div style="margin-top:10px;">
+                <a href="#" onclick="sendCockpitResetEmail(); return false;" style="color: var(--color-mint-soft); font-size:12px;">Forgot password?</a>
+            </div>
         </div>
     </div>
 
@@ -223,7 +226,7 @@
             <p style="font-size:13px; opacity:0.75; margin-top:-6px;">This is your first login — set a password only you know before continuing.</p>
             <div class="form-group">
                 <label>New Password</label>
-                <input type="password" id="reset-new-password" placeholder="At least 8 characters" onkeydown="if(event.key==='Enter') attemptForcedReset()">
+                <input type="password" id="reset-new-password" placeholder="8+ chars, incl. a letter, number & symbol" onkeydown="if(event.key==='Enter') attemptForcedReset()">
             </div>
             <div class="form-group">
                 <label>Confirm New Password</label>
@@ -577,7 +580,7 @@
         </form>
     </div>
 
-    <script src="https://jitneylogic.github.io/jitneylogic-shared/jitneylogic-engine.js?v=4"></script>
+    <script src="https://jitneylogic.github.io/jitneylogic-shared/jitneylogic-engine.js?v=6"></script>
     <script>
         // =====================================================================
         // CLIENT CONFIG — the only block that should need to change when
