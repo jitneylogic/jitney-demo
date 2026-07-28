@@ -217,6 +217,23 @@
         </div>
     </div>
 
+    <div id="force-reset-gate" style="display:none; align-items:center; justify-content:center; height:100vh; width:100vw; position:fixed; top:0; left:0; background:var(--color-bg-dark); z-index:1000;">
+        <div style="background:var(--color-box-translucent); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:30px; width:320px; box-shadow:var(--shadow-soft);">
+            <h2 style="margin-top:0;">Set Your Password</h2>
+            <p style="font-size:13px; opacity:0.75; margin-top:-6px;">This is your first login — set a password only you know before continuing.</p>
+            <div class="form-group">
+                <label>New Password</label>
+                <input type="password" id="reset-new-password" placeholder="At least 8 characters" onkeydown="if(event.key==='Enter') attemptForcedReset()">
+            </div>
+            <div class="form-group">
+                <label>Confirm New Password</label>
+                <input type="password" id="reset-confirm-password" placeholder="••••••••" onkeydown="if(event.key==='Enter') attemptForcedReset()">
+            </div>
+            <button type="button" class="btn-primary" onclick="attemptForcedReset()">Set Password &amp; Continue</button>
+            <div id="reset-error" style="margin-top:10px; font-size:12px; color:#ef4444;"></div>
+        </div>
+    </div>
+
     <div id="app-content" style="display:none;">
     <div id="script-pane">
         <h2>Call Flow & Scripting</h2>
@@ -560,7 +577,7 @@
         </form>
     </div>
 
-    <script src="https://jitneylogic.github.io/jitneylogic-shared/jitneylogic-engine.js?v=3"></script>
+    <script src="https://jitneylogic.github.io/jitneylogic-shared/jitneylogic-engine.js?v=4"></script>
     <script>
         // =====================================================================
         // CLIENT CONFIG — the only block that should need to change when
@@ -573,6 +590,7 @@
             clientId: "demo-pest-co",
             vaultUrl: "https://jitneyvault-889415757227.us-central1.run.app/",
             loggerUrl: "https://jitneylogger-889415757227.us-central1.run.app/",
+            adminUrl: "https://jitneyadmin-889415757227.us-central1.run.app/",
             businessTimezone: "America/Denver", // Utah — change per client (must match jitneylogger's BUSINESS_TIMEZONE)
             ardenusUrl: "https://REPLACE-WITH-ARDENUS-ENDPOINT.example.com/",
 
