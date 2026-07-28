@@ -311,6 +311,9 @@
         // Firebase project and use the same business timezone, since this
         // reads the exact stats documents the cockpit writes.
         window.JITNEYLOGIC_CONFIG = {
+          // Must match the cockpit's clientId — this is what scopes the
+          // dashboard to one client's stats instead of another's.
+          clientId: "demo-pest-co",
           firebaseConfig: {
                 apiKey: "AIzaSyDkWrGWcepdHlkzkeSGWLiIrV0Kxsul4nE",
   authDomain: "jitneylogic-beta.firebaseapp.com",
