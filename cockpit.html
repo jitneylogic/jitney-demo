@@ -292,6 +292,14 @@
             font-size: 11px; font-weight: 700; border-radius: 8px; cursor: pointer; text-transform: uppercase; 
             letter-spacing: 0.5px; transition: background 0.15s; flex-shrink: 0;
         }
+
+        .btn-logout {
+            background: var(--color-sage-accent); color: #ffffff; border: none; padding: 12px 26px;
+            font-size: 13px; font-weight: 700; border-radius: 8px; cursor: pointer; text-transform: uppercase;
+            letter-spacing: 0.5px; transition: background 0.15s; flex-shrink: 0;
+        }
+        .btn-logout:hover { background: #3d7a5c; }
+        body.theme-executive .btn-logout { border-radius: 10px; letter-spacing: 1.5px; }
         .btn-copy-action:hover { background: var(--color-border-deep); }
 
         .btn-primary { 
@@ -492,7 +500,7 @@
                     <label style="margin:0;">Logged in as</label>
                     <div id="logged-in-rep-display" style="font-size:17px; font-weight:600; color:#fff; font-family:'Fraunces',serif;">—</div>
                 </div>
-                <button type="button" class="btn-copy-action" onclick="attemptLogout()">Log Out</button>
+                <button type="button" class="btn-logout" onclick="attemptLogout()">Log Out</button>
             </div>
         </div>
         
