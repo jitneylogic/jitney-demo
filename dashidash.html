@@ -76,7 +76,7 @@
             color: var(--text-main);
             height: 100vh;
             box-sizing: border-box;
-            overflow: hidden; /* Hard lock to prevent window scrolling */
+            overflow: hidden; 
             display: flex;
             flex-direction: column;
             transition: background 0.3s ease, color 0.3s ease;
@@ -182,8 +182,8 @@
         .leaderboards-container {
             display: flex;
             gap: 20px;
-            flex: 1; /* Takes up all remaining vertical space */
-            min-height: 0; /* Crucial for internal table scrolling */
+            flex: 1; 
+            min-height: 0; 
         }
 
         .timeframe-block {
@@ -192,7 +192,7 @@
             border-radius: 10px;
             padding: 16px 20px;
             box-shadow: var(--shadow-soft);
-            flex: 1; /* Splits width 50/50 */
+            flex: 1; 
             display: flex;
             flex-direction: column;
             min-height: 0; 
@@ -234,8 +234,8 @@
 
         .leaderboard-table-wrapper {
             width: 100%;
-            flex: 1; /* Fills remaining card height */
-            overflow-y: auto; /* Allows scrolling INSIDE the table, not the page */
+            flex: 1; 
+            overflow-y: auto; 
             border: 1px solid var(--table-border);
             border-radius: 8px;
             background: var(--color-box-translucent);
@@ -309,7 +309,7 @@
         .money-cell { color: var(--color-highlight) !important; font-weight: 800; }
     </style>
 </head>
-<body>
+<body data-ignition="demo-ready">
 
     <header>
         <h1>Executive Performance Dashboard</h1>
@@ -384,16 +384,18 @@
                 <table class="leaderboard-table" id="team-table">
                     <thead>
                         <tr>
-                            <th style="width: 25%;">Squad</th>
-                            <th style="width: 15%;">Closed</th>
-                            <th style="width: 15%;">Rate</th>
-                            <th style="width: 25%;">Revenue</th>
-                            <th style="width: 20%;">RPC</th>
+                            <th style="width: 20%;">Squad</th>
+                            <th style="width: 12%;">Calls</th>
+                            <th style="width: 12%;">Closed</th>
+                            <th style="width: 14%;">Rate</th>
+                            <th style="width: 24%;">Revenue</th>
+                            <th style="width: 18%;">RPC</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr class="rank-row-1" id="team-rank-1">
                             <td><span class="rank-badge">1</span>Vanguard (Sarah)</td>
+                            <td class="monospaced-cell">45</td>
                             <td class="monospaced-cell">15</td>
                             <td class="monospaced-cell">33.3%</td>
                             <td class="monospaced-cell money-cell">$9,150.00</td>
@@ -401,6 +403,7 @@
                         </tr>
                         <tr class="rank-row-2 team-highlight-row" id="team-rank-user">
                             <td><span class="rank-badge">2</span>Apex (Your Team)</td>
+                            <td class="monospaced-cell" id="team-calls">38</td>
                             <td class="monospaced-cell" id="team-closed">11</td>
                             <td class="monospaced-cell" id="team-rate">28.9%</td>
                             <td class="monospaced-cell money-cell" id="team-rev">$6,450.00</td>
@@ -408,6 +411,7 @@
                         </tr>
                         <tr id="team-rank-3">
                             <td><span class="rank-badge">3</span>Nova (Marcus)</td>
+                            <td class="monospaced-cell">35</td>
                             <td class="monospaced-cell">8</td>
                             <td class="monospaced-cell">22.8%</td>
                             <td class="monospaced-cell money-cell">$4,800.50</td>
@@ -415,6 +419,7 @@
                         </tr>
                         <tr id="team-rank-4">
                             <td><span class="rank-badge">4</span>Titan (Elena)</td>
+                            <td class="monospaced-cell">24</td>
                             <td class="monospaced-cell">7</td>
                             <td class="monospaced-cell">29.1%</td>
                             <td class="monospaced-cell money-cell">$3,949.70</td>
@@ -431,15 +436,16 @@
                 <table class="leaderboard-table">
                     <thead>
                         <tr>
-                            <th style="width: 25%;">Rep Name</th>
-                            <th style="width: 15%;">Closed</th>
-                            <th style="width: 15%;">Rate</th>
-                            <th style="width: 25%;">Revenue</th>
-                            <th style="width: 20%;">RPC</th>
+                            <th style="width: 20%;">Rep Name</th>
+                            <th style="width: 12%;">Calls</th>
+                            <th style="width: 12%;">Closed</th>
+                            <th style="width: 14%;">Rate</th>
+                            <th style="width: 24%;">Revenue</th>
+                            <th style="width: 18%;">RPC</th>
                         </tr>
                     </thead>
                     <tbody id="rep-standings-tbody">
-                        <tr><td colspan="5" style="text-align:center; opacity:0.6; padding: 30px;">Waiting for today's activity...</td></tr>
+                        <tr><td colspan="6" style="text-align:center; opacity:0.6; padding: 30px;">Waiting for today's activity...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -451,12 +457,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
     <script src="https://jitneylogic.github.io/jitneylogic-shared/jitneylogic-engine.js?v=8"></script>
     <script>
-        // Same config values as the cockpit — must point at the same
-        // Firebase project and use the same business timezone, since this
-        // reads the exact stats documents the cockpit writes.
         window.JITNEYLOGIC_CONFIG = {
-          // Must match the cockpit's clientId — this is what scopes the
-          // dashboard to one client's stats instead of another's.
           clientId: "demo-pest-co",
           firebaseConfig: {
                 apiKey: "AIzaSyDkWrGWcepdHlkzkeSGWLiIrV0Kxsul4nE",
@@ -468,14 +469,12 @@
                 measurementId: "G-4JECF3BX6E"
             },
             businessTimezone: "America/Denver",
-            leaderboardMetric: "revenue" // must match the cockpit's setting
+            leaderboardMetric: "revenue" 
         };
 
         function setDashboardTheme(theme) {
-            // Apply data-theme to HTML root
             document.documentElement.setAttribute('data-theme', theme);
             
-            // Toggle active state on buttons
             const btnGreen = document.getElementById('theme-btn-green');
             const btnLinen = document.getElementById('theme-btn-linen');
             const btnJazz = document.getElementById('theme-btn-jazz');
@@ -486,19 +485,21 @@
                 btnJazz.classList.toggle('active', theme === 'jazz');
             }
             
-            // Save state
             localStorage.setItem('jitneylogic_dashboard_theme', theme);
         }
         
         window.setDashboardTheme = setDashboardTheme;
         
-        // Initialize theme on load (defaults to green if not set)
         setDashboardTheme(localStorage.getItem('jitneylogic_dashboard_theme') || 'green');
 
         window.addEventListener('DOMContentLoaded', () => {
             const today = new Date();
             const optionsToday = { year: 'numeric', month: 'short', day: 'numeric' };
             document.getElementById('intraday-team-date').innerText = `(${today.toLocaleDateString(undefined, optionsToday)})`;
+            
+            if(document.body.getAttribute('data-ignition') === "demo-ready") {
+                console.info("SYS_LOG: UI locked. Execution mode active. Have a great demo, Tyler.");
+            }
         });
 
         initExecutiveDashboard();
