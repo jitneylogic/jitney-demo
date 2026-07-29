@@ -21,9 +21,9 @@
             --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --shadow-inset: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
 
-            /* Script pane — defaults to warm dark (coffee), toggled to light via .light-mode */
-            --sp-bg: #2E2620;
-            --sp-panel-bg: #3A302A;
+            /* Script pane — defaults to warm dark, toggled to light via .light-mode */
+            --sp-bg: #1C1917;
+            --sp-panel-bg: #26221F;
             --sp-input-bg: rgba(255,255,255,0.05);
             --sp-hairline: rgba(255,255,255,0.1);
             --sp-text: rgba(243,241,236,0.95);
@@ -32,9 +32,9 @@
             --sp-h2-color: rgba(243,241,236,0.95);
         }
         #script-pane.light-mode {
-            --sp-bg: #F1ECE3;
-            --sp-panel-bg: #FFFFFF;
-            --sp-input-bg: #FFFFFF;
+            --sp-bg: #E4DACB;
+            --sp-panel-bg: #F5F1EA;
+            --sp-input-bg: #F5F1EA;
             --sp-hairline: rgba(0,0,0,0.12);
             --sp-text: #262220;
             --sp-text-dim: #8A8177;
@@ -125,8 +125,8 @@
             display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; color: rgba(248, 250, 252, 0.8);
         }
         .metrics-row:last-child { margin-bottom: 0; }
-        .metrics-val { font-family: 'Fraunces', serif; font-weight: 600; color: #ffffff; }
-        .val-highlight { color: var(--gold-accent); font-family: 'Fraunces', serif; }
+        .metrics-val { font-family: 'SFMono-Regular', Consolas, monospace; font-weight: 700; color: #ffffff; }
+        .val-highlight { color: var(--gold-accent); font-family: 'SFMono-Regular', Consolas, monospace; }
 
         /* --- LIVE LEADERBOARD (Clean & Visceral) --- */
         .leaderboard-section {
@@ -143,7 +143,7 @@
         .rep-rank-badge {
             background: rgba(255,255,255,0.08); padding: 3px 8px; border-radius: 5px;
             font-size: 11px; font-weight: 700; margin-right: 12px; color: rgba(248, 250, 252, 0.8);
-            font-family: 'Fraunces', serif;
+            font-family: 'SFMono-Regular', Consolas, monospace;
         }
         .rank-1 .rep-rank-badge { background: var(--gold-accent); color: #2B1F09; }
         .user-row .rep-rank-badge { background: var(--gold-accent); color: #2B1F09; }
@@ -173,8 +173,8 @@
             border: 1px solid var(--sp-hairline); background: var(--sp-input-bg); color: var(--sp-text);
         }
         input:focus, select:focus, textarea:focus { border-color: var(--color-sage-accent); outline: none; box-shadow: 0 0 0 3px rgba(76, 145, 112, 0.2); }
-        #input-pane input[readonly], #input-pane textarea[readonly] { background: rgba(0,0,0,0.3); color: var(--color-mint-soft); font-family: 'Fraunces', serif; font-size: 15px;}
-        .money-readonly { color: var(--gold-accent) !important; font-weight: 600; }
+        #input-pane input[readonly], #input-pane textarea[readonly] { background: rgba(0,0,0,0.3); color: var(--color-mint-soft); font-family: 'Manrope', sans-serif; font-size: 14px;}
+        .money-readonly { color: var(--gold-accent) !important; font-weight: 700; font-family: 'SFMono-Regular', Consolas, monospace !important; }
 
         /* Dropdowns & Multi-select Z-Index Overlap Fixes */
         .multiselect-container { position: relative; width: 100%; z-index: 10; }
@@ -222,7 +222,7 @@
         }
         .btn-primary:hover { background: #3d7a5c; transform: translateY(-1px); }
         .btn-primary:active { transform: translateY(1px); }
-        .btn-transaction { font-family: 'Fraunces', serif; font-weight: 600; letter-spacing: 0.5px; }
+        .btn-transaction { font-family: 'Manrope', sans-serif; font-weight: 700; letter-spacing: 1px; }
 
         .pest-fact-bullet { margin: 6px 0 6px 10px; font-size: 14px; display: flex; align-items: flex-start; gap: 8px; }
         .pest-fact-bullet::before { content: "→"; color: var(--color-sage-accent); font-weight: bold; }
