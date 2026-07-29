@@ -325,12 +325,15 @@
         .theme-toggle button.active { background: var(--color-sage-accent); color: #fff; }
 
         /* Agreement signature status — scaffolding for the FieldRoutes prototype.
-           Blinks red/"Pending" by default; clicking toggles a demo-only preview
-           of the green/"Signed" state. Not wired to any real signing event yet. */
+           Sits horizontally next to the Send Agreement button (which is why
+           that button is 2/3 width — this fills the remaining third).
+           Blinks red/"Pending" by default; clicking toggles a demo-only
+           preview of the green/"Signed" state. Not wired to a real signing
+           event yet. */
         .signature-status {
-            display: flex; align-items: center; gap: 8px; margin-top: 12px;
+            display: flex; align-items: center; gap: 8px;
             font-size: 12px; font-weight: 600; color: var(--sp-text-dim); cursor: pointer;
-            width: fit-content;
+            white-space: nowrap;
         }
         .status-dot {
             width: 9px; height: 9px; border-radius: 50%; background: #ef4444; flex-shrink: 0;
@@ -457,20 +460,11 @@
         </div>
 
         <div class="script-block">
-            <span class="script-quote">I'm going to send you over a confirmation document. Would you like that texted or emailed to you?</span>
-        </div>
-        <div class="script-field-wrapper">
-            <label>Customer Email</label>
-            <input type="email" id="script-email-input" placeholder="customer@email.com" oninput="syncEmailValue(this.value)">
-        </div>
-
-        <div class="script-block">
             <span class="script-quote">Standard pricing in your zip code is normally <span class="script-price-text inject-pitch-normal">$0.00</span> to start, and <span class="script-price-text inject-pitch-monthly">$0.00</span> a month after. That covers everything, with unlimited free re-services. Okay?</span>
         </div>
 
-        <div class="script-field-wrapper" style="margin: 16px 0;">
-            <button type="button" class="btn-primary btn-transaction" id="create-customer-btn" onclick="fireCreateCustomer()">Create Customer</button>
-            <div id="create-customer-status" style="margin-top:8px; font-size:12px; color:var(--sp-text-dim);"></div>
+        <div class="script-block">
+            <span class="script-quote">I'm going to send you over a confirmation document. Would you like that texted or emailed to you?</span>
         </div>
 
         <div class="script-block">
@@ -486,8 +480,12 @@
             </select>
         </div>
 
+        <div class="script-field-wrapper" style="margin: 16px 0;">
+            <button type="button" class="btn-primary btn-transaction" onclick="alert('Prototype scaffolding — not wired to FieldRoutes yet.')">Schedule Appointment</button>
+        </div>
+
         <div class="script-block">
-            <span class="script-quote">I'm generating your service document now. <span class="script-highlight-text inject-script-name">____</span>, how do you spell your last name?</span>
+            <span class="script-quote">Great! I'm going to send you over a confirmation document and then we can get something scheduled. How do you spell your last name?</span>
         </div>
         <div class="script-field-wrapper">
             <label>Last Name</label>
@@ -495,12 +493,25 @@
         </div>
 
         <div class="script-block">
+            <span class="script-quote">Thank you <span class="script-highlight-text inject-script-name">____</span>, what's a good email address to put on file?</span>
+        </div>
+        <div class="script-field-wrapper">
+            <label>Customer Email</label>
+            <input type="email" id="script-email-input" placeholder="customer@email.com" oninput="syncEmailValue(this.value)">
+        </div>
+
+        <div class="script-field-wrapper" style="margin: 16px 0;">
+            <button type="button" class="btn-primary btn-transaction" id="create-customer-btn" onclick="fireCreateCustomer()">Create Customer</button>
+            <div id="create-customer-status" style="margin-top:8px; font-size:12px; color:var(--sp-text-dim);"></div>
+        </div>
+
+        <div class="script-block">
             <span class="script-quote">Great. I'm sending that over now. Please scroll to the bottom, type the letter 'X' in the signature box, and let me know when it clears.</span>
             <div style="font-size: 11px; margin-top: 8px; color: #64748b;">*By typing 'X', you are providing your legally binding electronic signature.</div>
         </div>
 
-        <div class="script-field-wrapper" style="margin: 16px 0;">
-            <button type="button" class="btn-primary btn-transaction" style="width: 66.67%;" onclick="alert('Prototype scaffolding — not wired to FieldRoutes yet.')">Send Agreement</button>
+        <div class="script-field-wrapper" style="margin: 16px 0; display: flex; align-items: center; gap: 16px;">
+            <button type="button" class="btn-primary btn-transaction" style="width: 66.67%; margin-top: 0;" onclick="alert('Prototype scaffolding — not wired to FieldRoutes yet.')">Send Agreement</button>
             <div class="signature-status" id="signature-status" onclick="toggleAgreementSignedDemo()" title="Demo only — click to preview the signed state">
                 <span class="status-dot" id="signature-status-dot"></span>
                 <span id="signature-status-text">Pending</span>
@@ -717,23 +728,14 @@
                     </div>
                 </div>
 
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label>Service Date</label>
-                        <input type="date" id="appointment-date" onchange="syncDateValue(this.value)">
-                    </div>
-                    <div class="form-group">
-                        <label>Arrival Window</label>
-                        <select id="time-window" onchange="syncWindowValue(this.value)">
-                            <option value="Any Time">Any Time</option>
-                            <option value="8:00 AM - 12:00 PM">8:00 AM - 12:00 PM</option>
-                            <option value="12:00 PM - 4:00 PM">12:00 PM - 4:00 PM</option>
-                            <option value="4:00 PM - 8:00 PM">4:00 PM - 8:00 PM</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <button type="button" class="btn-primary btn-transaction" onclick="alert('Prototype scaffolding — not wired to FieldRoutes yet.')">Schedule Appointment</button>
+                <div style="display:none;">
+                    <input type="date" id="appointment-date" onchange="syncDateValue(this.value)">
+                    <select id="time-window" onchange="syncWindowValue(this.value)">
+                        <option value="Any Time">Any Time</option>
+                        <option value="8:00 AM - 12:00 PM">8:00 AM - 12:00 PM</option>
+                        <option value="12:00 PM - 4:00 PM">12:00 PM - 4:00 PM</option>
+                        <option value="4:00 PM - 8:00 PM">4:00 PM - 8:00 PM</option>
+                    </select>
                 </div>
             </div>
         </form>
