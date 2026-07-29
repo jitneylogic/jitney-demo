@@ -42,6 +42,48 @@
             --sp-h2-color: #262220;
         }
 
+        /* Executive theme — full whole-cockpit re-skin, third option alongside Dark/Light.
+           Ported from a design exploration; redefines the same semantic variables every
+           other rule already references, so the whole app reskins from one block. */
+        body.theme-executive {
+            --color-bg-dark: hsl(210, 15%, 12%);
+            --color-box-translucent: rgba(255,255,255,0.03);
+            --color-sage-accent: hsl(259, 30%, 42%);
+            --color-mint-soft: hsl(259, 15%, 70%);
+            --gold-accent: hsl(180, 60%, 50%);
+            --gold-dim: hsla(180, 60%, 50%, 0.1);
+            --shadow-soft: 0 10px 25px -5px rgba(0,0,0,0.2), 0 8px 10px -6px rgba(0,0,0,0.1);
+
+            --sp-bg: #141619;
+            --sp-panel-bg: rgba(255,255,255,0.02);
+            --sp-input-bg: rgba(0,0,0,0.2);
+            --sp-hairline: rgba(255,255,255,0.05);
+            --sp-text: rgba(248,250,252,0.9);
+            --sp-text-dim: hsl(259, 15%, 60%);
+            --sp-dynamic: hsl(180, 60%, 50%);
+            --sp-h2-color: #ffffff;
+        }
+        body.theme-executive h1, body.theme-executive h2 { font-weight: 300; }
+        body.theme-executive .metrics-card,
+        body.theme-executive .leaderboard-section,
+        body.theme-executive .form-section {
+            border: none; border-radius: 16px; box-shadow: var(--shadow-soft);
+        }
+        body.theme-executive input, body.theme-executive select, body.theme-executive textarea,
+        body.theme-executive .select-display-box, body.theme-executive .checkbox-dropdown-window {
+            border-radius: 10px;
+        }
+        body.theme-executive .script-block { border-radius: 0 12px 12px 0; }
+        body.theme-executive .btn-primary {
+            border-radius: 10px; letter-spacing: 1.5px;
+            box-shadow: 0 4px 15px rgba(90,74,140,0.3);
+        }
+        body.theme-executive .btn-primary:hover {
+            transform: translateY(-2px); box-shadow: 0 6px 20px rgba(90,74,140,0.4);
+        }
+        body.theme-executive .btn-transaction { box-shadow: 0 4px 15px rgba(0,204,204,0.2); }
+        body.theme-executive .money-readonly { font-size: 16px; }
+
         body { 
             margin: 0; padding: 0; 
             font-family: 'Manrope', system-ui, -apple-system, sans-serif; 
@@ -400,6 +442,7 @@
             <div class="theme-toggle">
                 <button type="button" id="theme-btn-dark" onclick="setScriptPaneTheme('dark')">Dark</button>
                 <button type="button" id="theme-btn-light" onclick="setScriptPaneTheme('light')">Light</button>
+                <button type="button" id="theme-btn-executive" onclick="setScriptPaneTheme('executive')">Executive</button>
             </div>
         </div>
     </div>
@@ -631,7 +674,7 @@
         </form>
     </div>
 
-    <script src="https://jitneylogic.github.io/jitneylogic-shared/jitneylogic-engine.js?v=7"></script>
+    <script src="https://jitneylogic.github.io/jitneylogic-shared/jitneylogic-engine.js?v=8"></script>
     <script>
         // =====================================================================
         // CLIENT CONFIG — the only block that should need to change when
@@ -749,9 +792,12 @@
         function setScriptPaneTheme(mode) {
             const pane = document.getElementById('script-pane');
             pane.classList.toggle('light-mode', mode === 'light');
-            document.getElementById('theme-btn-dark').classList.toggle('active', mode !== 'light');
+            document.body.classList.toggle('theme-executive', mode === 'executive');
+            document.getElementById('theme-btn-dark').classList.toggle('active', mode === 'dark');
             document.getElementById('theme-btn-light').classList.toggle('active', mode === 'light');
+            document.getElementById('theme-btn-executive').classList.toggle('active', mode === 'executive');
             localStorage.setItem('jitneylogic_script_pane_theme', mode);
+            if (window.syncThemePreference) window.syncThemePreference(mode);
         }
         window.setScriptPaneTheme = setScriptPaneTheme;
         setScriptPaneTheme(localStorage.getItem('jitneylogic_script_pane_theme') || 'dark');
