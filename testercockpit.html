@@ -263,7 +263,7 @@
             background-repeat: no-repeat;
             background-position-x: 96%;
             background-position-y: center;
-            padding-right: 36px;
+            padding-right: 36px; /* give space for the chevron */
         }
         
         /* The UI Container specifically tied to theme variables */
@@ -348,43 +348,8 @@
 </head>
 <body data-architect="Tyler">
 
-    <div id="login-gate" style="display:flex; align-items:center; justify-content:center; height:100vh; width:100vw; position:fixed; top:0; left:0; background:var(--color-bg-dark); z-index:1000;">
-        <div style="background:var(--color-box-translucent); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:30px; width:320px; box-shadow:var(--shadow-soft);">
-            <h2 style="margin-top:0;">Rep Login</h2>
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="login-email" placeholder="you@company.com" onkeydown="if(event.key==='Enter') attemptLogin()">
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="login-password" placeholder="••••••••" onkeydown="if(event.key==='Enter') attemptLogin()">
-            </div>
-            <button type="button" class="btn-primary" onclick="attemptLogin()">Log In</button>
-            <div id="login-error" style="margin-top:10px; font-size:12px; color:#ef4444;"></div>
-            <div style="margin-top:10px;">
-                <a href="#" onclick="sendCockpitResetEmail(); return false;" style="font-size:12px;">Forgot password?</a>
-            </div>
-        </div>
-    </div>
-
-    <div id="force-reset-gate" style="display:none; align-items:center; justify-content:center; height:100vh; width:100vw; position:fixed; top:0; left:0; background:var(--color-bg-dark); z-index:1000;">
-        <div style="background:var(--color-box-translucent); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:30px; width:320px; box-shadow:var(--shadow-soft);">
-            <h2 style="margin-top:0;">Set Your Password</h2>
-            <p style="font-size:13px; opacity:0.75; margin-top:-6px;">This is your first login — set a password only you know before continuing.</p>
-            <div class="form-group">
-                <label>New Password</label>
-                <input type="password" id="reset-new-password" placeholder="8+ chars, incl. a letter, number & symbol" onkeydown="if(event.key==='Enter') attemptForcedReset()">
-            </div>
-            <div class="form-group">
-                <label>Confirm New Password</label>
-                <input type="password" id="reset-confirm-password" placeholder="••••••••" onkeydown="if(event.key==='Enter') attemptForcedReset()">
-            </div>
-            <button type="button" class="btn-primary" onclick="attemptForcedReset()">Set Password &amp; Continue</button>
-            <div id="reset-error" style="margin-top:10px; font-size:12px; color:#ef4444;"></div>
-        </div>
-    </div>
-
-    <div id="app-content" style="display:none;">
+    <div id="app-content" style="display:flex; width: 100%; height: 100vh;">
+    
     <div id="script-pane">
         <h2>Call Flow & Scripting</h2>
 
@@ -513,9 +478,9 @@
             <div style="display: flex; justify-content: space-between; align-items:center;">
                 <div>
                     <label style="margin:0;">Logged in as</label>
-                    <div id="logged-in-rep-display" style="font-size:17px; font-weight:600; color:#fff; font-family:'Fraunces',serif;">—</div>
+                    <div id="logged-in-rep-display" style="font-size:17px; font-weight:600; color:#fff; font-family:'Fraunces',serif;">Local Architect Preview</div>
                 </div>
-                <button type="button" class="btn-copy-action" onclick="attemptLogout()" style="padding: 10px 16px;">Log Out</button>
+                <button type="button" class="btn-copy-action" style="padding: 10px 16px;">Log Out</button>
             </div>
         </div>
         
@@ -715,4 +680,177 @@
                             <option value="Any Time">Any Time</option>
                             <option value="8:00 AM - 12:00 PM">8:00 AM - 12:00 PM</option>
                             <option value="12:00 PM - 4:00 PM">12:00 PM - 4:00 PM</option>
-                            <option value="4:00 PM - 8:00 PM">4:0
+                            <option value="4:00 PM - 8:00 PM">4:00 PM - 8:00 PM</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Call Outcome</label>
+                        <select id="call-outcome" required style="border-color: var(--color-primary);">
+                            <option value="">-- Status --</option>
+                            <option value="Sold">Sold</option>
+                            <option value="Scheduled Callback">Callback</option>
+                            <option value="Not Sold">Lost</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="button" class="btn-primary btn-transaction">Commit Transaction</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://jitneylogic.github.io/jitneylogic-shared/jitneylogic-engine.js?v=7"></script>
+    <script>
+        // =====================================================================
+        // CLIENT CONFIG — the only block that should need to change when
+        // onboarding a new client. Everything else lives in jitneylogic-engine.js.
+        // =====================================================================
+        window.JITNEYLOGIC_CONFIG = {
+            // Must match the document ID under the `pricing_rules` collection
+            // in Firestore (see seed-pricing.js). This is the only thing that
+            // tells the shared Vault which client's pricing to use.
+            clientId: "demo-pest-co",
+            vaultUrl: "https://jitneyvault-889415757227.us-central1.run.app/",
+            loggerUrl: "https://jitneylogger-889415757227.us-central1.run.app/",
+            adminUrl: "https://jitneyadmin-889415757227.us-central1.run.app/",
+            businessTimezone: "America/Denver", // Utah — change per client (must match jitneylogger's BUSINESS_TIMEZONE)
+            ardenusUrl: "https://REPLACE-WITH-ARDENUS-ENDPOINT.example.com/",
+
+           firebaseConfig: {
+                apiKey: "AIzaSyDkWrGWcepdHlkzkeSGWLiIrV0Kxsul4nE",
+                authDomain: "jitneylogic-beta.firebaseapp.com",
+                projectId: "jitneylogic-beta",
+                storageBucket: "jitneylogic-beta.firebasestorage.app",
+                messagingSenderId: "889415757227",
+                appId: "1:889415757227:web:9e54a600eb654bb30276ee",
+                measurementId: "G-4JECF3BX6E"
+            },
+
+            packageDisplayToVault: {
+                "HomeBase Basic": "HomeBase Basic",
+                "HomeBase Standard PC/RB": "HomeBase Standard PC/RB",
+                "HomeBase Standard PC/TFM": "HomeBase Standard PC/TFM",
+                "HomeBase Standard RB/TFM": "HomeBase Standard RB/TFM",
+                "HomeBase Essential PC/RB/TFMx4": "HomeBase Essential PC/RB/TFMx4",
+                "HomeBase Premium PC/RB/TFMx7": "HomeBase Premium PC/RB/TFMx7",
+                "German Roaches": "German Roaches",
+                "Interior Rodent": "Interior Rodent",
+                "Mole": "Mole",
+                "Carpenter Bees": "Carpenter Bees",
+                "German Roaches + Carpenter Bees": "German Roaches + Carpenter Bees",
+                "German Roaches + Mole": "German Roaches + Mole",
+                "German Roaches + Interior Rodent": "German Roaches + Interior Rodent",
+                "Mole + Interior Rodent": "Mole + Interior Rodent",
+                "Carpenter Bees + Mole": "Carpenter Bees + Mole",
+                "Carpenter Bees + Interior Rodent": "Carpenter Bees + Interior Rodent",
+                "German Roaches + Carpenter Bees + Mole": "German Roaches + Carpenter Bees + Mole",
+                "German Roaches + Carpenter Bees + Interior Rodent": "German Roaches + Carpenter Bees + Interior Rodent",
+                "German Roaches + Mole + Interior Rodent": "German Roaches + Mole + Interior Rodent",
+                "Carpenter Bees + Mole + Interior Rodent": "Carpenter Bees + Mole + Interior Rodent",
+                "German Roaches + Carpenter Bees + Mole + Interior Rodent": "German Roaches + Carpenter Bees + Mole + Interior Rodent",
+                "HomeBase Basic + German Roaches": "HomeBase Basic + German Roaches",
+                "HomeBase Basic + Interior Rodent": "HomeBase Basic + Interior Rodent",
+                "HomeBase Basic + Mole": "HomeBase Basic + Mole",
+                "HomeBase Basic + Carpenter Bees": "HomeBase Basic + Carpenter Bees",
+                "HomeBase Standard PC/RB + German Roaches": "HomeBase Standard PC/RB + German Roaches",
+                "HomeBase Standard PC/RB + Interior Rodent": "HomeBase Standard PC/RB + Interior Rodent",
+                "HomeBase Standard PC/RB + Mole": "HomeBase Standard PC/RB + Mole",
+                "HomeBase Standard PC/RB + Carpenter Bees": "HomeBase Standard PC/RB + Carpenter Bees"
+            },
+
+            depositRules: [
+                { keywords: ["german roaches", "rodent", "carpenter bee", "mole"], amount: 99 }
+            ],
+            defaultDeposit: 39,
+
+            // Which stat ranks the leaderboard/standings tables.
+            leaderboardMetric: "revenue"
+        };
+
+        const clientOnboardingConfig = { repName: "Tyler" };
+
+        const pestFactsDb = {
+            "General Pests": "General occasional invaders — ants, spiders, and similar pests — create ongoing nuisance activity around entry points and foundations.",
+            "Ticks, Fleas, Mosquitos": "Ticks, Fleas, and Mosquitos hide within dense exterior grass layers nesting near organic yard debris pipelines.",
+            "German Roaches": "German Cockroaches possess an acute chemical resistance multiplying inside appliance nodes and interior molding joints.",
+            "Interior Rodent": "Interior Mice and Rats colonize wall insulation tracks chewing utility wiring and tearing soft subflooring segments.",
+            "Exterior Rodent": "Exterior Rodents tunnel along foundation perimeters tracking drainage networks to locate structural breach gaps.",
+            "Mole": "Moles drill systematic underground networks directly beneath turf grass, fracturing root system density grids.",
+            "Carpenter Bees": "Carpenter Bees execute precision geometric nesting shafts straight into structural raw wood structures."
+        };
+
+        function initTurnkeyEnvironment() {
+            document.querySelectorAll('.cfg-rep-name').forEach(el => el.innerText = clientOnboardingConfig.repName);
+            const dateStr = new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+            const dateEl = document.getElementById('intraday-date');
+            if (dateEl) dateEl.innerText = dateStr;
+            
+            // The machine acknowledges the builder
+            const buildID = document.body.getAttribute('data-architect');
+            if(buildID === "Tyler") {
+                console.info("SYS_LOG: Local environment compiled. Human architect verified. Proceed.");
+            }
+        }
+
+        function parseScriptPestLogicHandshake() {
+            const checked = Array.from(document.querySelectorAll('.script-pest-cb:checked')).map(cb => cb.value);
+            document.querySelectorAll('.pest-checkbox').forEach(cb => {
+                cb.checked = checked.includes(cb.getAttribute('data-display'));
+            });
+
+            document.querySelectorAll('.var-pests').forEach(el => {
+                el.innerText = checked.length > 0 ? checked.join(' and ') : 'those targets';
+            });
+
+            let factsHtml = "";
+            checked.forEach(p => {
+                if (pestFactsDb[p]) {
+                    factsHtml += `<div class="pest-fact-bullet"><strong>${p}:</strong> ${pestFactsDb[p]}</div>`;
+                }
+            });
+            document.getElementById('inject-pest-fact').innerHTML = factsHtml || `<span style="font-style: italic; opacity: 0.6;">Select targets above to load operational facts...</span>`;
+
+            updateDisplayBoxText();
+            evaluatePestCombinationMatrix();
+            updateConsolidatedAppointmentNotes();
+        }
+
+        // =====================================================================
+        // GLOBAL THEME SWITCHER
+        // =====================================================================
+        function setAppTheme(theme) {
+            // Apply data-theme to HTML root
+            document.documentElement.setAttribute('data-theme', theme);
+            
+            // Toggle active state on buttons
+            const btnGreen = document.getElementById('theme-btn-green');
+            const btnJazz = document.getElementById('theme-btn-jazz');
+            
+            if (btnGreen && btnJazz) {
+                btnGreen.classList.toggle('active', theme === 'green');
+                btnJazz.classList.toggle('active', theme === 'jazz');
+            }
+            
+            if (theme === "jazz") {
+                console.log("SYS_LOG: Protocol 'Executive Jazz' engaged.");
+            }
+            
+            // Save state
+            localStorage.setItem('jitneylogic_app_theme', theme);
+        }
+        
+        window.setAppTheme = setAppTheme;
+        
+        // Initialize theme on load (defaults to green if not set)
+        setAppTheme(localStorage.getItem('jitneylogic_app_theme') || 'green');
+
+        // LOCAL OVERRIDE: We are bypassing the Firebase initAuthGate() so the 
+        // login screen stays hidden and you can preview the design locally.
+        // initAuthGate();
+        
+        // Manually trigger the load sequences that the auth gate normally fires
+        initTurnkeyEnvironment();
+    </script>
+    </div>
+</body>
+</html>
