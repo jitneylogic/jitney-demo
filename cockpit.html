@@ -490,6 +490,19 @@
                 <button type="button" id="theme-btn-executive" onclick="setScriptPaneTheme('executive')">Executive</button>
             </div>
         </div>
+
+        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--sp-hairline);">
+            <div class="script-field-wrapper" style="margin-bottom: 16px;">
+                <label>Call Outcome</label>
+                <select id="call-outcome" form="closer-portal-form" required style="border-color: var(--color-sage-accent);">
+                    <option value="">-- Status --</option>
+                    <option value="Sold">Sold</option>
+                    <option value="Scheduled Callback">Callback</option>
+                    <option value="Not Sold">Lost</option>
+                </select>
+            </div>
+            <button type="submit" form="closer-portal-form" class="btn-primary btn-transaction">Submit Call</button>
+        </div>
     </div>
 
     <div id="input-pane">
@@ -689,37 +702,20 @@
                     </div>
                 </div>
 
-                <div class="grid-3">
-                    <div class="form-group">
-                        <label>Service Date</label>
-                        <input type="date" id="appointment-date" onchange="syncDateValue(this.value)">
-                    </div>
-                    <div class="form-group">
-                        <label>Arrival Window</label>
-                        <select id="time-window" onchange="syncWindowValue(this.value)">
-                            <option value="Any Time">Any Time</option>
-                            <option value="8:00 AM - 12:00 PM">8:00 AM - 12:00 PM</option>
-                            <option value="12:00 PM - 4:00 PM">12:00 PM - 4:00 PM</option>
-                            <option value="4:00 PM - 8:00 PM">4:00 PM - 8:00 PM</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Call Outcome</label>
-                        <select id="call-outcome" required style="border-color: var(--color-sage-accent);">
-                            <option value="">-- Status --</option>
-                            <option value="Sold">Sold</option>
-                            <option value="Scheduled Callback">Callback</option>
-                            <option value="Not Sold">Lost</option>
-                        </select>
-                    </div>
+                <div style="display:none;">
+                    <input type="date" id="appointment-date" onchange="syncDateValue(this.value)">
+                    <select id="time-window" onchange="syncWindowValue(this.value)">
+                        <option value="Any Time">Any Time</option>
+                        <option value="8:00 AM - 12:00 PM">8:00 AM - 12:00 PM</option>
+                        <option value="12:00 PM - 4:00 PM">12:00 PM - 4:00 PM</option>
+                        <option value="4:00 PM - 8:00 PM">4:00 PM - 8:00 PM</option>
+                    </select>
                 </div>
-                
-                <button type="submit" class="btn-primary btn-transaction">Commit Transaction</button>
             </div>
         </form>
     </div>
 
-    <script src="https://jitneylogic.github.io/jitneylogic-shared/jitneylogic-engine.js?v=8"></script>
+    <script src="https://jitneylogic.github.io/jitneylogic-shared/jitneylogic-engine.js?v=9"></script>
     <script>
         // =====================================================================
         // CLIENT CONFIG — the only block that should need to change when
