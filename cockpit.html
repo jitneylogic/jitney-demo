@@ -442,15 +442,11 @@
         </div>
 
         <div class="script-block">
-            <span class="script-quote">I'm going to send you over a confirmation document. Would you like that texted or emailed to you?</span>
-        </div>
-        <div class="script-field-wrapper">
-            <label>Customer Email</label>
-            <input type="email" id="script-email-input" placeholder="customer@email.com" oninput="syncEmailValue(this.value)">
+            <span class="script-quote">Standard pricing in your zip code is normally <span class="script-price-text inject-pitch-normal">$0.00</span> to start, and <span class="script-price-text inject-pitch-monthly">$0.00</span> a month after. That covers everything, with unlimited free re-services. Okay?</span>
         </div>
 
         <div class="script-block">
-            <span class="script-quote">Standard pricing in your zip code is normally <span class="script-price-text inject-pitch-normal">$0.00</span> to start, and <span class="script-price-text inject-pitch-monthly">$0.00</span> a month after. That covers everything, with unlimited free re-services. Okay?</span>
+            <span class="script-quote">I'm going to send you over a confirmation document. Would you like that texted or emailed to you?</span>
         </div>
 
         <div class="script-block">
@@ -467,11 +463,19 @@
         </div>
 
         <div class="script-block">
-            <span class="script-quote">I'm generating your service document now. <span class="script-highlight-text inject-script-name">____</span>, how do you spell your last name?</span>
+            <span class="script-quote">Great! I'm going to send you over a confirmation document and then we can get something scheduled. How do you spell your last name?</span>
         </div>
         <div class="script-field-wrapper">
             <label>Last Name</label>
             <input type="text" id="script-last-name" placeholder="Last Name" oninput="syncLastName(this.value)">
+        </div>
+
+        <div class="script-block">
+            <span class="script-quote">Thank you <span class="script-highlight-text inject-script-name">____</span>, what's a good email address to put on file?</span>
+        </div>
+        <div class="script-field-wrapper">
+            <label>Customer Email</label>
+            <input type="email" id="script-email-input" placeholder="customer@email.com" oninput="syncEmailValue(this.value)">
         </div>
 
         <div class="script-block">
