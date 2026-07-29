@@ -446,23 +446,6 @@
         </div>
 
         <div class="script-block">
-            <span class="script-quote">I'm going to send you over a confirmation document. Would you like that texted or emailed to you?</span>
-        </div>
-
-        <div class="script-block">
-            <span class="script-quote">I have a route opening tomorrow. Do you prefer a morning or afternoon arrival?</span>
-        </div>
-        <div class="grid-2 script-field-wrapper">
-            <input type="date" id="script-date-input" onchange="syncDateValue(this.value)">
-            <select id="script-window-input" onchange="syncWindowValue(this.value)">
-                <option value="Any Time">Any Time</option>
-                <option value="8:00 AM - 12:00 PM">8:00 AM - 12:00 PM</option>
-                <option value="12:00 PM - 4:00 PM">12:00 PM - 4:00 PM</option>
-                <option value="4:00 PM - 8:00 PM">4:00 PM - 8:00 PM</option>
-            </select>
-        </div>
-
-        <div class="script-block">
             <span class="script-quote">Great! I'm going to send you over a confirmation document and then we can get something scheduled. How do you spell your last name?</span>
         </div>
         <div class="script-field-wrapper">
@@ -484,7 +467,20 @@
         </div>
 
         <div class="script-block">
-            <span class="script-quote">That cleared. We will see you on <span class="script-highlight-text" id="inject-final-window">[Date & Window]</span> for your <span class="script-highlight-text" id="inject-package-text">[Package]</span> service. Welcome to the family.</span>
+            <span class="script-quote">Great that cleared. I have a route opening tomorrow. Do you prefer a morning or afternoon arrival?</span>
+        </div>
+        <div class="grid-2 script-field-wrapper">
+            <input type="date" id="script-date-input" onchange="syncDateValue(this.value)">
+            <select id="script-window-input" onchange="syncWindowValue(this.value)">
+                <option value="Any Time">Any Time</option>
+                <option value="8:00 AM - 12:00 PM">8:00 AM - 12:00 PM</option>
+                <option value="12:00 PM - 4:00 PM">12:00 PM - 4:00 PM</option>
+                <option value="4:00 PM - 8:00 PM">4:00 PM - 8:00 PM</option>
+            </select>
+        </div>
+
+        <div class="script-block">
+            <span class="script-quote">I've scheduled that appointment. We will see you on <span class="script-highlight-text" id="inject-final-window">[Date & Window]</span> for your <span class="script-highlight-text" id="inject-package-text">[Package]</span> service. Welcome to the family.</span>
         </div>
 
         <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--sp-hairline);">
