@@ -483,14 +483,6 @@
             <span class="script-quote">That cleared. We will see you on <span class="script-highlight-text" id="inject-final-window">[Date & Window]</span> for your <span class="script-highlight-text" id="inject-package-text">[Package]</span> service. Welcome to the family.</span>
         </div>
 
-        <div class="theme-toggle-wrapper">
-            <div class="theme-toggle">
-                <button type="button" id="theme-btn-dark" onclick="setScriptPaneTheme('dark')">Dark</button>
-                <button type="button" id="theme-btn-light" onclick="setScriptPaneTheme('light')">Light</button>
-                <button type="button" id="theme-btn-executive" onclick="setScriptPaneTheme('executive')">Executive</button>
-            </div>
-        </div>
-
         <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--sp-hairline);">
             <div class="script-field-wrapper" style="margin-bottom: 16px;">
                 <label>Call Outcome</label>
@@ -676,7 +668,7 @@
                     <div class="form-group">
                         <label>FR Account Number</label>
                         <div class="copy-input-group">
-                            <input type="text" id="account-number" placeholder="Auto-filled after Create Customer" readonly>
+                            <input type="text" id="account-number" placeholder="Not connected in this demo" readonly>
                             <button type="button" class="btn-copy-action" onclick="copyField('account-number')">Copy</button>
                         </div>
                     </div>
@@ -687,11 +679,6 @@
                             <button type="button" class="btn-copy-action" onclick="copyField('right-address')">Copy</button>
                         </div>
                     </div>
-                </div>
-
-                <div class="form-group">
-                    <button type="button" class="btn-primary btn-transaction" id="create-customer-btn" onclick="fireCreateCustomer()">Create Customer</button>
-                    <div id="create-customer-status" style="margin-top:8px; font-size:12px; color:var(--color-mint-soft);"></div>
                 </div>
 
                 <div class="form-group">
@@ -713,6 +700,14 @@
                 </div>
             </div>
         </form>
+
+        <div class="theme-toggle-wrapper">
+            <div class="theme-toggle">
+                <button type="button" id="theme-btn-dark" onclick="setScriptPaneTheme('dark')">Dark</button>
+                <button type="button" id="theme-btn-light" onclick="setScriptPaneTheme('light')">Light</button>
+                <button type="button" id="theme-btn-executive" onclick="setScriptPaneTheme('executive')">Executive</button>
+            </div>
+        </div>
     </div>
 
     <script src="https://jitneylogic.github.io/jitneylogic-shared/jitneylogic-engine.js?v=9"></script>
