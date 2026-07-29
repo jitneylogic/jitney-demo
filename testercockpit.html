@@ -40,9 +40,9 @@
             --sp-dynamic: #8A5A12;
             --sp-h2-color: #262220;
             
-            /* Flat Dropdown Icons */
-            --sp-chevron: url('data:image/svg+xml;utf8,<svg fill="%23333333" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
-            --ui-chevron: url('data:image/svg+xml;utf8,<svg fill="%23ffffff" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+            /* Clean Chevron Icons (Replaced chunky triangles) */
+            --sp-chevron: url('data:image/svg+xml;utf8,<svg fill="none" stroke="%23888888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><polyline points="6 9 12 15 18 9"/></svg>');
+            --ui-chevron: url('data:image/svg+xml;utf8,<svg fill="none" stroke="%23ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><polyline points="6 9 12 15 18 9"/></svg>');
         }
 
         /* 2. EXECUTIVE JAZZ (Purple, Teal, Charcoal) */
@@ -72,7 +72,7 @@
             --sp-dynamic: hsl(180, 60%, 50%);
             --sp-h2-color: #ffffff;
             
-            --sp-chevron: url('data:image/svg+xml;utf8,<svg fill="%23888888" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+            --sp-chevron: url('data:image/svg+xml;utf8,<svg fill="none" stroke="%23888888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><polyline points="6 9 12 15 18 9"/></svg>');
         }
 
         body { 
@@ -201,11 +201,22 @@
         label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 11px; text-transform: uppercase; color: var(--color-secondary); letter-spacing: 0.5px; transition: color 0.3s ease;}
         #script-pane label { color: var(--sp-text-dim); }
         
-        /* Flattened dropdowns fixing the "old school shiny" issue */
+        /* Flatted inputs and Dropdowns */
         input, select, textarea { 
             width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; 
             font-size: 14px; background: #ffffff; font-family: inherit; color: var(--text-on-light); transition: all 0.2s; box-sizing: border-box;
         }
+        
+        /* Ensuring options have solid backgrounds so they don't ghost over the UI */
+        select option {
+            background-color: var(--color-bg-dark);
+            color: #ffffff;
+        }
+        #script-pane select option {
+            background-color: var(--sp-panel-bg);
+            color: var(--sp-text);
+        }
+
         select {
             -webkit-appearance: none;
             -moz-appearance: none;
@@ -217,29 +228,33 @@
         }
 
         #input-pane input, #input-pane select, #input-pane textarea { 
-            border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.15); color: #ffffff;
+            border: 1px solid rgba(255,255,255,0.2); background-color: rgba(0,0,0,0.15); color: #ffffff;
         }
         #input-pane select { background-image: var(--ui-chevron); }
         
         #script-pane input, #script-pane select, #script-pane textarea {
-            border: 1px solid var(--sp-hairline); background: var(--sp-input-bg); color: var(--sp-text);
+            border: 1px solid var(--sp-hairline); background-color: var(--sp-input-bg); color: var(--sp-text);
         }
         #script-pane select { background-image: var(--sp-chevron); }
 
         input:focus, select:focus, textarea:focus { border-color: var(--color-primary); outline: none; box-shadow: 0 0 0 3px var(--color-primary-alpha); }
-        #input-pane input[readonly], #input-pane textarea[readonly] { background: rgba(0,0,0,0.3); color: var(--color-secondary); font-family: 'Manrope', sans-serif; font-size: 14px;}
+        #input-pane input[readonly], #input-pane textarea[readonly] { background-color: rgba(0,0,0,0.3); color: var(--color-secondary); font-family: 'Manrope', sans-serif; font-size: 14px;}
         .money-readonly { color: var(--color-highlight) !important; font-weight: 800; font-family: 'Manrope', sans-serif !important; }
 
         /* Dropdowns & Multi-select Z-Index Overlap Fixes */
         .multiselect-container { position: relative; width: 100%; z-index: 10; }
         .multiselect-container.active { z-index: 9999; }
         .select-display-box { 
-            width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; 
-            font-size: 14px; background: #ffffff; color: #64748b; cursor: pointer; 
+            width: 100%; padding: 12px; border-radius: 8px; 
+            font-size: 14px; cursor: pointer; 
             display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;
+            background-repeat: no-repeat;
+            background-position-x: 96%;
+            background-position-y: center;
+            padding-right: 36px; /* give space for the chevron */
         }
-        #input-pane .select-display-box { background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.2); color: #ffffff; }
-        #script-pane .select-display-box { background: var(--sp-input-bg); border: 1px solid var(--sp-hairline); color: var(--sp-text-dim); }
+        #input-pane .select-display-box { background-color: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.2); color: #ffffff; background-image: var(--ui-chevron); }
+        #script-pane .select-display-box { background-color: var(--sp-input-bg); border: 1px solid var(--sp-hairline); color: var(--sp-text); background-image: var(--sp-chevron); }
         
         .checkbox-dropdown-window { 
             display: none; position: absolute; top: 100%; left: 0; width: 100%; 
@@ -294,6 +309,8 @@
             color: var(--sp-text-dim); transition: all 0.2s ease;
         }
         .theme-toggle button.active { background: var(--color-primary); color: #fff; }
+        
+        .placeholder-text { color: var(--color-secondary); }
 
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAdT027lWYDDB6Ab58_h0JfvnehSt8UPF0&libraries=places&loading=async" async defer></script>
@@ -363,7 +380,7 @@
             <label>Active Target Infestations</label>
             <div class="multiselect-container" id="script-pest-dropdown-wrapper">
                 <div class="select-display-box" onclick="toggleScriptDropdownWindow(event)">
-                    <span id="display-script-selected-text">-- Select Targets --</span> <span>▼</span>
+                    <span id="display-script-selected-text" class="placeholder-text">-- Select Targets --</span> 
                 </div>
                 <div class="checkbox-dropdown-window" id="script-dropdown-checkbox-panel">
                     <label><input type="checkbox" class="script-pest-cb" value="General Pests" onchange="updateScriptDisplayBoxText()"> General Pests</label>
@@ -519,7 +536,7 @@
                         <label>Pest Logic Matrix</label>
                         <div class="multiselect-container" id="pest-dropdown-wrapper">
                             <div class="select-display-box" onclick="toggleDropdownWindow(event)">
-                                <span id="display-selected-text" style="opacity:0.6;">-- Map Targets --</span> 
+                                <span id="display-selected-text" class="placeholder-text">-- Map Targets --</span> 
                             </div>
                             <div class="checkbox-dropdown-window" id="dropdown-checkbox-panel">
                                 <label><input type="checkbox" class="pest-checkbox" data-display="General Pests" onchange="updateDisplayBoxText()"> General Pests</label>
