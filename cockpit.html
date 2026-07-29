@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Closer Workspace | RevOps Engine</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* Modern, Calm Matte Green UI Tokens — v2 redesign */
         :root {
@@ -18,6 +18,7 @@
             --text-on-light: #1e293b;       /* Dark slate for high readability on white */
             --gold-accent: #D9A441;
             --gold-dim: rgba(217,164,65,0.14);
+            --focus-glow: rgba(76, 145, 112, 0.2);
             --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --shadow-inset: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
 
@@ -52,6 +53,7 @@
             --color-mint-soft: hsl(259, 15%, 70%);
             --gold-accent: hsl(180, 60%, 50%);
             --gold-dim: hsla(180, 60%, 50%, 0.1);
+            --focus-glow: rgba(90, 74, 140, 0.2);
             --shadow-soft: 0 10px 25px -5px rgba(0,0,0,0.2), 0 8px 10px -6px rgba(0,0,0,0.1);
 
             --sp-bg: #141619;
@@ -63,26 +65,61 @@
             --sp-dynamic: hsl(180, 60%, 50%);
             --sp-h2-color: #ffffff;
         }
-        body.theme-executive h1, body.theme-executive h2 { font-weight: 300; }
+        /* Typography — lighter weight, tighter tracking, more generous scale */
+        body.theme-executive h1, body.theme-executive h2 { font-weight: 300; letter-spacing: -0.02em; }
+        body.theme-executive h2 { font-size: 22px; margin-bottom: 24px; padding-bottom: 12px; border-bottom-width: 1px; }
+        body.theme-executive label { font-size: 10px; letter-spacing: 1px; }
+
+        /* Script cards — more line-height and padding, softer rounding, thinner border */
+        body.theme-executive .script-block { padding: 20px 28px; margin-bottom: 20px; line-height: 1.7; border-left-width: 3px; border-radius: 0 12px 12px 0; }
+        body.theme-executive .script-field-wrapper { margin-bottom: 30px; }
+
+        /* Dashboard cards — shadow instead of border, more internal room, larger radius */
+        body.theme-executive .metrics-dashboard { gap: 24px; margin-bottom: 35px; }
         body.theme-executive .metrics-card,
         body.theme-executive .leaderboard-section,
         body.theme-executive .form-section {
             border: none; border-radius: 16px; box-shadow: var(--shadow-soft);
         }
+        body.theme-executive .metrics-card { padding: 24px; }
+        body.theme-executive .metrics-card h3 { font-size: 11px; letter-spacing: 1.5px; margin-bottom: 16px; padding-bottom: 10px; }
+        body.theme-executive .metrics-row { font-size: 14px; margin-bottom: 12px; }
+        body.theme-executive .leaderboard-section { padding: 24px; margin-bottom: 35px; }
+        body.theme-executive .leaderboard-grid { gap: 10px; margin-top: 16px; }
+        body.theme-executive .leaderboard-row { padding: 12px 16px; border-radius: 10px; font-size: 14px; transition: all 0.2s; }
+        body.theme-executive .rep-rank-badge { padding: 4px 10px; border-radius: 6px; margin-right: 14px; }
+        body.theme-executive .form-section { padding: 28px; margin-bottom: 35px; }
+
+        /* Forms — more generous grid gaps, airier field padding, borderless/underline feel */
+        body.theme-executive .grid-2, body.theme-executive .grid-3 { gap: 20px; margin-bottom: 20px; }
         body.theme-executive input, body.theme-executive select, body.theme-executive textarea,
         body.theme-executive .select-display-box, body.theme-executive .checkbox-dropdown-window {
             border-radius: 10px;
         }
-        body.theme-executive .script-block { border-radius: 0 12px 12px 0; }
+        body.theme-executive input, body.theme-executive select, body.theme-executive textarea,
+        body.theme-executive .select-display-box {
+            padding: 14px 16px; border: 1px solid transparent;
+        }
+        body.theme-executive #input-pane input, body.theme-executive #input-pane select, body.theme-executive #input-pane textarea,
+        body.theme-executive #input-pane .select-display-box {
+            border: none; border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        body.theme-executive .money-readonly { font-size: 16px; }
+        body.theme-executive .checkbox-dropdown-window { padding: 8px; margin-top: 6px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4); }
+        body.theme-executive .checkbox-dropdown-window label { padding: 10px 12px; border-radius: 6px; gap: 12px; }
+        body.theme-executive .pest-fact-bullet { margin: 8px 0 8px 12px; gap: 10px; }
+        body.theme-executive .btn-copy-action { border-radius: 10px; padding: 0 18px; font-size: 10px; }
+
+        /* Buttons — softer radius, wider tracking, colored glow shadows matching each action */
         body.theme-executive .btn-primary {
-            border-radius: 10px; letter-spacing: 1.5px;
+            padding: 18px; border-radius: 10px; letter-spacing: 1.5px;
             box-shadow: 0 4px 15px rgba(90,74,140,0.3);
         }
         body.theme-executive .btn-primary:hover {
             transform: translateY(-2px); box-shadow: 0 6px 20px rgba(90,74,140,0.4);
         }
         body.theme-executive .btn-transaction { box-shadow: 0 4px 15px rgba(0,204,204,0.2); }
-        body.theme-executive .money-readonly { font-size: 16px; }
+        body.theme-executive .btn-transaction:hover { box-shadow: 0 6px 20px rgba(0,204,204,0.3); }
 
         body { 
             margin: 0; padding: 0; 
@@ -214,7 +251,7 @@
         #script-pane input, #script-pane select, #script-pane textarea {
             border: 1px solid var(--sp-hairline); background: var(--sp-input-bg); color: var(--sp-text);
         }
-        input:focus, select:focus, textarea:focus { border-color: var(--color-sage-accent); outline: none; box-shadow: 0 0 0 3px rgba(76, 145, 112, 0.2); }
+        input:focus, select:focus, textarea:focus { border-color: var(--color-sage-accent); outline: none; box-shadow: 0 0 0 3px var(--focus-glow); }
         #input-pane input[readonly], #input-pane textarea[readonly] { background: rgba(0,0,0,0.3); color: var(--color-mint-soft); font-family: 'Manrope', sans-serif; font-size: 14px;}
         .money-readonly { color: var(--gold-accent) !important; font-weight: 800; font-family: 'Manrope', sans-serif !important; }
 
