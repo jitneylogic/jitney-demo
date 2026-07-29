@@ -21,9 +21,9 @@
             --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --shadow-inset: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
 
-            /* Script pane — defaults to warm dark, toggled to light via .light-mode */
-            --sp-bg: #1C1917;
-            --sp-panel-bg: #26221F;
+            /* Script pane — defaults to warm dark (coffee), toggled to light via .light-mode */
+            --sp-bg: #2E2620;
+            --sp-panel-bg: #3A302A;
             --sp-input-bg: rgba(255,255,255,0.05);
             --sp-hairline: rgba(255,255,255,0.1);
             --sp-text: rgba(243,241,236,0.95);
@@ -32,7 +32,7 @@
             --sp-h2-color: rgba(243,241,236,0.95);
         }
         #script-pane.light-mode {
-            --sp-bg: #FAF8F4;
+            --sp-bg: #F1ECE3;
             --sp-panel-bg: #FFFFFF;
             --sp-input-bg: #FFFFFF;
             --sp-hairline: rgba(0,0,0,0.12);
@@ -104,7 +104,8 @@
             transition: background 0.2s ease, color 0.2s ease;
         }
         .script-quote { font-weight: 400; }
-        .script-highlight-text { color: var(--sp-dynamic); font-weight: 700; }
+        .script-highlight-text { font-weight: 700; }
+        .script-price-text { color: var(--sp-dynamic); font-weight: 700; }
         .script-field-wrapper { margin-bottom: 25px; padding-left: 5px; }
 
         /* --- DASHBOARD METRICS (Tight Grid) --- */
@@ -124,7 +125,7 @@
             display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; color: rgba(248, 250, 252, 0.8);
         }
         .metrics-row:last-child { margin-bottom: 0; }
-        .metrics-val { font-family: 'SFMono-Regular', Consolas, monospace; font-weight: 700; color: #ffffff; }
+        .metrics-val { font-family: 'Fraunces', serif; font-weight: 600; color: #ffffff; }
         .val-highlight { color: var(--gold-accent); font-family: 'Fraunces', serif; }
 
         /* --- LIVE LEADERBOARD (Clean & Visceral) --- */
@@ -141,7 +142,8 @@
         .user-row { border-color: var(--gold-accent); background: var(--gold-dim); }
         .rep-rank-badge {
             background: rgba(255,255,255,0.08); padding: 3px 8px; border-radius: 5px;
-            font-size: 11px; font-weight: 800; margin-right: 12px; color: rgba(248, 250, 252, 0.8);
+            font-size: 11px; font-weight: 700; margin-right: 12px; color: rgba(248, 250, 252, 0.8);
+            font-family: 'Fraunces', serif;
         }
         .rank-1 .rep-rank-badge { background: var(--gold-accent); color: #2B1F09; }
         .user-row .rep-rank-badge { background: var(--gold-accent); color: #2B1F09; }
@@ -171,7 +173,8 @@
             border: 1px solid var(--sp-hairline); background: var(--sp-input-bg); color: var(--sp-text);
         }
         input:focus, select:focus, textarea:focus { border-color: var(--color-sage-accent); outline: none; box-shadow: 0 0 0 3px rgba(76, 145, 112, 0.2); }
-        #input-pane input[readonly], #input-pane textarea[readonly] { background: rgba(0,0,0,0.3); color: var(--color-mint-soft); font-family: monospace; font-size: 14px;}
+        #input-pane input[readonly], #input-pane textarea[readonly] { background: rgba(0,0,0,0.3); color: var(--color-mint-soft); font-family: 'Fraunces', serif; font-size: 15px;}
+        .money-readonly { color: var(--gold-accent) !important; font-weight: 600; }
 
         /* Dropdowns & Multi-select Z-Index Overlap Fixes */
         .multiselect-container { position: relative; width: 100%; z-index: 10; }
@@ -219,6 +222,7 @@
         }
         .btn-primary:hover { background: #3d7a5c; transform: translateY(-1px); }
         .btn-primary:active { transform: translateY(1px); }
+        .btn-transaction { font-family: 'Fraunces', serif; font-weight: 600; letter-spacing: 0.5px; }
 
         .pest-fact-bullet { margin: 6px 0 6px 10px; font-size: 14px; display: flex; align-items: flex-start; gap: 8px; }
         .pest-fact-bullet::before { content: "→"; color: var(--color-sage-accent); font-weight: bold; }
@@ -359,7 +363,7 @@
         </div>
 
         <div class="script-block">
-            <span class="script-quote">Standard pricing in your zip code is normally <span class="script-highlight-text inject-pitch-normal">$0.00</span> to start, and <span class="script-highlight-text inject-pitch-monthly">$0.00</span> a month after. That covers everything, with unlimited free re-services. Okay?</span>
+            <span class="script-quote">Standard pricing in your zip code is normally <span class="script-price-text inject-pitch-normal">$0.00</span> to start, and <span class="script-price-text inject-pitch-monthly">$0.00</span> a month after. That covers everything, with unlimited free re-services. Okay?</span>
         </div>
 
         <div class="script-block">
@@ -406,7 +410,7 @@
             <div style="display: flex; justify-content: space-between; align-items:center;">
                 <div>
                     <label style="margin:0;">Logged in as</label>
-                    <div id="logged-in-rep-display" style="font-size:16px; font-weight:700; color:#fff;">—</div>
+                    <div id="logged-in-rep-display" style="font-size:17px; font-weight:600; color:#fff; font-family:'Fraunces',serif;">—</div>
                 </div>
                 <button type="button" class="btn-copy-action" onclick="attemptLogout()">Log Out</button>
             </div>
@@ -521,7 +525,7 @@
                 <div class="grid-3" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; margin-top: 10px;">
                     <div class="form-group">
                         <label>Total Contract (TCV)</label>
-                        <input type="text" id="tcv-display" readonly value="$0.00">
+                        <input type="text" id="tcv-display" class="money-readonly" readonly value="$0.00">
                     </div>
                     <div class="form-group">
                         <label>Comm Tier (%)</label>
@@ -529,7 +533,7 @@
                     </div>
                     <div class="form-group">
                         <label>Calculated Payout</label>
-                        <input type="text" id="payout-display" readonly value="$0.00" style="color:#4ade80;">
+                        <input type="text" id="payout-display" class="money-readonly" readonly value="$0.00">
                     </div>
                 </div>
             </div>
@@ -585,7 +589,7 @@
                 </div>
 
                 <div class="form-group">
-                    <button type="button" class="btn-primary" id="create-customer-btn" onclick="fireCreateCustomer()">Create Customer</button>
+                    <button type="button" class="btn-primary btn-transaction" id="create-customer-btn" onclick="fireCreateCustomer()">Create Customer</button>
                     <div id="create-customer-status" style="margin-top:8px; font-size:12px; color:var(--color-mint-soft);"></div>
                 </div>
 
@@ -622,12 +626,12 @@
                     </div>
                 </div>
                 
-                <button type="submit" class="btn-primary">Commit Transaction</button>
+                <button type="submit" class="btn-primary btn-transaction">Commit Transaction</button>
             </div>
         </form>
     </div>
 
-    <script src="https://jitneylogic.github.io/jitneylogic-shared/jitneylogic-engine.js?v=6"></script>
+    <script src="https://jitneylogic.github.io/jitneylogic-shared/jitneylogic-engine.js?v=7"></script>
     <script>
         // =====================================================================
         // CLIENT CONFIG — the only block that should need to change when
