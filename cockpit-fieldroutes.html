@@ -339,7 +339,8 @@
             width: 9px; height: 9px; border-radius: 50%; background: #ef4444; flex-shrink: 0;
             animation: status-dot-blink 1.3s ease-in-out infinite;
         }
-        .status-dot.signed { background: #4ade80; animation: none; }
+        .status-dot.signed, .status-dot.complete { background: #4ade80; animation: none; }
+        .status-dot.progress { background: #f59e0b; animation: none; }
         @keyframes status-dot-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
 
     </style>
@@ -464,27 +465,6 @@
         </div>
 
         <div class="script-block">
-            <span class="script-quote">I'm going to send you over a confirmation document. Would you like that texted or emailed to you?</span>
-        </div>
-
-        <div class="script-block">
-            <span class="script-quote">I have a route opening tomorrow. Do you prefer a morning or afternoon arrival?</span>
-        </div>
-        <div class="grid-2 script-field-wrapper">
-            <input type="date" id="script-date-input" onchange="syncDateValue(this.value)">
-            <select id="script-window-input" onchange="syncWindowValue(this.value)">
-                <option value="Any Time">Any Time</option>
-                <option value="8:00 AM - 12:00 PM">8:00 AM - 12:00 PM</option>
-                <option value="12:00 PM - 4:00 PM">12:00 PM - 4:00 PM</option>
-                <option value="4:00 PM - 8:00 PM">4:00 PM - 8:00 PM</option>
-            </select>
-        </div>
-
-        <div class="script-field-wrapper" style="margin: 16px 0;">
-            <button type="button" class="btn-primary btn-transaction" onclick="alert('Prototype scaffolding — not wired to FieldRoutes yet.')">Schedule Appointment</button>
-        </div>
-
-        <div class="script-block">
             <span class="script-quote">Great! I'm going to send you over a confirmation document and then we can get something scheduled. How do you spell your last name?</span>
         </div>
         <div class="script-field-wrapper">
@@ -500,9 +480,12 @@
             <input type="email" id="script-email-input" placeholder="customer@email.com" oninput="syncEmailValue(this.value)">
         </div>
 
-        <div class="script-field-wrapper" style="margin: 16px 0;">
-            <button type="button" class="btn-primary btn-transaction" id="create-customer-btn" onclick="fireCreateCustomer()">Create Customer</button>
-            <div id="create-customer-status" style="margin-top:8px; font-size:12px; color:var(--sp-text-dim);"></div>
+        <div class="script-field-wrapper" style="margin: 16px 0; display: flex; align-items: center; gap: 16px;">
+            <button type="button" class="btn-primary btn-transaction" style="width: 66.67%; margin-top: 0;" onclick="alert('Prototype scaffolding — not wired to FieldRoutes yet.')">Create Customer</button>
+            <div class="signature-status" onclick="cycleStatusDemo('createCustomer','cc-status-dot','cc-status-text', createCustomerStates)" title="Demo only — click to preview states">
+                <span class="status-dot" id="cc-status-dot"></span>
+                <span id="cc-status-text">Pending</span>
+            </div>
         </div>
 
         <div class="script-block">
@@ -512,14 +495,35 @@
 
         <div class="script-field-wrapper" style="margin: 16px 0; display: flex; align-items: center; gap: 16px;">
             <button type="button" class="btn-primary btn-transaction" style="width: 66.67%; margin-top: 0;" onclick="alert('Prototype scaffolding — not wired to FieldRoutes yet.')">Send Agreement</button>
-            <div class="signature-status" id="signature-status" onclick="toggleAgreementSignedDemo()" title="Demo only — click to preview the signed state">
-                <span class="status-dot" id="signature-status-dot"></span>
-                <span id="signature-status-text">Pending</span>
+            <div class="signature-status" onclick="cycleStatusDemo('sendAgreement','sa-status-dot','sa-status-text', sendAgreementStates)" title="Demo only — click to preview states">
+                <span class="status-dot" id="sa-status-dot"></span>
+                <span id="sa-status-text">Pending</span>
             </div>
         </div>
 
         <div class="script-block">
-            <span class="script-quote">That cleared. We will see you on <span class="script-highlight-text" id="inject-final-window">[Date & Window]</span> for your <span class="script-highlight-text" id="inject-package-text">[Package]</span> service. Welcome to the family.</span>
+            <span class="script-quote">Great that cleared. I have a route opening tomorrow. Do you prefer a morning or afternoon arrival?</span>
+        </div>
+        <div class="grid-2 script-field-wrapper">
+            <input type="date" id="script-date-input" onchange="syncDateValue(this.value)">
+            <select id="script-window-input" onchange="syncWindowValue(this.value)">
+                <option value="Any Time">Any Time</option>
+                <option value="8:00 AM - 12:00 PM">8:00 AM - 12:00 PM</option>
+                <option value="12:00 PM - 4:00 PM">12:00 PM - 4:00 PM</option>
+                <option value="4:00 PM - 8:00 PM">4:00 PM - 8:00 PM</option>
+            </select>
+        </div>
+
+        <div class="script-field-wrapper" style="margin: 16px 0; display: flex; align-items: center; gap: 16px;">
+            <button type="button" class="btn-primary btn-transaction" style="width: 66.67%; margin-top: 0;" onclick="alert('Prototype scaffolding — not wired to FieldRoutes yet.')">Schedule Appointment</button>
+            <div class="signature-status" onclick="cycleStatusDemo('scheduleAppt','sched-status-dot','sched-status-text', scheduleApptStates)" title="Demo only — click to preview states">
+                <span class="status-dot" id="sched-status-dot"></span>
+                <span id="sched-status-text">Pending</span>
+            </div>
+        </div>
+
+        <div class="script-block">
+            <span class="script-quote">I've scheduled that appointment. We will see you on <span class="script-highlight-text" id="inject-final-window">[Date & Window]</span> for your <span class="script-highlight-text" id="inject-package-text">[Package]</span> service. Welcome to the family.</span>
         </div>
 
         <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--sp-hairline);">
@@ -877,16 +881,30 @@
         window.setScriptPaneTheme = setScriptPaneTheme;
         setScriptPaneTheme(localStorage.getItem('jitneylogic_script_pane_theme') || 'dark');
 
-        // Scaffolding only — real toggle would fire when FieldRoutes actually
-        // reports the agreement as signed. For now this just lets the demo
-        // show both states on click.
-        function toggleAgreementSignedDemo() {
-            const dot = document.getElementById('signature-status-dot');
-            const text = document.getElementById('signature-status-text');
-            const isSigned = dot.classList.toggle('signed');
-            text.innerText = isSigned ? 'Signed' : 'Pending';
+        // Scaffolding only — real transitions would fire when FieldRoutes
+        // actually reports each event. For now these just let the demo show
+        // every state on click, cycling forward and wrapping back to Pending.
+        const createCustomerStates = [
+            { label: 'Pending', cls: '' },
+            { label: 'Customer Created', cls: 'complete' }
+        ];
+        const sendAgreementStates = [
+            { label: 'Pending', cls: '' },
+            { label: 'Sent', cls: 'progress' },
+            { label: 'Signed', cls: 'complete' }
+        ];
+        const scheduleApptStates = [
+            { label: 'Pending', cls: '' },
+            { label: 'Appointment Scheduled', cls: 'complete' }
+        ];
+        const statusCyclerState = {};
+        function cycleStatusDemo(key, dotId, textId, states) {
+            statusCyclerState[key] = ((statusCyclerState[key] || 0) + 1) % states.length;
+            const s = states[statusCyclerState[key]];
+            document.getElementById(dotId).className = 'status-dot' + (s.cls ? ' ' + s.cls : '');
+            document.getElementById(textId).innerText = s.label;
         }
-        window.toggleAgreementSignedDemo = toggleAgreementSignedDemo;
+        window.cycleStatusDemo = cycleStatusDemo;
 
         initAuthGate();
     </script>
