@@ -337,7 +337,7 @@
            event yet. */
         .signature-status {
             display: flex; align-items: center; gap: 8px;
-            font-size: 12px; font-weight: 600; color: var(--sp-text-dim); cursor: pointer;
+            font-size: 12px; font-weight: 600; color: var(--sp-text-dim);
             white-space: nowrap;
         }
         .status-dot {
@@ -486,8 +486,8 @@
         </div>
 
         <div class="script-field-wrapper" style="margin: 16px 0; display: flex; align-items: center; gap: 16px;">
-            <button type="button" class="btn-primary btn-transaction btn-proto-action" onclick="alert('Prototype scaffolding — not wired to FieldRoutes yet.')">Create Customer</button>
-            <div class="signature-status" onclick="cycleStatusDemo('createCustomer','cc-status-dot','cc-status-text', createCustomerStates)" title="Demo only — click to preview states">
+            <button type="button" class="btn-primary btn-transaction btn-proto-action" onclick="runDemoSequence('cc-status-dot','cc-status-text')">Create Customer</button>
+            <div class="signature-status" >
                 <span class="status-dot" id="cc-status-dot"></span>
                 <span id="cc-status-text">Pending</span>
             </div>
@@ -499,8 +499,8 @@
         </div>
 
         <div class="script-field-wrapper" style="margin: 16px 0; display: flex; align-items: center; gap: 16px;">
-            <button type="button" class="btn-primary btn-transaction btn-proto-action" onclick="alert('Prototype scaffolding — not wired to FieldRoutes yet.')">Send Agreement</button>
-            <div class="signature-status" onclick="cycleStatusDemo('sendAgreement','sa-status-dot','sa-status-text', sendAgreementStates)" title="Demo only — click to preview states">
+            <button type="button" class="btn-primary btn-transaction btn-proto-action" onclick="runDemoSequence('sa-status-dot','sa-status-text')">Send Agreement</button>
+            <div class="signature-status" >
                 <span class="status-dot" id="sa-status-dot"></span>
                 <span id="sa-status-text">Pending</span>
             </div>
@@ -520,8 +520,8 @@
         </div>
 
         <div class="script-field-wrapper" style="margin: 16px 0; display: flex; align-items: center; gap: 16px;">
-            <button type="button" class="btn-primary btn-transaction btn-proto-action" onclick="alert('Prototype scaffolding — not wired to FieldRoutes yet.')">Schedule Appointment</button>
-            <div class="signature-status" onclick="cycleStatusDemo('scheduleAppt','sched-status-dot','sched-status-text', scheduleApptStates)" title="Demo only — click to preview states">
+            <button type="button" class="btn-primary btn-transaction btn-proto-action" onclick="runDemoSequence('sched-status-dot','sched-status-text')">Schedule Appointment</button>
+            <div class="signature-status" >
                 <span class="status-dot" id="sched-status-dot"></span>
                 <span id="sched-status-text">Pending</span>
             </div>
@@ -886,30 +886,24 @@
         window.setScriptPaneTheme = setScriptPaneTheme;
         setScriptPaneTheme(localStorage.getItem('jitneylogic_script_pane_theme') || 'dark');
 
-        // Scaffolding only — real transitions would fire when FieldRoutes
-        // actually reports each event. For now these just let the demo show
-        // every state on click, cycling forward and wrapping back to Pending.
-        const createCustomerStates = [
-            { label: 'Pending', cls: '' },
-            { label: 'Customer Created', cls: 'complete' }
-        ];
-        const sendAgreementStates = [
-            { label: 'Pending', cls: '' },
-            { label: 'Sent', cls: 'progress' },
-            { label: 'Signed', cls: 'complete' }
-        ];
-        const scheduleApptStates = [
-            { label: 'Pending', cls: '' },
-            { label: 'Appointment Scheduled', cls: 'complete' }
-        ];
-        const statusCyclerState = {};
-        function cycleStatusDemo(key, dotId, textId, states) {
-            statusCyclerState[key] = ((statusCyclerState[key] || 0) + 1) % states.length;
-            const s = states[statusCyclerState[key]];
-            document.getElementById(dotId).className = 'status-dot' + (s.cls ? ' ' + s.cls : '');
-            document.getElementById(textId).innerText = s.label;
+        // =====================================================================
+        // TEMPORARY DEMO-VIDEO SCAFFOLDING — remove after recording.
+        // Clicking the button itself now drives the status: immediately shows
+        // orange "Sent", then flips to green "Confirmed" 5 seconds later, so
+        // the video shows the full state change without needing a second click
+        // timed precisely during recording. Not wired to any real event yet.
+        // =====================================================================
+        function runDemoSequence(dotId, textId) {
+            const dot = document.getElementById(dotId);
+            const text = document.getElementById(textId);
+            dot.className = 'status-dot progress';
+            text.innerText = 'Sent';
+            setTimeout(() => {
+                dot.className = 'status-dot complete';
+                text.innerText = 'Confirmed';
+            }, 5000);
         }
-        window.cycleStatusDemo = cycleStatusDemo;
+        window.runDemoSequence = runDemoSequence;
 
         initAuthGate();
     </script>
