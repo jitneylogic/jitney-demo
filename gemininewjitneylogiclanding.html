@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JitneyLogic | Revenue Operations Infrastructure</title>
+    <style>
+        :root {
+            --jitney-purple: hsl(259, 30%, 42%);
+            --jitney-purple-hover: hsl(259, 30%, 32%);
+            --linen-bg: #F4F2EC; 
+            --stark-white: #FFFFFF;
+            --slate-charcoal: #1B291F; 
+            --sage-green: #4C9170;
+            --gold-accent: #d97706;
+            --border-width: 3px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--linen-bg);
+            font-family: system-ui, -apple-system, sans-serif;
+            color: var(--slate-charcoal);
+            line-height: 1.6;
+        }
+
+        /* NAVIGATION */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            border-bottom: var(--border-width) solid var(--slate-charcoal);
+            background-color: var(--stark-white);
+        }
+
+        .logo {
+            font-weight: 900;
+            font-size: 1.5rem;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+        }
+
+        .logo span {
+            color: var(--jitney-purple);
+        }
+
+        .nav-btn {
+            background-color: var(--stark-white);
+            color: var(--slate-charcoal);
+            text-decoration: none;
+            font-weight: 700;
+            padding: 10px 20px;
+            border: 2px solid var(--slate-charcoal);
+            box-shadow: 3px 3px 0px var(--slate-charcoal);
+            transition: all 0.1s;
+        }
+
+        .nav-btn:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px var(--slate-charcoal);
+        }
+
+        /* HERO SECTION */
+        .hero {
+            padding: 100px 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .pill {
+            display: inline-block;
+            background-color: var(--sage-green);
+            color: var(--stark-white);
+            font-family: ui-monospace, monospace;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 6px 12px;
+            border: 2px solid var(--slate-charcoal);
+            text-transform: uppercase;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 6vw, 4.5rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 1;
+            letter-spacing: -1px;
+            margin-bottom: 24px;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            max-width: 700px;
+            margin-bottom: 40px;
+            font-weight: 500;
+            color: #3f4e44;
+        }
+
+        .primary-cta {
+            display: inline-block;
+            background-color: var(--jitney-purple);
+            color: var(--stark-white);
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 18px 32px;
+            border: var(--border-width) solid var(--slate-charcoal);
+            box-shadow: 6px 6px 0px var(--slate-charcoal);
+            transition: all 0.1s;
+        }
+
+        .primary-cta:hover {
+            background-color: var(--jitney-purple-hover);
+            transform: translate(2px, 2px);
+            box-shadow: 4px 4px 0px var(--slate-charcoal);
+        }
+
+        /* FEATURES GRID */
+        .features {
+            padding: 80px 5%;
+            background-color: var(--stark-white);
+            border-top: var(--border-width) solid var(--slate-charcoal);
+            border-bottom: var(--border-width) solid var(--slate-charcoal);
+        }
+
+        .features-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+        }
+
+        .feature-card {
+            background-color: var(--linen-bg);
+            border: var(--border-width) solid var(--slate-charcoal);
+            padding: 32px;
+            box-shadow: 6px 6px 0px rgba(27, 41, 31, 0.1);
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            color: var(--jitney-purple);
+        }
+
+        .feature-card p {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        /* FOOTER */
+        footer {
+            padding: 40px 5%;
+            text-align: center;
+            font-family: ui-monospace, monospace;
+            font-size: 0.9rem;
+            color: var(--slate-charcoal);
+        }
+
+        @media (max-width: 768px) {
+            .hero { padding: 60px 5%; }
+            .features { padding: 60px 5%; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">Jitney<span>Logic</span></div>
+        <a href="demo.html" class="nav-btn">Run Terminal</a>
+    </nav>
+
+    <section class="hero">
+        <div class="pill">RevOps Infrastructure</div>
+        <h1>Sales reps are guessing.<br>Management is looking backward.</h1>
+        <p>Currently, reps are forced to juggle multiple software tabs and guess at pricing mid-call, while executives manage their floors backward relying on stale, delayed data exports. JitneyLogic is the lightweight RevOps overlay that fixes it.</p>
+        <a href="demo.html" class="primary-cta">Watch The System Run</a>
+    </section>
+
+    <section class="features">
+        <div class="features-container">
+            <div class="feature-card">
+                <h3>Closer Cockpit</h3>
+                <p>A single window where scripts and pricing live, so reps can focus 100% of their cognitive bandwidth on the customer instead of fighting clunky CRM systems.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Live Leaderboards</h3>
+                <p>Intraday momentum tracking so managers can course-correct and throw out SPIFFs in real-time instead of acting as data clerks for stale spreadsheets.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Automated Culture</h3>
+                <p>Live floor notifications when a sale logs to drive dopamine, gamification, and striving. A high-status leaderboard that builds an elite sales culture.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        &copy; 2026 JitneyLogic LLC. All Systems Secure.
+    </footer>
+
+</body>
+</html>
