@@ -1,0 +1,233 @@
+/* ==========================================================================
+   JITNEYLOGIC - ELITE REVOPS ARCHITECTURE
+   Theme: Linen, Cream, & Sovereign Purple
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap');
+
+:root {
+    /* The Sovereign Color Palette */
+    --jitney-purple: hsl(259, 30%, 42%);
+    --jitney-purple-hover: hsl(259, 30%, 34%);
+    --jitney-purple-light: hsla(259, 30%, 42%, 0.06);
+    
+    /* The Paper & Ink */
+    --bg-linen: #F2EFEA;       /* The deep background - Warm, expensive linen */
+    --card-cream: #FCFBF8;     /* The raised cards - Crisp cream, no stark white */
+    --text-espresso: #292524;  /* Deep, warm charcoal ink (easier on eyes than black) */
+    --text-muted: #57534E;     /* Muted ink for subtext */
+    
+    /* The Accents */
+    --brass-accent: #B89C72;   /* Quiet, expensive gold/brass */
+    --brass-light: rgba(184, 156, 114, 0.2);
+    
+    /* Architecture */
+    --border-fine: 1px solid rgba(41, 37, 36, 0.12);
+    --radius-soft: 12px;
+    --shadow-elite: 
+        0 20px 40px -10px rgba(41, 37, 36, 0.08), 
+        0 1px 3px rgba(41, 37, 36, 0.04);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background-color: var(--bg-linen);
+    font-family: 'Inter', sans-serif;
+    color: var(--text-espresso);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================================================
+   TYPOGRAPHY
+   ========================================================================== */
+h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    color: var(--text-espresso);
+    letter-spacing: -0.5px;
+}
+
+.subtext {
+    font-size: 1.15rem;
+    font-weight: 300;
+    color: var(--text-muted);
+    line-height: 1.7;
+}
+
+/* ==========================================================================
+   BUTTONS & CTAs
+   ========================================================================== */
+.btn-primary {
+    display: inline-block;
+    background-color: var(--jitney-purple);
+    color: var(--card-cream);
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 18px 36px;
+    border-radius: 4px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(75, 66, 121, 0.25);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.btn-primary:hover {
+    background-color: var(--jitney-purple-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px rgba(75, 66, 121, 0.35);
+}
+
+/* ==========================================================================
+   THE TERMINAL CARD (Demo Page)
+   ========================================================================== */
+.terminal-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+}
+
+.terminal-card {
+    background-color: var(--card-cream);
+    width: 100%;
+    max-width: 680px;
+    padding: 50px;
+    border-radius: var(--radius-soft);
+    box-shadow: var(--shadow-elite);
+    border: var(--border-fine);
+    position: relative;
+}
+
+.brand-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: var(--border-fine);
+    padding-bottom: 16px;
+    margin-bottom: 32px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--jitney-purple);
+}
+
+.status-dot {
+    width: 8px; height: 8px;
+    background-color: var(--jitney-purple);
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 rgba(75, 66, 121, 0.5);
+    animation: pulse-purple 2s infinite;
+}
+
+/* ==========================================================================
+   VIDEO EMBED
+   ========================================================================== */
+.video-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    background-color: var(--text-espresso);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    margin: 32px 0;
+    border: 2px solid var(--brass-light);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.video-wrapper:hover {
+    transform: scale(1.02);
+    box-shadow: 0 15px 30px rgba(41, 37, 36, 0.15);
+}
+
+.video-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(41, 37, 36, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    transition: background 0.3s ease;
+}
+
+.video-wrapper:hover .video-overlay {
+    background: rgba(41, 37, 36, 0.05);
+}
+
+.play-badge {
+    background-color: var(--card-cream);
+    color: var(--jitney-purple);
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.video-wrapper iframe {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    border: none; pointer-events: none;
+}
+
+/* ==========================================================================
+   FULLSCREEN MODAL
+   ========================================================================== */
+.fullscreen-modal {
+    display: none; 
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background-color: rgba(26, 24, 23, 0.95);
+    backdrop-filter: blur(5px);
+    z-index: 9999;
+    justify-content: center; align-items: center; flex-direction: column;
+}
+
+.fullscreen-modal iframe {
+    width: 90vw; height: 50.6vw; max-height: 85vh;
+    border-radius: 8px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.close-modal {
+    color: var(--card-cream);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 24px;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.close-modal:hover { opacity: 1; }
+
+@keyframes pulse-purple { 
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(75, 66, 121, 0.5); } 
+    70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(75, 66, 121, 0); } 
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(75, 66, 121, 0); } 
+}
+
+@media (max-width: 600px) {
+    .terminal-card { padding: 40px 24px; }
+    .fullscreen-modal iframe { width: 100vw; height: 56.25vw; border-radius: 0; }
+}
