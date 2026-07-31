@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JitneyLogic | Secure Terminal</title>
+    </head>
+<body>
+
+    <div class="terminal-wrapper">
+        <div class="terminal-card">
+            
+            <div class="brand-header">
+                <span>JitneyLogic Architecture</span>
+                <span class="status-indicator"><span class="status-dot"></span>System Live</span>
+            </div>
+
+            <h1 id="hero-headline" style="font-size: 2.8rem; margin-bottom: 16px;">Stop babysitting the floor. Start engineering it.</h1>
+            <p class="subtext">You've reached the end of the manual. Hit play to see the actual engine running our frontline sales architecture.</p>
+
+            <div class="video-wrapper" onclick="openFullscreen()">
+                <div class="video-overlay">
+                    <div class="play-badge">Tap To View Terminal</div>
+                </div>
+                <iframe src="https://player.vimeo.com/video/1209732458?badge=0&autopause=0&player_id=0&app_id=58479&background=1" frameborder="0"></iframe>
+            </div>
+
+            <a href="#" class="btn-primary" style="width: 100%; text-align: center;"
+               onclick="Calendly.initPopupWidget({url: 'https://calendly.com/tyler-jitneylogic'});return false;"
+               onmouseover="document.getElementById('hero-headline').innerText='Friction costs you deals. Watch how we kill it.';"
+               onmouseout="document.getElementById('hero-headline').innerText='Stop babysitting the floor. Start engineering it.';">
+                Secure Executive Briefing
+            </a>
+            
+        </div>
+    </div>
+
+    <div class="fullscreen-modal" id="videoModal">
+        <iframe id="modalIframe" src="" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+        <div class="close-modal" onclick="closeFullscreen()">Close Terminal X</div>
+    </div>
+
+    <script>
+        function openFullscreen() {
+            const modal = document.getElementById('videoModal');
+            const iframe = document.getElementById('modalIframe');
+            iframe.src = "https://player.vimeo.com/video/1209732458?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1";
+            modal.style.display = "flex";
+            if (iframe.requestFullscreen) { iframe.requestFullscreen(); }
+            else if (iframe.webkitRequestFullscreen) { iframe.webkitRequestFullscreen(); }
+        }
+
+        function closeFullscreen() {
+            const modal = document.getElementById('videoModal');
+            const iframe = document.getElementById('modalIframe');
+            modal.style.display = "none";
+            iframe.src = ""; 
+            if (document.exitFullscreen) { document.exitFullscreen(); }
+            else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+        }
+    </script>
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+    <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+
+</body>
+</html>
