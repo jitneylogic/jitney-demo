@@ -233,9 +233,11 @@ function updateConsolidatedAppointmentNotes() {
     const location = document.getElementById('script-location-input').value.trim();
     const duration = document.getElementById('script-duration-input').value.trim();
     const checkedScriptPests = Array.from(document.querySelectorAll('.script-pest-cb:checked')).map(cb => cb.value);
+    const leftNotesEl = document.getElementById('appointment-notes-consolidated-left');
 
     if (!firstName && !location && !duration && checkedScriptPests.length === 0) {
         document.getElementById('appointment-notes-consolidated').value = "";
+        if (leftNotesEl) leftNotesEl.value = "";
         return;
     }
 
@@ -244,8 +246,9 @@ function updateConsolidatedAppointmentNotes() {
     const pDuration = duration || "[duration of infestation]";
     const pestsString = checkedScriptPests.length > 0 ? checkedScriptPests.join(', ') : "[pests]";
 
-    document.getElementById('appointment-notes-consolidated').value =
-        `${pFirst} has been dealing with ${pestsString} in the ${pLocation} for ${pDuration}`;
+    const notesValue = `${pFirst} has been dealing with ${pestsString} in the ${pLocation} for ${pDuration}`;
+    document.getElementById('appointment-notes-consolidated').value = notesValue;
+    if (leftNotesEl) leftNotesEl.value = notesValue;
 }
 
 function syncCustomerName(val) {
