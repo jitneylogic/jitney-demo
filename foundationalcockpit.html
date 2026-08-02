@@ -264,7 +264,7 @@
             display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;
         }
         #input-pane .select-display-box { background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.2); color: #ffffff; }
-        #script-pane .select-display-box { background: var(--sp-input-bg); border: 1px solid var(--sp-hairline); color: var(--sp-text-dim); }
+        #script-pane .select-display-box { background: var(--sp-input-bg); border: 1px solid var(--sp-hairline); color: var(--sp-text); }
         
         .checkbox-dropdown-window { 
             display: none; position: absolute; top: 100%; left: 0; width: 100%; 
@@ -554,7 +554,7 @@
                         <label>Pest Logic Matrix</label>
                         <div class="multiselect-container" id="pest-dropdown-wrapper">
                             <div class="select-display-box" onclick="toggleDropdownWindow(event)">
-                                <span id="display-selected-text" style="opacity:0.6;">-- Map Targets --</span> <span>▼</span>
+                                <span id="display-selected-text">-- Map Targets --</span> <span>▼</span>
                             </div>
                             <div class="checkbox-dropdown-window" id="dropdown-checkbox-panel">
                                 <label><input type="checkbox" class="pest-checkbox" data-display="General Pests" onchange="updateDisplayBoxText()"> General Pests</label>
@@ -703,14 +703,14 @@
 
         <div class="theme-toggle-wrapper">
             <div class="theme-toggle">
-                <button type="button" id="theme-btn-dark" onclick="setScriptPaneTheme('dark')">Dark</button>
-                <button type="button" id="theme-btn-light" onclick="setScriptPaneTheme('light')">Light</button>
+                <button type="button" id="theme-btn-dark" onclick="setScriptPaneTheme('dark')">Green</button>
+                <button type="button" id="theme-btn-light" onclick="setScriptPaneTheme('light')">Linen</button>
                 <button type="button" id="theme-btn-executive" onclick="setScriptPaneTheme('executive')">Executive</button>
             </div>
         </div>
     </div>
 
-    <script src="https://jitneylogic.github.io/jitneylogic-shared/jitneylogic-engine.js?v=11"></script>
+    <script src="https://jitneylogic.github.io/jitneylogic-shared/jitneylogic-engine.js?v=13"></script>
     <script>
         // =====================================================================
         // CLIENT CONFIG — the only block that should need to change when
