@@ -265,7 +265,7 @@
             display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;
         }
         #input-pane .select-display-box { background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.2); color: #ffffff; }
-        #script-pane .select-display-box { background: var(--sp-input-bg); border: 1px solid var(--sp-hairline); color: var(--sp-text-dim); }
+        #script-pane .select-display-box { background: var(--sp-input-bg); border: 1px solid var(--sp-hairline); color: var(--sp-text); }
         
         .checkbox-dropdown-window { 
             display: none; position: absolute; top: 100%; left: 0; width: 100%; 
@@ -321,6 +321,37 @@
         .pest-fact-bullet::before { content: "→"; color: var(--color-sage-accent); font-weight: bold; }
 
         /* --- SCRIPT PANE THEME TOGGLE --- */
+        /* Linen theme, hide-pane view only — matches the dashboard's exact
+           "Clean Linen" palette. Script pane's own light-mode (used when
+           the script pane is showing) is a separate, untouched mechanism. */
+        body.hide-script-pane.theme-light {
+            --color-bg-dark: #DCD7CC;
+            --color-box-translucent: #F3EFE5;
+            --color-sage-accent: #4C9170;
+            --color-mint-soft: #5C6B5F;
+            --gold-accent: #8A5A12;
+            --gold-dim: rgba(138,90,18,0.1);
+            --focus-glow: rgba(76,145,112,0.15);
+        }
+        body.hide-script-pane.theme-light h2 { color: #262220; border-bottom-color: rgba(0,0,0,0.1); }
+        body.hide-script-pane.theme-light .metrics-val { color: #262220; }
+        body.hide-script-pane.theme-light .strong-label { color: #262220; }
+        body.hide-script-pane.theme-light .dept-metric-label,
+        body.hide-script-pane.theme-light label { color: rgba(38,34,32,0.7); }
+        body.hide-script-pane.theme-light #input-pane input,
+        body.hide-script-pane.theme-light #input-pane select,
+        body.hide-script-pane.theme-light #input-pane textarea,
+        body.hide-script-pane.theme-light #input-pane .select-display-box {
+            background: #F3EFE5; border-color: rgba(0,0,0,0.15); color: #262220;
+        }
+        body.hide-script-pane.theme-light #commission-input {
+            color: #262220 !important; background: rgba(0,0,0,0.05) !important; border-color: rgba(0,0,0,0.15) !important;
+        }
+        body.hide-script-pane.theme-light #logged-in-rep-display { color: #262220 !important; }
+        body.hide-script-pane.theme-light .leaderboard-row { background: rgba(0,0,0,0.04); }
+        body.hide-script-pane.theme-light .user-row { background: var(--gold-dim); }
+
+        .strong-label { color: #ffffff; }
         .theme-toggle-wrapper { margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--sp-hairline); display: flex; justify-content: space-between; align-items: center; gap: 16px; }
         .logged-in-block { display: flex; align-items: center; gap: 12px; }
 
@@ -615,7 +646,7 @@
                         <label>Pest Logic Matrix</label>
                         <div class="multiselect-container" id="pest-dropdown-wrapper">
                             <div class="select-display-box" onclick="toggleDropdownWindow(event)">
-                                <span id="display-selected-text" style="opacity:0.6;">-- Map Targets --</span> <span>▼</span>
+                                <span id="display-selected-text">-- Map Targets --</span> <span>▼</span>
                             </div>
                             <div class="checkbox-dropdown-window" id="dropdown-checkbox-panel">
                                 <label><input type="checkbox" class="pest-checkbox" data-display="General Pests" onchange="updateDisplayBoxText()"> General Pests</label>
@@ -666,6 +697,7 @@
                     <div class="form-group">
                         <label>Agreement Length</label>
                         <select id="agreement-length-select">
+                            <option value="">-- Awaiting Input --</option>
                             <option value="24 Month">24 Month</option>
                             <option value="12 Month">12 Month</option>
                         </select>
@@ -814,7 +846,7 @@
                 <div class="metrics-row"><span>Avg Contract (ACV):</span><span id="day-acv" class="metrics-val">$0.00</span></div>
                 <div class="metrics-row"><span>Rev Per Call (RPC):</span><span id="day-rpc" class="metrics-val">$0.00</span></div>
                 <div class="metrics-row" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; margin-top: 8px;">
-                    <span style="color:#fff;">Est. Commission:</span><span id="day-comm" class="metrics-val val-highlight">$0.00</span>
+                    <span class="strong-label">Est. Commission:</span><span id="day-comm" class="metrics-val val-highlight">$0.00</span>
                 </div>
             </div>
             <div class="metrics-card">
@@ -825,14 +857,14 @@
                 <div class="metrics-row"><span>Avg Contract (ACV):</span><span id="week-acv" class="metrics-val">$0.00</span></div>
                 <div class="metrics-row"><span>Rev Per Call (RPC):</span><span id="week-rpc" class="metrics-val">$0.00</span></div>
                 <div class="metrics-row" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; margin-top: 8px;">
-                    <span style="color:#fff;">Est. Commission:</span><span id="week-comm" class="metrics-val val-highlight">$0.00</span>
+                    <span class="strong-label">Est. Commission:</span><span id="week-comm" class="metrics-val val-highlight">$0.00</span>
                 </div>
             </div>
         </div>
 
         <div class="leaderboard-section">
             <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                <label style="color:#ffffff; margin:0;">Live Office Leaderboard</label>
+                <label class="strong-label" style="margin:0;">Live Office Leaderboard</label>
                 <label style="color:var(--color-mint-soft); margin:0;" id="intraday-date">Today</label>
             </div>
             <div class="leaderboard-grid" id="leaderboard-grid">
@@ -852,15 +884,15 @@
                 <button type="button" class="btn-logout" onclick="attemptLogout()">Log Out</button>
             </div>
             <div class="theme-toggle">
-                <button type="button" id="theme-btn-dark" onclick="setScriptPaneTheme('dark')">Dark</button>
-                <button type="button" id="theme-btn-light" onclick="setScriptPaneTheme('light')">Light</button>
+                <button type="button" id="theme-btn-dark" onclick="setScriptPaneTheme('dark')">Green</button>
+                <button type="button" id="theme-btn-light" onclick="setScriptPaneTheme('light')">Linen</button>
                 <button type="button" id="theme-btn-executive" onclick="setScriptPaneTheme('executive')">Executive</button>
             </div>
             <button type="button" class="btn-copy-action" id="hide-script-toggle-btn" onclick="toggleScriptPaneVisibility()">Hide Script Pane</button>
         </div>
     </div>
 
-    <script src="https://jitneylogic.github.io/jitneylogic-shared/jitneylogic-engine.js?v=11"></script>
+    <script src="https://jitneylogic.github.io/jitneylogic-shared/jitneylogic-engine.js?v=13"></script>
     <script>
         // =====================================================================
         // CLIENT CONFIG — the only block that should need to change when
@@ -978,6 +1010,7 @@
         function setScriptPaneTheme(mode) {
             const pane = document.getElementById('script-pane');
             pane.classList.toggle('light-mode', mode === 'light');
+            document.body.classList.toggle('theme-light', mode === 'light');
             document.body.classList.toggle('theme-executive', mode === 'executive');
             document.getElementById('theme-btn-dark').classList.toggle('active', mode === 'dark');
             document.getElementById('theme-btn-light').classList.toggle('active', mode === 'light');
