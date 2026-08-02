@@ -334,10 +334,18 @@
         body.hide-script-pane #script-pane { display: none; }
         body.hide-script-pane #input-pane { width: 100%; }
         body.hide-script-pane .console-columns {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-areas:
+                "record agreement"
+                "record stats";
+            gap: 24px;
+            align-items: start;
         }
+        body.hide-script-pane .agreement-col { grid-area: agreement; }
+        body.hide-script-pane .record-col { grid-area: record; }
         body.hide-script-pane .bottom-stats-wrap {
-            max-width: 720px; margin: 0 auto;
+            grid-area: stats; max-width: none; margin: 0;
         }
         .theme-toggle { display: flex; background: var(--sp-hairline); border-radius: 20px; padding: 3px; gap: 2px; }
         .theme-toggle button {
@@ -581,7 +589,7 @@
 
         <form id="closer-portal-form" onsubmit="fireRevenuePipelineTracking(event)">
             <div class="console-columns">
-            <div class="console-col">
+            <div class="console-col agreement-col">
             <h2>Agreement & Pricing Console</h2>
             <div class="form-section">
                 <div class="grid-3">
@@ -674,7 +682,7 @@
             </div>
             </div>
 
-            <div class="console-col">
+            <div class="console-col record-col">
             <h2>Customer Record</h2>
             <div class="form-section">
                 <div class="grid-2">
@@ -776,10 +784,8 @@
                 </div>
             </div>
             </div>
-            </div>
-        </form>
 
-        <div class="bottom-stats-wrap">
+            <div class="bottom-stats-wrap">
         <div class="metrics-dashboard">
             <div class="metrics-card">
                 <h3>Daily Production</h3>
@@ -815,6 +821,8 @@
             </div>
         </div>
         </div>
+            </div>
+        </form>
 
         <div class="theme-toggle-wrapper">
             <div class="logged-in-block">
