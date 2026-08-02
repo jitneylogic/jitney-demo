@@ -468,10 +468,18 @@ function executeRealtimeCalculations() {
     setIfPresent('inject-initial-text', "$" + initialValue.toFixed(2));
     setIfPresent('inject-monthly-text', "$" + monthlyValue.toFixed(2));
 
-    const normalInitialMarkup = initialValue + 150;
-    setIfPresent('inject-pitch-normal', "$" + normalInitialMarkup.toFixed(2));
-    setIfPresent('inject-pitch-monthly', "$" + monthlyValue.toFixed(2));
-    setIfPresent('inject-pitch-discounted', "$" + initialValue.toFixed(2));
+    // Both figures here are the real, currently-selected/charged prices —
+    // no separate "normal vs. discounted" anchor framing for the demo
+    // script. Revisit per-client if a real anchor-price flow is needed;
+    // that requires a genuine stored anchor price per package, not a
+    // markup computed from whatever's currently selected (see roadmap).
+    //
+    // NOTE: these are CSS classes in cockpit.html, not ids (same pattern
+    // as inject-script-name), so they need querySelectorAll — getElementById
+    // silently finds nothing for a class, which is why this was stuck at
+    // $0.00 even though the calculation itself was always correct.
+    document.querySelectorAll('.inject-pitch-normal').forEach(el => { el.innerText = "$" + initialValue.toFixed(2); });
+    document.querySelectorAll('.inject-pitch-monthly').forEach(el => { el.innerText = "$" + monthlyValue.toFixed(2); });
 
     let depositAmount = config.defaultDeposit ?? 39;
     const lowerPackageStr = currentPackage.toLowerCase();
@@ -597,11 +605,106 @@ function attemptLogin() {
         .catch(err => { errorEl.innerText = err.message; });
 }
 
+function sendCockpitResetEmail() {
+    const email = document.getElementById('login-email').value.trim();
+    const errorEl = document.getElementById('login-error');
+    if (!email) {
+        errorEl.style.color = "#ef4444";
+        errorEl.innerText = "Enter your email above first, then click Forgot password.";
+        return;
+    }
+    firebase.auth().sendPasswordResetEmail(email)
+        .then(() => {
+            errorEl.style.color = "#4ade80";
+            errorEl.innerText = "Reset email sent — check your inbox.";
+        })
+        .catch(err => {
+            errorEl.style.color = "#ef4444";
+            errorEl.innerText = err.message;
+        });
+}
+window.sendCockpitResetEmail = sendCockpitResetEmail;
+
+// Fire-and-forget: persists the rep's current theme choice so it can be
+// aggregated later ("which theme gets used most"). Self-service only —
+// jitneyadmin's set_theme_preference action only ever touches the calling
+// rep's own account, verified from their own token. Failure here should
+// never block the UI switch itself, so errors are swallowed after logging.
+async function syncThemePreference(theme) {
+    const config = getConfig();
+    if (!config.adminUrl) return;
+    try {
+        const user = firebase.auth().currentUser;
+        if (!user) return;
+        const token = await user.getIdToken();
+        await fetch(config.adminUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+            body: JSON.stringify({ action: "set_theme_preference", theme })
+        });
+    } catch (err) {
+        console.error("Theme preference sync failed (non-blocking):", err.message);
+    }
+}
+window.syncThemePreference = syncThemePreference;
+
 function attemptLogout() {
     firebase.auth().signOut();
 }
 window.attemptLogin = attemptLogin;
 window.attemptLogout = attemptLogout;
+
+async function attemptForcedReset() {
+    const newPassword = document.getElementById('reset-new-password').value;
+    const confirmPassword = document.getElementById('reset-confirm-password').value;
+    const errorEl = document.getElementById('reset-error');
+    errorEl.innerText = "";
+
+    if (newPassword.length < 8) {
+        errorEl.innerText = "Password must be at least 8 characters.";
+        return;
+    }
+    if (!/[a-zA-Z]/.test(newPassword) || !/[0-9]/.test(newPassword) || !/[^a-zA-Z0-9]/.test(newPassword)) {
+        errorEl.innerText = "Password must include at least one letter, one number, and one special character.";
+        return;
+    }
+    if (newPassword !== confirmPassword) {
+        errorEl.innerText = "Passwords don't match.";
+        return;
+    }
+
+    const config = getConfig();
+    if (!config.adminUrl) {
+        errorEl.innerText = "Setup error: adminUrl is not configured. Contact your administrator.";
+        return;
+    }
+
+    try {
+        const user = firebase.auth().currentUser;
+        await user.updatePassword(newPassword);
+
+        const token = await user.getIdToken(true);
+        const resp = await fetch(config.adminUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+            body: JSON.stringify({ action: "clear_password_reset_flag" })
+        });
+        if (!resp.ok) {
+            const data = await resp.json().catch(() => ({}));
+            errorEl.innerText = "Password was set, but couldn't finish setup: " + (data.message || "unknown error") + ". Contact your administrator.";
+            return;
+        }
+
+        // Force a fresh token so the cleared claim is reflected immediately,
+        // then re-run the gate check directly (NOT initAuthGate(), which
+        // would register a second onAuthStateChanged listener).
+        await user.getIdToken(true);
+        evaluateAuthGateState(firebase.auth().currentUser);
+    } catch (err) {
+        errorEl.innerText = err.message;
+    }
+}
+window.attemptForcedReset = attemptForcedReset;
 
 function startAppAfterLogin() {
     initTurnkeyEnvironment();
@@ -609,6 +712,45 @@ function startAppAfterLogin() {
     initLiveLeaderboard();
     runDynamicGuardrails();
     updateConsolidatedAppointmentNotes();
+}
+
+async function evaluateAuthGateState(user) {
+    const loginGate = document.getElementById('login-gate');
+    const appContent = document.getElementById('app-content');
+
+    if (!user) {
+        currentRepClaims = null;
+        if (loginGate) loginGate.style.display = "flex";
+        if (appContent) appContent.style.display = "none";
+        return;
+    }
+
+    const tokenResult = await user.getIdTokenResult();
+    if (!tokenResult.claims.rep_id || !tokenResult.claims.rep_name) {
+        document.getElementById('login-error').innerText =
+            "This account has no rep profile attached. Contact your administrator.";
+        firebase.auth().signOut();
+        return;
+    }
+
+    currentRepClaims = { rep_id: tokenResult.claims.rep_id, rep_name: tokenResult.claims.rep_name };
+
+    const forceResetGate = document.getElementById('force-reset-gate');
+    if (tokenResult.claims.must_reset_password) {
+        if (loginGate) loginGate.style.display = "none";
+        if (appContent) appContent.style.display = "none";
+        if (forceResetGate) forceResetGate.style.display = "flex";
+        return;
+    }
+    if (forceResetGate) forceResetGate.style.display = "none";
+
+    if (loginGate) loginGate.style.display = "none";
+    if (appContent) appContent.style.display = "flex";
+
+    const displayEl = document.getElementById('logged-in-rep-display');
+    if (displayEl) displayEl.innerText = currentRepClaims.rep_name;
+
+    startAppAfterLogin();
 }
 
 function initAuthGate() {
@@ -620,36 +762,7 @@ function initAuthGate() {
     if (!firebase.apps.length) {
         firebase.initializeApp(config.firebaseConfig);
     }
-
-    firebase.auth().onAuthStateChanged(async (user) => {
-        const loginGate = document.getElementById('login-gate');
-        const appContent = document.getElementById('app-content');
-
-        if (!user) {
-            currentRepClaims = null;
-            if (loginGate) loginGate.style.display = "flex";
-            if (appContent) appContent.style.display = "none";
-            return;
-        }
-
-        const tokenResult = await user.getIdTokenResult();
-        if (!tokenResult.claims.rep_id || !tokenResult.claims.rep_name) {
-            document.getElementById('login-error').innerText =
-                "This account has no rep profile attached. Contact your administrator.";
-            firebase.auth().signOut();
-            return;
-        }
-
-        currentRepClaims = { rep_id: tokenResult.claims.rep_id, rep_name: tokenResult.claims.rep_name };
-
-        if (loginGate) loginGate.style.display = "none";
-        if (appContent) appContent.style.display = "flex";
-
-        const displayEl = document.getElementById('logged-in-rep-display');
-        if (displayEl) displayEl.innerText = `${currentRepClaims.rep_name} (${currentRepClaims.rep_id})`;
-
-        startAppAfterLogin();
-    });
+    firebase.auth().onAuthStateChanged(evaluateAuthGateState);
 }
 window.initAuthGate = initAuthGate;
 
@@ -980,7 +1093,7 @@ async function fireRevenuePipelineTracking(event) {
     document.getElementById('script-window-input').value = "AT";
 
     document.getElementById('display-selected-text').innerText = '-- Select Active Infestations --';
-    document.getElementById('display-selected-text').style.color = '#64748b';
+    document.getElementById('display-selected-text').style.opacity = '0.6';
     document.getElementById('display-script-selected-text').innerText = '-- Select Active Infestations --';
     document.getElementById('display-script-selected-text').style.color = '#64748b';
 
@@ -999,4 +1112,12 @@ async function fireRevenuePipelineTracking(event) {
     syncScheduleDetails();
     runDynamicGuardrails();
     parseScriptPestLogicHandshake();
+
+    // Fields are cleared above, but scroll position isn't — a rep coming off
+    // a long call would otherwise land back on a blank form still scrolled
+    // partway down from the previous one.
+    const scriptPaneEl = document.getElementById('script-pane');
+    const inputPaneEl = document.getElementById('input-pane');
+    if (scriptPaneEl) scriptPaneEl.scrollTop = 0;
+    if (inputPaneEl) inputPaneEl.scrollTop = 0;
 }
