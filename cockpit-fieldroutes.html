@@ -469,8 +469,18 @@
             <span class="script-quote">Standard pricing in your zip code is normally <span class="script-price-text inject-pitch-normal">$0.00</span> to start, and <span class="script-price-text inject-pitch-monthly">$0.00</span> a month after. That covers everything, with unlimited free re-services. Okay?</span>
         </div>
 
+        <div class="script-field-wrapper" style="margin: 16px 0;">
+            <label>Customer Response</label>
+            <select id="objection-select" onchange="updateObjectionScript(this.value)">
+                <option value="Okay">Okay</option>
+                <option value="Spouse Objection">Spouse Objection</option>
+                <option value="Too Expensive">Too Expensive</option>
+                <option value="Shopping Around">Shopping Around</option>
+            </select>
+        </div>
+
         <div class="script-block">
-            <span class="script-quote">Great! I'm going to send you over a confirmation document and then we can get something scheduled. How do you spell your last name?</span>
+            <span class="script-quote" id="objection-response-text">Great! I'm going to send you over a confirmation document and then we can get something scheduled. How do you spell your last name?</span>
         </div>
         <div class="script-field-wrapper">
             <label>Last Name</label>
@@ -485,25 +495,9 @@
             <input type="email" id="script-email-input" placeholder="customer@email.com" oninput="syncEmailValue(this.value)">
         </div>
 
-        <div class="script-field-wrapper" style="margin: 16px 0; display: flex; align-items: center; gap: 16px;">
-            <button type="button" class="btn-primary btn-transaction btn-proto-action" onclick="runDemoSequence('cc-status-dot','cc-status-text')">Create Customer</button>
-            <div class="signature-status" >
-                <span class="status-dot" id="cc-status-dot"></span>
-                <span id="cc-status-text">Pending</span>
-            </div>
-        </div>
-
         <div class="script-block">
             <span class="script-quote">Great. I'm sending that over now. Please scroll to the bottom, type the letter 'X' in the signature box, and let me know when it clears.</span>
             <div style="font-size: 11px; margin-top: 8px; color: #64748b;">*By typing 'X', you are providing your legally binding electronic signature.</div>
-        </div>
-
-        <div class="script-field-wrapper" style="margin: 16px 0; display: flex; align-items: center; gap: 16px;">
-            <button type="button" class="btn-primary btn-transaction btn-proto-action" onclick="runDemoSequence('sa-status-dot','sa-status-text')">Send Agreement</button>
-            <div class="signature-status" >
-                <span class="status-dot" id="sa-status-dot"></span>
-                <span id="sa-status-text">Pending</span>
-            </div>
         </div>
 
         <div class="script-block">
@@ -517,14 +511,6 @@
                 <option value="12:00 PM - 4:00 PM">12:00 PM - 4:00 PM</option>
                 <option value="4:00 PM - 8:00 PM">4:00 PM - 8:00 PM</option>
             </select>
-        </div>
-
-        <div class="script-field-wrapper" style="margin: 16px 0; display: flex; align-items: center; gap: 16px;">
-            <button type="button" class="btn-primary btn-transaction btn-proto-action" onclick="runDemoSequence('sched-status-dot','sched-status-text')">Schedule Appointment</button>
-            <div class="signature-status" >
-                <span class="status-dot" id="sched-status-dot"></span>
-                <span id="sched-status-text">Pending</span>
-            </div>
         </div>
 
         <div class="script-block">
@@ -556,48 +542,12 @@
                 <button type="button" class="btn-logout" onclick="attemptLogout()">Log Out</button>
             </div>
         </div>
-        
-        <div class="leaderboard-section">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                <label style="color:#ffffff; margin:0;">Live Office Leaderboard</label>
-                <label style="color:var(--color-mint-soft); margin:0;" id="intraday-date">Today</label>
-            </div>
-            <div class="leaderboard-grid" id="leaderboard-grid">
-                <div class="leaderboard-row"><span style="opacity:0.6;">Waiting for today's activity...</span></div>
-            </div>
-        </div>
-
-
-        <div class="metrics-dashboard">
-            <div class="metrics-card">
-                <h3>Daily Production</h3>
-                <div class="metrics-row"><span>Calls Taken:</span><span id="day-calls" class="metrics-val">0</span></div>
-                <div class="metrics-row"><span>Closed / Rate:</span><span class="metrics-val"><span id="day-sold">0</span> (<span id="day-rate">0.0%</span>)</span></div>
-                <div class="metrics-row"><span>Total TCV:</span><span id="day-tcv" class="metrics-val val-highlight">$0.00</span></div>
-                <div class="metrics-row"><span>Avg Contract (ACV):</span><span id="day-acv" class="metrics-val">$0.00</span></div>
-                <div class="metrics-row"><span>Rev Per Call (RPC):</span><span id="day-rpc" class="metrics-val">$0.00</span></div>
-                <div class="metrics-row" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; margin-top: 8px;">
-                    <span style="color:#fff;">Est. Commission:</span><span id="day-comm" class="metrics-val val-highlight">$0.00</span>
-                </div>
-            </div>
-            <div class="metrics-card">
-                <h3>Weekly Pacing</h3>
-                <div class="metrics-row"><span>Calls Taken:</span><span id="week-calls" class="metrics-val">0</span></div>
-                <div class="metrics-row"><span>Closed / Rate:</span><span class="metrics-val"><span id="week-sold">0</span> (<span id="week-rate">0.0%</span>)</span></div>
-                <div class="metrics-row"><span>Total TCV:</span><span id="week-tcv" class="metrics-val val-highlight">$0.00</span></div>
-                <div class="metrics-row"><span>Avg Contract (ACV):</span><span id="week-acv" class="metrics-val">$0.00</span></div>
-                <div class="metrics-row"><span>Rev Per Call (RPC):</span><span id="week-rpc" class="metrics-val">$0.00</span></div>
-                <div class="metrics-row" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; margin-top: 8px;">
-                    <span style="color:#fff;">Est. Commission:</span><span id="week-comm" class="metrics-val val-highlight">$0.00</span>
-                </div>
-            </div>
-        </div>
 
         <h2>Agreement & Pricing Console</h2>
         <form id="closer-portal-form" onsubmit="fireRevenuePipelineTracking(event)">
             
             <div class="form-section">
-                <div class="grid-2">
+                <div class="grid-3">
                     <div class="form-group">
                         <label>Pest Logic Matrix</label>
                         <div class="multiselect-container" id="pest-dropdown-wrapper">
@@ -650,6 +600,13 @@
                             <option value="HomeBase Standard PC/RB + Carpenter Bees">HomeBase Standard PC/RB + Carpenter Bees</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label>Agreement Length</label>
+                        <select id="agreement-length-select">
+                            <option value="24 Month">24 Month</option>
+                            <option value="12 Month">12 Month</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="grid-2">
@@ -679,22 +636,16 @@
                 </div>
             </div>
 
-            <h2>Customer Record (CRM Sync)</h2>
+            <h2>Customer Record</h2>
             <div class="form-section">
                 <div class="grid-2">
                     <div class="form-group">
                         <label>First Name</label>
-                        <div class="copy-input-group">
-                            <input type="text" id="first-name" oninput="syncCustomerName(this.value)">
-                            <button type="button" class="btn-copy-action" onclick="copyField('first-name')">Copy</button>
-                        </div>
+                        <input type="text" id="first-name" oninput="syncCustomerName(this.value)">
                     </div>
                     <div class="form-group">
                         <label>Last Name</label>
-                        <div class="copy-input-group">
-                            <input type="text" id="last-name" oninput="syncLastName(this.value)">
-                            <button type="button" class="btn-copy-action" onclick="copyField('last-name')">Copy</button>
-                        </div>
+                        <input type="text" id="last-name" oninput="syncLastName(this.value)">
                     </div>
                 </div>
 
@@ -705,49 +656,108 @@
                     </div>
                     <div class="form-group">
                         <label>Customer Email</label>
-                        <div class="copy-input-group">
-                            <input type="email" id="customer-email" placeholder="customer@email.com" oninput="syncEmailValue(this.value)">
-                            <button type="button" class="btn-copy-action" onclick="copyField('customer-email')">Copy</button>
-                        </div>
+                        <input type="email" id="customer-email" placeholder="customer@email.com" oninput="syncEmailValue(this.value)">
                     </div>
                 </div>
 
                 <div class="grid-2">
                     <div class="form-group">
                         <label>FR Account Number</label>
-                        <div class="copy-input-group">
-                            <input type="text" id="account-number" placeholder="Not connected in this demo" readonly>
-                            <button type="button" class="btn-copy-action" onclick="copyField('account-number')">Copy</button>
-                        </div>
+                        <input type="text" id="account-number" placeholder="waiting on account creation..." readonly>
                     </div>
                     <div class="form-group">
                         <label>Service Address</label>
-                        <div class="copy-input-group">
-                            <input type="text" id="right-address" oninput="syncAddressValue(this.value)">
-                            <button type="button" class="btn-copy-action" onclick="copyField('right-address')">Copy</button>
-                        </div>
+                        <input type="text" id="right-address" oninput="syncAddressValue(this.value)">
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Service Date</label>
+                        <input type="date" id="appointment-date" onchange="syncDateValue(this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label>Arrival Window</label>
+                        <select id="time-window" onchange="syncWindowValue(this.value)">
+                            <option value="Any Time">Any Time</option>
+                            <option value="8:00 AM - 12:00 PM">8:00 AM - 12:00 PM</option>
+                            <option value="12:00 PM - 4:00 PM">12:00 PM - 4:00 PM</option>
+                            <option value="4:00 PM - 8:00 PM">4:00 PM - 8:00 PM</option>
+                        </select>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Consolidated CRM Notes</label>
-                    <div class="copy-input-group">
-                        <textarea id="appointment-notes-consolidated" rows="2" readonly placeholder="Awaiting script inputs to build note block..."></textarea>
-                        <button type="button" class="btn-copy-action" onclick="copyField('appointment-notes-consolidated')">Copy</button>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <label style="margin:0;">FieldRoutes Notes</label>
+                        <select id="note-type-select" style="width:auto; padding:6px 10px; font-size:12px;">
+                            <option value="Appointment Note">Appointment Note</option>
+                            <option value="Red Note">Red Note</option>
+                        </select>
                     </div>
+                    <textarea id="appointment-notes-consolidated" rows="2" placeholder="Awaiting script inputs to build note block..."></textarea>
                 </div>
 
-                <div style="display:none;">
-                    <input type="date" id="appointment-date" onchange="syncDateValue(this.value)">
-                    <select id="time-window" onchange="syncWindowValue(this.value)">
-                        <option value="Any Time">Any Time</option>
-                        <option value="8:00 AM - 12:00 PM">8:00 AM - 12:00 PM</option>
-                        <option value="12:00 PM - 4:00 PM">12:00 PM - 4:00 PM</option>
-                        <option value="4:00 PM - 8:00 PM">4:00 PM - 8:00 PM</option>
-                    </select>
+                <div class="grid-3" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; margin-top: 10px;">
+                    <div class="form-group">
+                        <button type="button" class="btn-primary btn-transaction btn-proto-action" onclick="runDemoSequence('cc-status-dot','cc-status-text','account-number','1239928')">Create Customer</button>
+                        <div class="signature-status">
+                            <span class="status-dot" id="cc-status-dot"></span>
+                            <span id="cc-status-text">Pending</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn-primary btn-transaction btn-proto-action" onclick="runDemoSequence('sa-status-dot','sa-status-text')">Send Agreement</button>
+                        <div class="signature-status">
+                            <span class="status-dot" id="sa-status-dot"></span>
+                            <span id="sa-status-text">Pending</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn-primary btn-transaction btn-proto-action" onclick="runDemoSequence('sched-status-dot','sched-status-text')">Schedule Appointment</button>
+                        <div class="signature-status">
+                            <span class="status-dot" id="sched-status-dot"></span>
+                            <span id="sched-status-text">Pending</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </form>
+
+        <div class="leaderboard-section">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <label style="color:#ffffff; margin:0;">Live Office Leaderboard</label>
+                <label style="color:var(--color-mint-soft); margin:0;" id="intraday-date">Today</label>
+            </div>
+            <div class="leaderboard-grid" id="leaderboard-grid">
+                <div class="leaderboard-row"><span style="opacity:0.6;">Waiting for today's activity...</span></div>
+            </div>
+        </div>
+
+        <div class="metrics-dashboard">
+            <div class="metrics-card">
+                <h3>Daily Production</h3>
+                <div class="metrics-row"><span>Calls Taken:</span><span id="day-calls" class="metrics-val">0</span></div>
+                <div class="metrics-row"><span>Closed / Rate:</span><span class="metrics-val"><span id="day-sold">0</span> (<span id="day-rate">0.0%</span>)</span></div>
+                <div class="metrics-row"><span>Total TCV:</span><span id="day-tcv" class="metrics-val val-highlight">$0.00</span></div>
+                <div class="metrics-row"><span>Avg Contract (ACV):</span><span id="day-acv" class="metrics-val">$0.00</span></div>
+                <div class="metrics-row"><span>Rev Per Call (RPC):</span><span id="day-rpc" class="metrics-val">$0.00</span></div>
+                <div class="metrics-row" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; margin-top: 8px;">
+                    <span style="color:#fff;">Est. Commission:</span><span id="day-comm" class="metrics-val val-highlight">$0.00</span>
+                </div>
+            </div>
+            <div class="metrics-card">
+                <h3>Weekly Pacing</h3>
+                <div class="metrics-row"><span>Calls Taken:</span><span id="week-calls" class="metrics-val">0</span></div>
+                <div class="metrics-row"><span>Closed / Rate:</span><span class="metrics-val"><span id="week-sold">0</span> (<span id="week-rate">0.0%</span>)</span></div>
+                <div class="metrics-row"><span>Total TCV:</span><span id="week-tcv" class="metrics-val val-highlight">$0.00</span></div>
+                <div class="metrics-row"><span>Avg Contract (ACV):</span><span id="week-acv" class="metrics-val">$0.00</span></div>
+                <div class="metrics-row"><span>Rev Per Call (RPC):</span><span id="week-rpc" class="metrics-val">$0.00</span></div>
+                <div class="metrics-row" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; margin-top: 8px;">
+                    <span style="color:#fff;">Est. Commission:</span><span id="week-comm" class="metrics-val val-highlight">$0.00</span>
+                </div>
+            </div>
+        </div>
 
         <div class="theme-toggle-wrapper">
             <div class="theme-toggle">
@@ -758,7 +768,7 @@
         </div>
     </div>
 
-    <script src="https://jitneylogic.github.io/jitneylogic-shared/jitneylogic-engine.js?v=9"></script>
+    <script src="https://jitneylogic.github.io/jitneylogic-shared/jitneylogic-engine.js?v=10"></script>
     <script>
         // =====================================================================
         // CLIENT CONFIG — the only block that should need to change when
@@ -893,7 +903,18 @@
         // the video shows the full state change without needing a second click
         // timed precisely during recording. Not wired to any real event yet.
         // =====================================================================
-        function runDemoSequence(dotId, textId) {
+        const objectionScripts = {
+            "Okay": "Great! I'm going to send you over a confirmation document and then we can get something scheduled. How do you spell your last name?",
+            "Spouse Objection": "[Spouse Objection Rebuttal Placeholder]",
+            "Too Expensive": "[Too Expensive Rebuttal Placeholder]",
+            "Shopping Around": "[Shopping Around Rebuttal Placeholder]"
+        };
+        function updateObjectionScript(value) {
+            document.getElementById('objection-response-text').innerText = objectionScripts[value] || objectionScripts["Okay"];
+        }
+        window.updateObjectionScript = updateObjectionScript;
+
+        function runDemoSequence(dotId, textId, fillFieldId, fillValue) {
             const dot = document.getElementById(dotId);
             const text = document.getElementById(textId);
             dot.className = 'status-dot progress';
@@ -901,7 +922,11 @@
             setTimeout(() => {
                 dot.className = 'status-dot complete';
                 text.innerText = 'Confirmed';
-            }, 2000);
+                if (fillFieldId) {
+                    const fillEl = document.getElementById(fillFieldId);
+                    if (fillEl) fillEl.value = fillValue;
+                }
+            }, 5000);
         }
         window.runDemoSequence = runDemoSequence;
 
