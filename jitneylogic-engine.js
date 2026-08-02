@@ -102,6 +102,8 @@ function runDynamicGuardrails() {
         currentVaultPricing = null;
         initialDropdown.innerHTML = '<option value="0">0.00</option>';
         monthlyDropdown.innerHTML = '<option value="0">0.00</option>';
+        const agreementLengthEl = document.getElementById('agreement-length-select');
+        if (agreementLengthEl) agreementLengthEl.value = "";
         executeRealtimeCalculations();
     };
 
@@ -136,6 +138,10 @@ function renderPriceDropdowns(pricing) {
         <option value="${pricing.monthly.target}">Target ($${pricing.monthly.target.toFixed(2)})</option>
         <option value="${pricing.monthly.floor}">Floor ($${pricing.monthly.floor.toFixed(2)})</option>
     `;
+    const agreementLengthEl = document.getElementById('agreement-length-select');
+    if (agreementLengthEl && !agreementLengthEl.value) {
+        agreementLengthEl.value = "24 Month";
+    }
     executeRealtimeCalculations();
 }
 
@@ -161,10 +167,8 @@ function updateScriptDisplayBoxText() {
     const textDisplayNode = document.getElementById('display-script-selected-text');
     if (checkedBoxes.length > 0) {
         textDisplayNode.innerText = checkedBoxes.join(', ');
-        textDisplayNode.style.color = '#333333';
     } else {
         textDisplayNode.innerText = '-- Select Active Infestations --';
-        textDisplayNode.style.color = '#64748b';
     }
 }
 
@@ -187,10 +191,8 @@ function updateDisplayBoxText() {
     const textDisplayNode = document.getElementById('display-selected-text');
     if (checkedBoxes.length > 0) {
         textDisplayNode.innerText = checkedBoxes.join(', ');
-        textDisplayNode.style.opacity = '1';
     } else {
         textDisplayNode.innerText = '-- Select Active Infestations --';
-        textDisplayNode.style.opacity = '0.6';
     }
 }
 
@@ -1009,6 +1011,20 @@ async function fireRevenuePipelineTracking(event) {
 
     const outcome = document.getElementById('call-outcome').value;
 
+    // Native `required` validation can get visually clipped inside
+    // scrollable/flex containers (which this layout uses throughout),
+    // so browsers sometimes correctly block submission without ever
+    // showing their bubble. Don't rely on that alone — check explicitly.
+    if (!outcome) {
+        alert("Please select a Call Outcome before submitting.");
+        return;
+    }
+    const phoneEl = document.getElementById('phone') || document.getElementById('script-phone-input');
+    if (phoneEl && !phoneEl.value.trim()) {
+        alert("Please enter a customer phone number before submitting.");
+        return;
+    }
+
     // Every call needs a phone number and an outcome (enforced via HTML
     // `required`, already checked by the browser before we get here).
     // A "Sold" outcome additionally requires the full customer record,
@@ -1089,6 +1105,7 @@ async function fireRevenuePipelineTracking(event) {
     }
 
     document.getElementById('closer-portal-form').reset();
+    runDynamicGuardrails();
     document.getElementById('script-location-input').value = "";
     document.getElementById('script-duration-input').value = "";
     document.getElementById('script-address-input').value = "";
@@ -1096,9 +1113,7 @@ async function fireRevenuePipelineTracking(event) {
     document.getElementById('script-window-input').value = "AT";
 
     document.getElementById('display-selected-text').innerText = '-- Select Active Infestations --';
-    document.getElementById('display-selected-text').style.opacity = '0.6';
     document.getElementById('display-script-selected-text').innerText = '-- Select Active Infestations --';
-    document.getElementById('display-script-selected-text').style.color = '#64748b';
 
     document.querySelectorAll('.script-pest-cb, .pest-checkbox').forEach(cb => cb.checked = false);
 
