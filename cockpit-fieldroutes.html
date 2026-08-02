@@ -106,9 +106,10 @@
         }
         body.theme-executive .money-readonly { font-size: 16px; }
         body.theme-executive .checkbox-dropdown-window { padding: 8px; margin-top: 6px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4); }
+        body.theme-executive #script-pane .checkbox-dropdown-window { background: #1A1C1F; }
         body.theme-executive .checkbox-dropdown-window label { padding: 10px 12px; border-radius: 6px; gap: 12px; }
         body.theme-executive .pest-fact-bullet { margin: 8px 0 8px 12px; gap: 10px; }
-        body.theme-executive .btn-copy-action { border-radius: 10px; padding: 0 18px; font-size: 10px; }
+        body.theme-executive .btn-copy-action { border-radius: 10px; padding: 6px 18px; font-size: 10px; }
 
         /* Buttons — softer radius, wider tracking, colored glow shadows matching each action */
         body.theme-executive .btn-primary {
@@ -330,6 +331,12 @@
         .console-col { display: block; }
         .bottom-stats-wrap { display: block; }
 
+        /* Customer Record only makes sense as a destination when the rep
+           is living entirely on the right side — with the script pane
+           showing, all its fields already exist there instead. */
+        .record-col { display: none; }
+        body.hide-script-pane .record-col { display: block; }
+
         /* Hide Script Pane mode */
         body.hide-script-pane #script-pane { display: none; }
         body.hide-script-pane #input-pane { width: 100%; }
@@ -424,7 +431,7 @@
 
         <div class="script-field-wrapper">
             <label>Customer Phone Number</label>
-            <input type="tel" id="script-phone-input" placeholder="(801) 555-0199" oninput="syncPhoneValue(this.value)">
+            <input type="tel" id="script-phone-input" placeholder="(801) 555-0199" required oninput="syncPhoneValue(this.value)">
         </div>
         
         <div class="script-block">
@@ -477,7 +484,7 @@
             
             <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #cbd5e1;">
                 <span style="font-size: 12px; font-weight: bold; color: #64748b; text-transform: uppercase;">Pest Facts:</span>
-                <div id="inject-pest-fact" style="margin-top: 8px; color: #475569;">
+                <div id="inject-pest-fact" style="margin-top: 8px; color: var(--sp-text);">
                     <span style="font-style: italic; opacity: 0.6;">Select targets above to load operational facts...</span>
                 </div>
             </div>
@@ -522,7 +529,7 @@
         </div>
 
         <div class="script-field-wrapper" style="margin: 16px 0; display: flex; align-items: center; gap: 16px;">
-            <button type="button" class="btn-primary btn-transaction btn-proto-action" onclick="runDemoSequence([['cc-status-dot-left','cc-status-text-left'],['cc-status-dot','cc-status-text']], 'account-number', '1239928')">Create Customer</button>
+            <button type="button" class="btn-primary btn-transaction btn-proto-action" id="create-customer-btn-left" onclick="runDemoSequence([['cc-status-dot-left','cc-status-text-left'],['cc-status-dot','cc-status-text']], 'account-number', '1239928', ['create-customer-btn-left','create-customer-btn-right'], 'Update Customer')">Create Customer</button>
             <div class="signature-status">
                 <span class="status-dot" id="cc-status-dot-left"></span>
                 <span id="cc-status-text-left">Pending</span>
@@ -563,6 +570,20 @@
             </div>
         </div>
 
+        <div class="script-field-wrapper">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:10px;">
+                <label style="margin:0;">Customer Card Notes</label>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <select id="note-type-select-left" onchange="syncNoteType(this.value)" style="width:auto; padding:6px 10px; font-size:12px;">
+                        <option value="Appointment Note">Appointment Note</option>
+                        <option value="Red Note">Red Note</option>
+                    </select>
+                    <button type="button" class="btn-copy-action" onclick="saveFieldRoutesNote()">Save Note</button>
+                </div>
+            </div>
+            <textarea id="appointment-notes-consolidated-left" rows="2" oninput="syncNotesText(this.value)" placeholder="Awaiting script inputs to build note block..."></textarea>
+        </div>
+
         <div class="script-block">
             <span class="script-quote">I've scheduled that appointment. We will see you on <span class="script-highlight-text" id="inject-final-window">[Date & Window]</span> for your <span class="script-highlight-text" id="inject-package-text">[Package]</span> service. Welcome to the family.</span>
         </div>
@@ -582,10 +603,6 @@
     </div>
 
     <div id="input-pane">
-
-        <div style="display:flex; justify-content:flex-end; margin-bottom:12px;">
-            <button type="button" class="btn-copy-action" id="hide-script-toggle-btn" onclick="toggleScriptPaneVisibility()">Hide Script Pane</button>
-        </div>
 
         <form id="closer-portal-form" onsubmit="fireRevenuePipelineTracking(event)">
             <div class="console-columns">
@@ -738,19 +755,19 @@
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:10px;">
                         <label style="margin:0;">Customer Card Notes</label>
                         <div style="display:flex; gap:8px; align-items:center;">
-                            <select id="note-type-select" style="width:auto; padding:6px 10px; font-size:12px;">
+                            <select id="note-type-select" onchange="syncNoteType(this.value)" style="width:auto; padding:6px 10px; font-size:12px;">
                                 <option value="Appointment Note">Appointment Note</option>
                                 <option value="Red Note">Red Note</option>
                             </select>
                             <button type="button" class="btn-copy-action" onclick="saveFieldRoutesNote()">Save Note</button>
                         </div>
                     </div>
-                    <textarea id="appointment-notes-consolidated" rows="2" placeholder="Awaiting script inputs to build note block..."></textarea>
+                    <textarea id="appointment-notes-consolidated" rows="2" oninput="syncNotesText(this.value)" placeholder="Awaiting script inputs to build note block..."></textarea>
                 </div>
 
                 <div class="grid-3" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; margin-top: 10px;">
                     <div class="form-group">
-                        <button type="button" class="btn-primary btn-transaction btn-proto-action" onclick="runDemoSequence([['cc-status-dot','cc-status-text'],['cc-status-dot-left','cc-status-text-left']], 'account-number', '1239928')">Create Customer</button>
+                        <button type="button" class="btn-primary btn-transaction btn-proto-action" id="create-customer-btn-right" onclick="runDemoSequence([['cc-status-dot','cc-status-text'],['cc-status-dot-left','cc-status-text-left']], 'account-number', '1239928', ['create-customer-btn-left','create-customer-btn-right'], 'Update Customer')">Create Customer</button>
                         <div class="signature-status">
                             <span class="status-dot" id="cc-status-dot"></span>
                             <span id="cc-status-text">Pending</span>
@@ -837,10 +854,11 @@
                 <button type="button" id="theme-btn-light" onclick="setScriptPaneTheme('light')">Light</button>
                 <button type="button" id="theme-btn-executive" onclick="setScriptPaneTheme('executive')">Executive</button>
             </div>
+            <button type="button" class="btn-copy-action" id="hide-script-toggle-btn" onclick="toggleScriptPaneVisibility()">Hide Script Pane</button>
         </div>
     </div>
 
-    <script src="https://jitneylogic.github.io/jitneylogic-shared/jitneylogic-engine.js?v=10"></script>
+    <script src="https://jitneylogic.github.io/jitneylogic-shared/jitneylogic-engine.js?v=11"></script>
     <script>
         // =====================================================================
         // CLIENT CONFIG — the only block that should need to change when
@@ -986,7 +1004,7 @@
         }
         window.updateObjectionScript = updateObjectionScript;
 
-        function runDemoSequence(pairs, fillFieldId, fillValue) {
+        function runDemoSequence(pairs, fillFieldId, fillValue, buttonIds, newButtonText) {
             pairs.forEach(([dotId, textId]) => {
                 document.getElementById(dotId).className = 'status-dot progress';
                 document.getElementById(textId).innerText = 'Sent';
@@ -999,6 +1017,12 @@
                 if (fillFieldId) {
                     const fillEl = document.getElementById(fillFieldId);
                     if (fillEl) fillEl.value = fillValue;
+                }
+                if (buttonIds) {
+                    buttonIds.forEach(id => {
+                        const btn = document.getElementById(id);
+                        if (btn) btn.innerText = newButtonText;
+                    });
                 }
             }, 5000);
         }
@@ -1030,6 +1054,18 @@
         // both stay in sync, and since a hidden (display:none) required field
         // is exempt from browser validation, submitting works correctly
         // whether the script pane is showing or hidden.
+        function syncNoteType(value) {
+            document.getElementById('note-type-select').value = value;
+            document.getElementById('note-type-select-left').value = value;
+        }
+        window.syncNoteType = syncNoteType;
+
+        function syncNotesText(value) {
+            document.getElementById('appointment-notes-consolidated').value = value;
+            document.getElementById('appointment-notes-consolidated-left').value = value;
+        }
+        window.syncNotesText = syncNotesText;
+
         function syncCallOutcome(value) {
             document.getElementById('call-outcome').value = value;
             document.getElementById('call-outcome-right').value = value;
