@@ -354,6 +354,7 @@
         body.hide-script-pane .bottom-stats-wrap {
             grid-area: stats; max-width: none; margin: 0;
         }
+        body.hide-script-pane .live-metrics-heading { display: block; }
         .theme-toggle { display: flex; background: var(--sp-hairline); border-radius: 20px; padding: 3px; gap: 2px; }
         .theme-toggle button {
             border: none; background: transparent; padding: 7px 16px; border-radius: 16px;
@@ -803,7 +804,7 @@
             </div>
 
             <div class="bottom-stats-wrap">
-        <h2>Live Metrics</h2>
+        <h2 class="live-metrics-heading" style="display:none;">Live Metrics</h2>
         <div class="metrics-dashboard">
             <div class="metrics-card">
                 <h3>Daily Production</h3>
