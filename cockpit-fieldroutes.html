@@ -288,7 +288,7 @@
         /* Fast Action Buttons */
         .copy-input-group { display: flex; gap: 8px; align-items: stretch; }
         .btn-copy-action {
-            background: var(--color-sage-accent); color: #ffffff; border: none; padding: 0 16px; 
+            background: var(--color-sage-accent); color: #ffffff; border: none; padding: 6px 16px; 
             font-size: 11px; font-weight: 700; border-radius: 8px; cursor: pointer; text-transform: uppercase; 
             letter-spacing: 0.5px; transition: background 0.15s; flex-shrink: 0;
         }
@@ -322,6 +322,23 @@
         /* --- SCRIPT PANE THEME TOGGLE --- */
         .theme-toggle-wrapper { margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--sp-hairline); display: flex; justify-content: space-between; align-items: center; gap: 16px; }
         .logged-in-block { display: flex; align-items: center; gap: 12px; }
+
+        /* Console columns — plain stacked blocks by default (identical to
+           the old layout). Only become a true side-by-side grid when the
+           script pane is hidden and there's room for it. */
+        .console-columns { display: block; }
+        .console-col { display: block; }
+        .bottom-stats-wrap { display: block; }
+
+        /* Hide Script Pane mode */
+        body.hide-script-pane #script-pane { display: none; }
+        body.hide-script-pane #input-pane { width: 100%; }
+        body.hide-script-pane .console-columns {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start;
+        }
+        body.hide-script-pane .bottom-stats-wrap {
+            max-width: 720px; margin: 0 auto;
+        }
         .theme-toggle { display: flex; background: var(--sp-hairline); border-radius: 20px; padding: 3px; gap: 2px; }
         .theme-toggle button {
             border: none; background: transparent; padding: 7px 16px; border-radius: 16px;
@@ -545,7 +562,7 @@
         <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--sp-hairline);">
             <div class="script-field-wrapper" style="margin-bottom: 16px;">
                 <label>Call Outcome</label>
-                <select id="call-outcome" form="closer-portal-form" required style="border-color: var(--color-sage-accent);">
+                <select id="call-outcome" form="closer-portal-form" onchange="syncCallOutcome(this.value)" required style="border-color: var(--color-sage-accent);">
                     <option value="">-- Status --</option>
                     <option value="Sold">Sold</option>
                     <option value="Scheduled Callback">Callback</option>
@@ -558,9 +575,14 @@
 
     <div id="input-pane">
 
-        <h2>Agreement & Pricing Console</h2>
+        <div style="display:flex; justify-content:flex-end; margin-bottom:12px;">
+            <button type="button" class="btn-copy-action" id="hide-script-toggle-btn" onclick="toggleScriptPaneVisibility()">Hide Script Pane</button>
+        </div>
+
         <form id="closer-portal-form" onsubmit="fireRevenuePipelineTracking(event)">
-            
+            <div class="console-columns">
+            <div class="console-col">
+            <h2>Agreement & Pricing Console</h2>
             <div class="form-section">
                 <div class="grid-3">
                     <div class="form-group">
@@ -650,7 +672,9 @@
                     </div>
                 </div>
             </div>
+            </div>
 
+            <div class="console-col">
             <h2>Customer Record</h2>
             <div class="form-section">
                 <div class="grid-2">
@@ -739,9 +763,23 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="form-group" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; margin-top: 10px;">
+                    <label>Call Outcome</label>
+                    <select id="call-outcome-right" onchange="syncCallOutcome(this.value)" required style="border-color: var(--color-sage-accent); margin-bottom: 12px;">
+                        <option value="">-- Status --</option>
+                        <option value="Sold">Sold</option>
+                        <option value="Scheduled Callback">Callback</option>
+                        <option value="Not Sold">Lost</option>
+                    </select>
+                    <button type="submit" form="closer-portal-form" class="btn-primary btn-transaction">Submit Call</button>
+                </div>
+            </div>
+            </div>
             </div>
         </form>
 
+        <div class="bottom-stats-wrap">
         <div class="metrics-dashboard">
             <div class="metrics-card">
                 <h3>Daily Production</h3>
@@ -775,6 +813,7 @@
             <div class="leaderboard-grid" id="leaderboard-grid">
                 <div class="leaderboard-row"><span style="opacity:0.6;">Waiting for today's activity...</span></div>
             </div>
+        </div>
         </div>
 
         <div class="theme-toggle-wrapper">
@@ -971,6 +1010,23 @@
             alert('Prototype scaffolding — note-save to FieldRoutes not wired yet.');
         }
         window.saveFieldRoutesNote = saveFieldRoutesNote;
+
+        function toggleScriptPaneVisibility() {
+            const hidden = document.body.classList.toggle('hide-script-pane');
+            document.getElementById('hide-script-toggle-btn').innerText = hidden ? 'Show Script Pane' : 'Hide Script Pane';
+        }
+        window.toggleScriptPaneVisibility = toggleScriptPaneVisibility;
+
+        // Keeps the left-pane and right-pane Call Outcome dropdowns mirrored,
+        // same pattern as date/window — whichever one the rep actually uses,
+        // both stay in sync, and since a hidden (display:none) required field
+        // is exempt from browser validation, submitting works correctly
+        // whether the script pane is showing or hidden.
+        function syncCallOutcome(value) {
+            document.getElementById('call-outcome').value = value;
+            document.getElementById('call-outcome-right').value = value;
+        }
+        window.syncCallOutcome = syncCallOutcome;
 
         initAuthGate();
     </script>
