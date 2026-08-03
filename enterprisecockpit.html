@@ -281,10 +281,12 @@
         .pest-fact-bullet::before { content: "→"; color: var(--color-sage-accent); font-weight: bold; }
 
         /* --- SCRIPT PANE THEME TOGGLE --- */
-        /* Linen theme, hide-pane view only — matches the dashboard's exact
-           "Clean Linen" palette. Script pane's own light-mode (used when
-           the script pane is showing) is a separate, untouched mechanism. */
-        body.hide-script-pane.theme-light {
+        /* Linen theme — now the automatic look whenever the script pane is
+           showing (and Executive isn't active), not a separately-selected
+           button. Hiding the script pane switches back to Green/dark
+           automatically (the plain :root defaults, no override needed).
+           Executive is unaffected either way. */
+        body:not(.hide-script-pane):not(.theme-executive) {
             --color-bg-dark: #DCD7CC;
             --color-box-translucent: #F3EFE5;
             --color-sage-accent: #4C9170;
@@ -295,37 +297,37 @@
             --sp-text-dim: #8A8177;
             --sp-hairline: rgba(0,0,0,0.14);
         }
-        body.hide-script-pane.theme-light h2 { color: #262220; border-bottom-color: rgba(0,0,0,0.1); }
-        body.hide-script-pane.theme-light .metrics-val { color: #262220; }
-        body.hide-script-pane.theme-light .strong-label { color: #262220; }
-        body.hide-script-pane.theme-light .dept-metric-label,
-        body.hide-script-pane.theme-light label { color: rgba(38,34,32,0.7); }
-        body.hide-script-pane.theme-light #input-pane input,
-        body.hide-script-pane.theme-light #input-pane select,
-        body.hide-script-pane.theme-light #input-pane textarea,
-        body.hide-script-pane.theme-light #input-pane .select-display-box {
+        body:not(.hide-script-pane):not(.theme-executive) h2 { color: #262220; border-bottom-color: rgba(0,0,0,0.1); }
+        body:not(.hide-script-pane):not(.theme-executive) .metrics-val { color: #262220; }
+        body:not(.hide-script-pane):not(.theme-executive) .strong-label { color: #262220; }
+        body:not(.hide-script-pane):not(.theme-executive) .dept-metric-label,
+        body:not(.hide-script-pane):not(.theme-executive) label { color: rgba(38,34,32,0.7); }
+        body:not(.hide-script-pane):not(.theme-executive) #input-pane input,
+        body:not(.hide-script-pane):not(.theme-executive) #input-pane select,
+        body:not(.hide-script-pane):not(.theme-executive) #input-pane textarea,
+        body:not(.hide-script-pane):not(.theme-executive) #input-pane .select-display-box {
             background: #F3EFE5; border-color: rgba(0,0,0,0.15); color: #262220;
         }
-        body.hide-script-pane.theme-light #commission-input {
+        body:not(.hide-script-pane):not(.theme-executive) #commission-input {
             color: #262220 !important; background: rgba(0,0,0,0.05) !important; border-color: rgba(0,0,0,0.15) !important;
         }
-        body.hide-script-pane.theme-light #logged-in-rep-display { color: #262220 !important; }
-        body.hide-script-pane.theme-light .metrics-row { color: rgba(38,34,32,0.75); }
-        body.hide-script-pane.theme-light .leaderboard-row { background: rgba(0,0,0,0.04); color: #262220; }
-        body.hide-script-pane.theme-light .user-row { background: var(--gold-dim); }
-        body.hide-script-pane.theme-light .rep-rank-badge { background: rgba(0,0,0,0.08); color: rgba(38,34,32,0.75); }
-        body.hide-script-pane.theme-light .signature-status { color: #8A8177; }
-        body.hide-script-pane.theme-light .theme-toggle { background: rgba(0,0,0,0.08); }
-        body.hide-script-pane.theme-light .theme-toggle button { color: #8A8177; }
-        body.hide-script-pane.theme-light .theme-toggle button.active,
-        body.hide-script-pane.theme-light .btn-primary,
-        body.hide-script-pane.theme-light .btn-logout,
-        body.hide-script-pane.theme-light .btn-copy-action {
+        body:not(.hide-script-pane):not(.theme-executive) #logged-in-rep-display { color: #262220 !important; }
+        body:not(.hide-script-pane):not(.theme-executive) .metrics-row { color: rgba(38,34,32,0.75); }
+        body:not(.hide-script-pane):not(.theme-executive) .leaderboard-row { background: rgba(0,0,0,0.04); color: #262220; }
+        body:not(.hide-script-pane):not(.theme-executive) .user-row { background: var(--gold-dim); }
+        body:not(.hide-script-pane):not(.theme-executive) .rep-rank-badge { background: rgba(0,0,0,0.08); color: rgba(38,34,32,0.75); }
+        body:not(.hide-script-pane):not(.theme-executive) .signature-status { color: #8A8177; }
+        body:not(.hide-script-pane):not(.theme-executive) .theme-toggle { background: rgba(0,0,0,0.08); }
+        body:not(.hide-script-pane):not(.theme-executive) .theme-toggle button { color: #8A8177; }
+        body:not(.hide-script-pane):not(.theme-executive) .theme-toggle button.active,
+        body:not(.hide-script-pane):not(.theme-executive) .btn-primary,
+        body:not(.hide-script-pane):not(.theme-executive) .btn-logout,
+        body:not(.hide-script-pane):not(.theme-executive) .btn-copy-action {
             background: var(--gold-accent);
         }
-        body.hide-script-pane.theme-light .btn-primary:hover,
-        body.hide-script-pane.theme-light .btn-logout:hover,
-        body.hide-script-pane.theme-light .btn-copy-action:hover {
+        body:not(.hide-script-pane):not(.theme-executive) .btn-primary:hover,
+        body:not(.hide-script-pane):not(.theme-executive) .btn-logout:hover,
+        body:not(.hide-script-pane):not(.theme-executive) .btn-copy-action:hover {
             background: #6E4710;
         }
 
@@ -863,7 +865,6 @@
             </div>
             <div class="theme-toggle">
                 <button type="button" id="theme-btn-dark" onclick="setScriptPaneTheme('dark')">Green</button>
-                <button type="button" id="theme-btn-light" onclick="setScriptPaneTheme('light')">Linen</button>
                 <button type="button" id="theme-btn-executive" onclick="setScriptPaneTheme('executive')">Executive</button>
             </div>
             <button type="button" class="btn-copy-action" id="hide-script-toggle-btn" onclick="toggleScriptPaneVisibility()">Hide Script Pane</button>
@@ -987,11 +988,9 @@
 
         function setScriptPaneTheme(mode) {
             const pane = document.getElementById('script-pane');
-            pane.classList.toggle('light-mode', mode === 'light');
-            document.body.classList.toggle('theme-light', mode === 'light');
+            pane.classList.toggle('light-mode', mode === 'dark');
             document.body.classList.toggle('theme-executive', mode === 'executive');
             document.getElementById('theme-btn-dark').classList.toggle('active', mode === 'dark');
-            document.getElementById('theme-btn-light').classList.toggle('active', mode === 'light');
             document.getElementById('theme-btn-executive').classList.toggle('active', mode === 'executive');
             localStorage.setItem('jitneylogic_script_pane_theme', mode);
             if (window.syncThemePreference) window.syncThemePreference(mode);
