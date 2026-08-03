@@ -281,55 +281,12 @@
         .pest-fact-bullet::before { content: "→"; color: var(--color-sage-accent); font-weight: bold; }
 
         /* --- SCRIPT PANE THEME TOGGLE --- */
-        /* Linen theme — now the automatic look whenever the script pane is
-           showing (and Executive isn't active), not a separately-selected
-           button. Hiding the script pane switches back to Green/dark
-           automatically (the plain :root defaults, no override needed).
-           Executive is unaffected either way. */
-        body:not(.hide-script-pane):not(.theme-executive) {
-            --color-bg-dark: #DCD7CC;
-            --color-box-translucent: #F3EFE5;
-            --color-sage-accent: #4C9170;
-            --color-mint-soft: #5C6B5F;
-            --gold-accent: #8A5A12;
-            --gold-dim: rgba(138,90,18,0.1);
-            --focus-glow: rgba(76,145,112,0.15);
-            --sp-text-dim: #8A8177;
-            --sp-hairline: rgba(0,0,0,0.14);
-        }
-        body:not(.hide-script-pane):not(.theme-executive) h2 { color: #262220; border-bottom-color: rgba(0,0,0,0.1); }
-        body:not(.hide-script-pane):not(.theme-executive) .metrics-val { color: #262220; }
-        body:not(.hide-script-pane):not(.theme-executive) .strong-label { color: #262220; }
-        body:not(.hide-script-pane):not(.theme-executive) .dept-metric-label,
-        body:not(.hide-script-pane):not(.theme-executive) label { color: rgba(38,34,32,0.7); }
-        body:not(.hide-script-pane):not(.theme-executive) #input-pane input,
-        body:not(.hide-script-pane):not(.theme-executive) #input-pane select,
-        body:not(.hide-script-pane):not(.theme-executive) #input-pane textarea,
-        body:not(.hide-script-pane):not(.theme-executive) #input-pane .select-display-box {
-            background: #F3EFE5; border-color: rgba(0,0,0,0.15); color: #262220;
-        }
-        body:not(.hide-script-pane):not(.theme-executive) #commission-input {
-            color: #262220 !important; background: rgba(0,0,0,0.05) !important; border-color: rgba(0,0,0,0.15) !important;
-        }
-        body:not(.hide-script-pane):not(.theme-executive) #logged-in-rep-display { color: #262220 !important; }
-        body:not(.hide-script-pane):not(.theme-executive) .metrics-row { color: rgba(38,34,32,0.75); }
-        body:not(.hide-script-pane):not(.theme-executive) .leaderboard-row { background: rgba(0,0,0,0.04); color: #262220; }
-        body:not(.hide-script-pane):not(.theme-executive) .user-row { background: var(--gold-dim); }
-        body:not(.hide-script-pane):not(.theme-executive) .rep-rank-badge { background: rgba(0,0,0,0.08); color: rgba(38,34,32,0.75); }
-        body:not(.hide-script-pane):not(.theme-executive) .signature-status { color: #8A8177; }
-        body:not(.hide-script-pane):not(.theme-executive) .theme-toggle { background: rgba(0,0,0,0.08); }
-        body:not(.hide-script-pane):not(.theme-executive) .theme-toggle button { color: #8A8177; }
-        body:not(.hide-script-pane):not(.theme-executive) .theme-toggle button.active,
-        body:not(.hide-script-pane):not(.theme-executive) .btn-primary,
-        body:not(.hide-script-pane):not(.theme-executive) .btn-logout,
-        body:not(.hide-script-pane):not(.theme-executive) .btn-copy-action {
-            background: var(--gold-accent);
-        }
-        body:not(.hide-script-pane):not(.theme-executive) .btn-primary:hover,
-        body:not(.hide-script-pane):not(.theme-executive) .btn-logout:hover,
-        body:not(.hide-script-pane):not(.theme-executive) .btn-copy-action:hover {
-            background: #6E4710;
-        }
+        /* Green mode: script pane's own look toggles to light/Linen
+           (unconditionally, via #script-pane.light-mode below), but the
+           input pane is intentionally untouched here — it stays the plain
+           dark-green :root default whether the script pane is showing or
+           hidden. That default was already correct in both states; no
+           override was ever needed for input-pane's own colors. */
 
         .strong-label { color: #ffffff; }
         .theme-toggle-wrapper { margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--sp-hairline); display: flex; justify-content: space-between; align-items: center; gap: 16px; }
